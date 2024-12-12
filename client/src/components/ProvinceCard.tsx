@@ -52,7 +52,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
   };
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full max-w-lg hover:shadow-lg transition-shadow border-t-4 border-t-primary/20">
       <CardHeader>
         <CardTitle>{provincia.nombre}</CardTitle>
         <CardDescription>

@@ -47,8 +47,8 @@ export function HomeView() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="space-y-8">
+    <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-background to-secondary/5">
+      <div className="space-y-10">
         {/* Header y Resumen */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
