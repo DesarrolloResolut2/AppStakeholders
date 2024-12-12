@@ -18,7 +18,7 @@ export function HomeView() {
   });
 
   const createProvinciaMutation = useMutation({
-    mutationFn: createProvincia,
+    mutationFn: (nombre: string) => createProvincia(nombre),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/provincias"] });
       setNewProvincia("");
@@ -27,7 +27,8 @@ export function HomeView() {
         description: "La provincia se ha creado exitosamente.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Error al crear provincia:", error);
       toast({
         title: "Error",
         description: "No se pudo crear la provincia.",
@@ -36,10 +37,15 @@ export function HomeView() {
     },
   });
 
-  const handleCreateProvincia = (e: React.FormEvent) => {
+  const handleCreateProvincia = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newProvincia.trim()) {
-      createProvinciaMutation.mutate(newProvincia);
+    const trimmedProvincia = newProvincia.trim();
+    if (trimmedProvincia) {
+      try {
+        await createProvinciaMutation.mutateAsync(trimmedProvincia);
+      } catch (error) {
+        console.error("Error en handleCreateProvincia:", error);
+      }
     }
   };
 
