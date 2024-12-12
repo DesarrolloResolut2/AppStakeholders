@@ -44,6 +44,18 @@ export const exportProvinciaData = async (provinciaId: number) => {
   a.click();
   window.URL.revokeObjectURL(url);
 };
+export const exportStakeholderContactData = async (stakeholder: Stakeholder) => {
+  if (!stakeholder.datos_contacto) return;
+  
+  const blob = new Blob([JSON.stringify(stakeholder.datos_contacto, null, 2)], { type: "application/json" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `contacto_${stakeholder.nombre.replace(/\s+/g, '_').toLowerCase()}.json`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
+
 
 export const deleteProvincia = async (id: number) => {
   await api.delete(`/provincias/${id}`);

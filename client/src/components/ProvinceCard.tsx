@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { StakeholderForm } from "./StakeholderForm";
 import type { Provincia, Stakeholder } from "@/lib/types";
-import { createStakeholder, updateStakeholder, deleteStakeholder, exportProvinciaData, deleteProvincia } from "@/lib/api";
+import { createStakeholder, updateStakeholder, deleteStakeholder, exportProvinciaData, deleteProvincia, exportStakeholderContactData } from "@/lib/api";
 
 interface Props {
   provincia: Provincia;
@@ -177,16 +177,27 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       </a>
                     )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedStakeholder(stakeholder);
-                      setViewDialogOpen(true);
-                    }}
-                  >
-                    Ver Detalles
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedStakeholder(stakeholder);
+                        setViewDialogOpen(true);
+                      }}
+                    >
+                      Ver Detalles
+                    </Button>
+                    {stakeholder.datos_contacto && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportStakeholderContactData(stakeholder)}
+                      >
+                        Exportar Contacto
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </Card>
