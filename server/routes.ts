@@ -22,10 +22,26 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/provincias", async (req, res) => {
     try {
       const { nombre } = req.body;
-      const result = await db.insert(provincias).values({ nombre }).returning();
-      res.json(result[0]);
+      console.log("Datos recibidos:", { nombre });
+      
+      if (!nombre || typeof nombre !== 'string' || nombre.trim() === '') {
+        return res.status(400).json({ error: "El nombre de la provincia es requerido y debe ser un texto válido" });
+      }
+
+      const nombreTrimmed = nombre.trim();
+      
+      const result = await db.insert(provincias)
+        .values({ nombre: nombreTrimmed })
+        .returning();
+      
+      console.log("Provincia creada:", result[0]);
+      res.status(201).json(result[0]);
     } catch (error) {
-      res.status(500).json({ error: "Error al crear provincia" });
+      console.error("Error detallado:", error);
+      res.status(500).json({ 
+        error: "Error al crear provincia",
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 

@@ -50,8 +50,8 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   };
 
   const handleExport = () => {
-    if (provincia) {
-      exportProvinciaData(provinciaId, provincia.nombre);
+    if (provincia && provincia.nombre) {
+      exportProvinciaData(provincia.id, provincia.nombre);
     }
   };
 
