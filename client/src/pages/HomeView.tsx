@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ProvinceCard } from "@/components/ProvinceCard";
-import { fetchProvincias, createProvincia } from "@/lib/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { fetchProvincias, createProvincia, deleteProvincia } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 export function HomeView() {
   const [newProvincia, setNewProvincia] = useState("");
@@ -107,13 +108,37 @@ export function HomeView() {
           <h2 className="text-2xl font-semibold mb-6">Provincias Registradas</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {provincias.map((provincia) => (
-              <ProvinceCard
-                key={provincia.id}
-                provincia={provincia}
-                onUpdate={() =>
-                  queryClient.invalidateQueries({ queryKey: ["/provincias"] })
-                }
-              />
+              <Link key={provincia.id} href={`/provincia/${provincia.id}`}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-t-4 border-t-primary/20">
+                  <CardHeader className="relative">
+                    <div className="absolute right-4 top-4">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (confirm('¿Estás seguro de que deseas eliminar esta provincia? Se eliminarán también todos los stakeholders asociados.')) {
+                            deleteProvincia(provincia.id).then(() => {
+                              queryClient.invalidateQueries({ queryKey: ["/provincias"] });
+                            });
+                          }
+                        }}
+                      >
+                        Eliminar Provincia
+                      </Button>
+                    </div>
+                    <CardTitle>{provincia.nombre}</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {provincia.stakeholders?.length || 0} stakeholders registrados
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                      Haz clic para ver detalles y gestionar stakeholders
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
