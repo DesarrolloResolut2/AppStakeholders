@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { StakeholderForm } from "./StakeholderForm";
 import type { Provincia, Stakeholder } from "@/lib/types";
-import { createStakeholder, updateStakeholder, deleteStakeholder, exportProvinciaData } from "@/lib/api";
+import { createStakeholder, updateStakeholder, deleteStakeholder, exportProvinciaData, deleteProvincia } from "@/lib/api";
 
 interface Props {
   provincia: Provincia;
@@ -27,6 +27,7 @@ interface Props {
 export function ProvinceCard({ provincia, onUpdate }: Props) {
   const [selectedStakeholder, setSelectedStakeholder] = useState<Stakeholder | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
   const handleCreateStakeholder = async (data: Omit<Stakeholder, "id">) => {
     await createStakeholder(data);
@@ -54,7 +55,21 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
   return (
     <Card className="w-full max-w-lg hover:shadow-lg transition-shadow border-t-4 border-t-primary/20">
-      <CardHeader>
+      <CardHeader className="relative">
+        <div className="absolute right-4 top-4">
+          <Button 
+            variant="destructive" 
+            size="sm"
+            onClick={async () => {
+              if (confirm('¿Estás seguro de que deseas eliminar esta provincia? Se eliminarán también todos los stakeholders asociados.')) {
+                await deleteProvincia(provincia.id);
+                onUpdate();
+              }
+            }}
+          >
+            Eliminar Provincia
+          </Button>
+        </div>
         <CardTitle>{provincia.nombre}</CardTitle>
         <CardDescription>
           {provincia.stakeholders?.length || 0} stakeholders registrados
@@ -141,37 +156,195 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                   </div>
                 </div>
 
-                {stakeholder.objetivos_generales && (
-                  <div className="text-sm">
-                    <p className="font-medium">Objetivos Generales:</p>
-                    <p className="text-muted-foreground">{stakeholder.objetivos_generales}</p>
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-wrap gap-2">
+                    {stakeholder.datos_contacto?.linkedin && (
+                      <a
+                        href={stakeholder.datos_contacto.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        LinkedIn
+                      </a>
+                    )}
+                    {stakeholder.datos_contacto?.email && (
+                      <a
+                        href={`mailto:${stakeholder.datos_contacto.email}`}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Email
+                      </a>
+                    )}
                   </div>
-                )}
-
-                <div className="flex flex-wrap gap-2">
-                  {stakeholder.datos_contacto?.linkedin && (
-                    <a
-                      href={stakeholder.datos_contacto.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
-                  {stakeholder.datos_contacto?.email && (
-                    <a
-                      href={`mailto:${stakeholder.datos_contacto.email}`}
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Email
-                    </a>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedStakeholder(stakeholder);
+                      setViewDialogOpen(true);
+                    }}
+                  >
+                    Ver Detalles
+                  </Button>
                 </div>
               </div>
             </Card>
           ))}
         </div>
+
+        {/* Diálogo para ver detalles completos del stakeholder */}
+        <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl">
+                {selectedStakeholder?.nombre}
+              </DialogTitle>
+              <DialogDescription>
+                Detalles completos del stakeholder
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6 py-4">
+              {/* Datos de Contacto */}
+              <div className="bg-secondary/20 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">Datos de Contacto</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {selectedStakeholder?.datos_contacto?.organizacion && (
+                    <div>
+                      <p className="font-medium">Organización</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.organizacion}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.datos_contacto?.persona_contacto && (
+                    <div>
+                      <p className="font-medium">Persona de Contacto</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.persona_contacto}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.datos_contacto?.email && (
+                    <div>
+                      <p className="font-medium">Email</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.email}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.datos_contacto?.website && (
+                    <div>
+                      <p className="font-medium">Website</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.website}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.datos_contacto?.telefono && (
+                    <div>
+                      <p className="font-medium">Teléfono</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.telefono}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Información Principal */}
+              <div className="bg-secondary/20 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">Información Principal</h3>
+                <div className="space-y-4">
+                  <div>
+                    <p className="font-medium">Nivel de Influencia</p>
+                    <p className="text-muted-foreground">{selectedStakeholder?.nivel_influencia}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Nivel de Interés</p>
+                    <p className="text-muted-foreground">{selectedStakeholder?.nivel_interes}</p>
+                  </div>
+                  {selectedStakeholder?.objetivos_generales && (
+                    <div>
+                      <p className="font-medium">Objetivos Generales</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.objetivos_generales}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.intereses_expectativas && (
+                    <div>
+                      <p className="font-medium">Intereses y Expectativas</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.intereses_expectativas}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Información Adicional */}
+              <div className="bg-secondary/20 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">Información Adicional</h3>
+                <div className="space-y-4">
+                  {selectedStakeholder?.recursos && (
+                    <div>
+                      <p className="font-medium">Recursos</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.recursos}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.expectativas_comunicacion && (
+                    <div>
+                      <p className="font-medium">Expectativas de Comunicación</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.expectativas_comunicacion}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.relaciones && (
+                    <div>
+                      <p className="font-medium">Relaciones con Otros Actores</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.relaciones}</p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.riesgos_conflictos && (
+                    <div>
+                      <p className="font-medium">Riesgos y Conflictos Potenciales</p>
+                      <p className="text-muted-foreground">{selectedStakeholder.riesgos_conflictos}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Datos de LinkedIn */}
+              {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
+                selectedStakeholder?.datos_especificos_linkedin?.headline ||
+                selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
+                selectedStakeholder?.datos_especificos_linkedin?.formacion ||
+                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
+                <div className="bg-secondary/20 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-4">Datos de LinkedIn</h3>
+                  <div className="space-y-4">
+                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
+                      <div>
+                        <p className="font-medium">About Me</p>
+                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.about_me}</p>
+                      </div>
+                    )}
+                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
+                      <div>
+                        <p className="font-medium">Headline</p>
+                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.headline}</p>
+                      </div>
+                    )}
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia && (
+                      <div>
+                        <p className="font-medium">Experiencia</p>
+                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.experiencia}</p>
+                      </div>
+                    )}
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && (
+                      <div>
+                        <p className="font-medium">Formación</p>
+                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.formacion}</p>
+                      </div>
+                    )}
+                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
+                      <div>
+                        <p className="font-medium">Otros Campos</p>
+                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.otros_campos}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

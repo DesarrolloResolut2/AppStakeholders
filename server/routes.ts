@@ -82,6 +82,24 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Delete provincia
+  app.delete("/api/provincias/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      // Primero eliminamos todos los stakeholders asociados
+      await db.delete(stakeholders).where(eq(stakeholders.provincia_id, id));
+      // Luego eliminamos la provincia
+      await db.delete(provincias).where(eq(provincias.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error al eliminar provincia:", error);
+      res.status(500).json({ 
+        error: "Error al eliminar provincia",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Export routes
   app.get("/api/provincias/:id/export", async (req, res) => {
     try {

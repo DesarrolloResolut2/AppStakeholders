@@ -44,3 +44,7 @@ export const exportProvinciaData = async (provinciaId: number) => {
   a.click();
   window.URL.revokeObjectURL(url);
 };
+
+export const deleteProvincia = async (id: number) => {
+  await api.delete(`/provincias/${id}`);
+};
