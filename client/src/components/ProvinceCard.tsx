@@ -87,33 +87,93 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
         <div className="space-y-2">
           {provincia.stakeholders?.map((stakeholder) => (
-            <Card key={stakeholder.id} className="p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{stakeholder.nombre}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Influencia: {stakeholder.nivel_influencia} | Interés:{" "}
-                    {stakeholder.nivel_interes}
-                  </p>
+            <Card key={stakeholder.id} className="p-4 hover:shadow-lg transition-shadow">
+              <div className="space-y-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold">{stakeholder.nombre}</h3>
+                    {stakeholder.datos_especificos_linkedin?.cargo && (
+                      <p className="text-sm text-muted-foreground">
+                        {stakeholder.datos_especificos_linkedin.cargo} en{" "}
+                        {stakeholder.datos_especificos_linkedin.empresa || "No especificado"}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedStakeholder(stakeholder);
+                        setDialogOpen(true);
+                      }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
                 </div>
-                <div className="space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedStakeholder(stakeholder);
-                      setDialogOpen(true);
-                    }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}
-                  >
-                    Eliminar
-                  </Button>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-secondary p-2 rounded-md">
+                    <p className="text-sm font-medium">Nivel de Influencia</p>
+                    <div className="flex items-center">
+                      <div className="flex-grow bg-background rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full"
+                          style={{ width: `${(stakeholder.nivel_influencia / 10) * 100}%` }}
+                        />
+                      </div>
+                      <span className="ml-2 text-sm">{stakeholder.nivel_influencia}/10</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-secondary p-2 rounded-md">
+                    <p className="text-sm font-medium">Nivel de Interés</p>
+                    <div className="flex items-center">
+                      <div className="flex-grow bg-background rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full"
+                          style={{ width: `${(stakeholder.nivel_interes / 10) * 100}%` }}
+                        />
+                      </div>
+                      <span className="ml-2 text-sm">{stakeholder.nivel_interes}/10</span>
+                    </div>
+                  </div>
+                </div>
+
+                {stakeholder.objetivos_generales && (
+                  <div className="text-sm">
+                    <p className="font-medium">Objetivos Generales:</p>
+                    <p className="text-muted-foreground">{stakeholder.objetivos_generales}</p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {stakeholder.datos_contacto?.linkedin && (
+                    <a
+                      href={stakeholder.datos_contacto.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      LinkedIn
+                    </a>
+                  )}
+                  {stakeholder.datos_contacto?.email && (
+                    <a
+                      href={`mailto:${stakeholder.datos_contacto.email}`}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Email
+                    </a>
+                  )}
                 </div>
               </div>
             </Card>
