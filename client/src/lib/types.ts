@@ -14,8 +14,8 @@ export interface Stakeholder {
   };
   objetivos_generales?: string;
   intereses_expectativas?: string;
-  nivel_influencia: number;
-  nivel_interes: number;
+  nivel_influencia: string;
+  nivel_interes: string;
   recursos?: string;
   expectativas_comunicacion?: string;
   relaciones?: string;

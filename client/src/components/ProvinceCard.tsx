@@ -131,28 +131,12 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-secondary p-2 rounded-md">
                     <p className="text-sm font-medium">Nivel de Influencia</p>
-                    <div className="flex items-center">
-                      <div className="flex-grow bg-background rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full"
-                          style={{ width: `${(stakeholder.nivel_influencia / 10) * 100}%` }}
-                        />
-                      </div>
-                      <span className="ml-2 text-sm">{stakeholder.nivel_influencia}/10</span>
-                    </div>
+                    <p className="text-sm mt-1 text-muted-foreground">{stakeholder.nivel_influencia}</p>
                   </div>
                   
                   <div className="bg-secondary p-2 rounded-md">
                     <p className="text-sm font-medium">Nivel de Interés</p>
-                    <div className="flex items-center">
-                      <div className="flex-grow bg-background rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full"
-                          style={{ width: `${(stakeholder.nivel_interes / 10) * 100}%` }}
-                        />
-                      </div>
-                      <span className="ml-2 text-sm">{stakeholder.nivel_interes}/10</span>
-                    </div>
+                    <p className="text-sm mt-1 text-muted-foreground">{stakeholder.nivel_interes}</p>
                   </div>
                 </div>
 

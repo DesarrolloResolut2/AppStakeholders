@@ -23,8 +23,8 @@ const stakeholderSchema = z.object({
   }).optional(),
   objetivos_generales: z.string().optional(),
   intereses_expectativas: z.string().optional(),
-  nivel_influencia: z.number().min(0).max(10),
-  nivel_interes: z.number().min(0).max(10),
+  nivel_influencia: z.string().min(1, "El nivel de influencia es requerido"),
+  nivel_interes: z.string().min(1, "El nivel de interés es requerido"),
   recursos: z.string().optional(),
   expectativas_comunicacion: z.string().optional(),
   relaciones: z.string().optional(),
@@ -183,14 +183,11 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
               name="nivel_influencia"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nivel de Influencia (0-10)</FormLabel>
+                  <FormLabel>Nivel de Influencia</FormLabel>
                   <FormControl>
-                    <Slider
-                      min={0}
-                      max={10}
-                      step={1}
-                      value={[field.value]}
-                      onValueChange={([value]) => field.onChange(value)}
+                    <Textarea 
+                      {...field} 
+                      placeholder="Describir el nivel de influencia del stakeholder..."
                     />
                   </FormControl>
                   <FormMessage />
@@ -203,14 +200,11 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
               name="nivel_interes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nivel de Interés (0-10)</FormLabel>
+                  <FormLabel>Nivel de Interés</FormLabel>
                   <FormControl>
-                    <Slider
-                      min={0}
-                      max={10}
-                      step={1}
-                      value={[field.value]}
-                      onValueChange={([value]) => field.onChange(value)}
+                    <Textarea 
+                      {...field} 
+                      placeholder="Describir el nivel de interés del stakeholder..."
                     />
                   </FormControl>
                   <FormMessage />
