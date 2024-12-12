@@ -1,0 +1,88 @@
+Guía para Crear la Aplicación
+1. Planificación
+Definición del alcance:
+
+Cada provincia tendrá su propia tarjeta con un formulario.
+El formulario tendrá los campos definidos en tu descripción.
+Los datos se almacenarán en PostgreSQL.
+La información será exportable a JSON.
+Herramientas y tecnologías:
+
+Frontend: React (con CSS o frameworks como Material-UI para estilizar).
+Backend: Node.js con Express.
+Base de datos: PostgreSQL.
+Gestión de estado: Redux (si es necesario gestionar estados complejos).
+Estructura general de la aplicación:
+
+Frontend: Componentes React para tarjetas, formularios y vistas.
+Backend: API REST para manejar solicitudes (crear, leer, actualizar, eliminar - CRUD).
+Base de datos: Tablas para provincias y stakeholders.
+2. Diseño de la Base de Datos
+Define una base de datos relacional con las siguientes tablas:
+
+Tabla: Provincias
+Campo	Tipo	Descripción
+id	SERIAL	Identificador único
+nombre	VARCHAR	Nombre de la provincia
+Tabla: Stakeholders
+Campo	Tipo	Descripción
+id	SERIAL	Identificador único
+provincia_id	INTEGER	Relación con la tabla Provincias
+nombre	VARCHAR	Nombre del stakeholder
+datos_contacto	JSONB	Datos de contacto (LinkedIn, mail, etc.)
+objetivos_generales	TEXT	Objetivos generales
+intereses_expectativas	TEXT	Intereses y expectativas
+nivel_influencia	INTEGER	Nivel de influencia
+nivel_interes	INTEGER	Nivel de interés
+recursos	TEXT	Recursos disponibles
+expectativas_comunicacion	TEXT	Expectativas de comunicación
+relaciones	TEXT	Relaciones con otros actores
+riesgos_conflictos	TEXT	Riesgos y conflictos potenciales
+datos_especificos_linkedin	JSONB	Datos específicos recogidos de LinkedIn
+3. Backend
+Instalación y configuración
+Crea un servidor con Node.js y Express.
+Instala el cliente de PostgreSQL (pg).
+Define las rutas para las operaciones CRUD:
+Provincias:
+GET: Obtener todas las provincias.
+POST: Crear una nueva provincia.
+DELETE: Eliminar una provincia.
+Stakeholders:
+GET: Obtener stakeholders de una provincia.
+POST: Crear un stakeholder.
+PUT: Actualizar un stakeholder.
+DELETE: Eliminar un stakeholder.
+Exportación a JSON
+Crea rutas adicionales para exportar:
+
+JSON por provincia: Descarga todos los datos relacionados con una provincia.
+JSON por stakeholder: Descarga los datos de un stakeholder específico.
+4. Frontend
+Estructura de Componentes
+App.js: Componente raíz.
+Vista de Provincias:
+Lista de tarjetas con provincias.
+Botón para agregar nuevas provincias.
+Tarjeta de Provincia:
+Formulario para agregar y gestionar stakeholders.
+Botón para exportar datos en JSON.
+Formulario de Stakeholder:
+Inputs dinámicos para cada campo.
+Validación de campos (por ejemplo, email, LinkedIn URL).
+Librerías recomendadas
+Axios: Para realizar peticiones al backend.
+Formik o React Hook Form: Para gestionar formularios.
+Material-UI o Chakra UI: Para un diseño atractivo y accesible.
+Estilización
+Diseña tarjetas usando CSS grid o flexbox.
+Asegúrate de que las tarjetas sean responsivas.
+Utiliza colores y tipografía claros para mejorar la legibilidad.
+5. Conexión del Frontend y Backend
+Crea servicios en el frontend para interactuar con la API.
+Ejemplo: getProvincias, createStakeholder, exportToJSON.
+Configura estados locales o globales (como Redux) para manejar datos en el frontend.
+6. Exportación de Datos
+En el backend, implementa la serialización de los datos en formato JSON.
+En el frontend, agrega botones que llamen a las rutas de exportación.
+Descarga los archivos JSON usando la API de JavaScript FileSaver
