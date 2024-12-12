@@ -67,17 +67,19 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 Agregar Stakeholder
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {selectedStakeholder ? "Editar" : "Nuevo"} Stakeholder
                 </DialogTitle>
               </DialogHeader>
-              <StakeholderForm
-                provinciaId={provincia.id}
-                stakeholder={selectedStakeholder}
-                onSubmit={selectedStakeholder ? handleUpdateStakeholder : handleCreateStakeholder}
-              />
+              <div className="py-4">
+                <StakeholderForm
+                  provinciaId={provincia.id}
+                  stakeholder={selectedStakeholder}
+                  onSubmit={selectedStakeholder ? handleUpdateStakeholder : handleCreateStakeholder}
+                />
+              </div>
             </DialogContent>
           </Dialog>
           <Button variant="outline" onClick={handleExport}>
