@@ -96,12 +96,9 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                       {stakeholder.nombre}
                     </h3>
-                    {stakeholder.datos_especificos_linkedin?.cargo && (
+                    {stakeholder.datos_especificos_linkedin?.headline && (
                       <p className="text-sm text-muted-foreground">
-                        {stakeholder.datos_especificos_linkedin.cargo} en{" "}
-                        <span className="font-medium">
-                          {stakeholder.datos_especificos_linkedin.empresa || "No especificado"}
-                        </span>
+                        {stakeholder.datos_especificos_linkedin.headline}
                       </p>
                     )}
                   </div>
