@@ -40,7 +40,8 @@ export const exportProvinciaData = async (provinciaId: number, nombreProvincia: 
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${nombreProvincia.toLowerCase().replace(/\s+/g, '_')}.json`;
+  const fileName = nombreProvincia ? `provincia_${nombreProvincia.toLowerCase().replace(/\s+/g, '_')}.json` : `provincia_${provinciaId}.json`;
+  a.download = fileName;
   a.click();
   window.URL.revokeObjectURL(url);
 };
