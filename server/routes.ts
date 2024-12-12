@@ -45,10 +45,15 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/stakeholders", async (req, res) => {
     try {
       const stakeholder = req.body;
+      console.log("Datos recibidos:", stakeholder);
       const result = await db.insert(stakeholders).values(stakeholder).returning();
       res.json(result[0]);
     } catch (error) {
-      res.status(500).json({ error: "Error al crear stakeholder" });
+      console.error("Error detallado:", error);
+      res.status(500).json({ 
+        error: "Error al crear stakeholder",
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
