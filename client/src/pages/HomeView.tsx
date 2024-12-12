@@ -39,13 +39,31 @@ export function HomeView() {
 
   const handleCreateProvincia = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     const trimmedProvincia = newProvincia.trim();
-    if (trimmedProvincia) {
-      try {
-        await createProvinciaMutation.mutateAsync(trimmedProvincia);
-      } catch (error) {
-        console.error("Error en handleCreateProvincia:", error);
-      }
+    if (!trimmedProvincia) {
+      toast({
+        title: "Error",
+        description: "El nombre de la provincia no puede estar vacío",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await createProvinciaMutation.mutateAsync(trimmedProvincia);
+      toast({
+        title: "Éxito",
+        description: "Provincia creada correctamente",
+      });
+    } catch (error) {
+      console.error("Error en handleCreateProvincia:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo crear la provincia. Por favor, intente nuevamente.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -98,14 +116,24 @@ export function HomeView() {
         {/* Formulario de Nueva Provincia */}
         <div className="bg-card p-6 rounded-lg shadow-sm">
           <h2 className="text-lg font-semibold mb-4">Agregar Nueva Provincia</h2>
-          <form onSubmit={handleCreateProvincia} className="flex gap-4">
+          <form 
+            onSubmit={handleCreateProvincia} 
+            className="flex gap-4"
+          >
             <Input
               value={newProvincia}
               onChange={(e) => setNewProvincia(e.target.value)}
               placeholder="Nombre de la nueva provincia"
               className="max-w-sm"
+              required
+              type="text"
             />
-            <Button type="submit">Agregar Provincia</Button>
+            <Button 
+              type="submit"
+              disabled={createProvinciaMutation.isPending}
+            >
+              {createProvinciaMutation.isPending ? "Creando..." : "Agregar Provincia"}
+            </Button>
           </form>
         </div>
 
