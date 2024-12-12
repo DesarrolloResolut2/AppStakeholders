@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { StakeholderForm } from "./StakeholderForm";
 import type { Provincia, Stakeholder } from "@/lib/types";
@@ -72,6 +73,9 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 <DialogTitle>
                   {selectedStakeholder ? "Editar" : "Nuevo"} Stakeholder
                 </DialogTitle>
+                <DialogDescription>
+                  Complete los siguientes campos para {selectedStakeholder ? "actualizar" : "registrar"} un stakeholder
+                </DialogDescription>
               </DialogHeader>
               <div className="py-4">
                 <StakeholderForm
