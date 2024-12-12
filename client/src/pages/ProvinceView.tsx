@@ -50,7 +50,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   };
 
   const handleExport = () => {
-    exportProvinciaData(provinciaId);
+    exportProvinciaData(provinciaId, provincia.nombre);
   };
 
   if (isLoading) {

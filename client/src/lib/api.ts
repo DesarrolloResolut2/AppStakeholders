@@ -34,13 +34,13 @@ export const deleteStakeholder = async (id: number) => {
   await api.delete(`/stakeholders/${id}`);
 };
 
-export const exportProvinciaData = async (provinciaId: number) => {
+export const exportProvinciaData = async (provinciaId: number, nombreProvincia: string) => {
   const { data } = await api.get<Provincia>(`/provincias/${provinciaId}/export`);
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `provincia_${provinciaId}.json`;
+  a.download = `${nombreProvincia.toLowerCase().replace(/\s+/g, '_')}.json`;
   a.click();
   window.URL.revokeObjectURL(url);
 };
