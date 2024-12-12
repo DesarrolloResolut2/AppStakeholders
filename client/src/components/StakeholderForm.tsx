@@ -47,8 +47,8 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
     resolver: zodResolver(stakeholderSchema),
     defaultValues: stakeholder || {
       nombre: "",
-      nivel_influencia: 5,
-      nivel_interes: 5,
+      nivel_influencia: "",
+      nivel_interes: "",
     },
   });
 
