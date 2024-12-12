@@ -92,12 +92,16 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
             <Card key={stakeholder.id} className="p-4 hover:shadow-lg transition-shadow">
               <div className="space-y-4">
                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold">{stakeholder.nombre}</h3>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                      {stakeholder.nombre}
+                    </h3>
                     {stakeholder.datos_especificos_linkedin?.cargo && (
                       <p className="text-sm text-muted-foreground">
                         {stakeholder.datos_especificos_linkedin.cargo} en{" "}
-                        {stakeholder.datos_especificos_linkedin.empresa || "No especificado"}
+                        <span className="font-medium">
+                          {stakeholder.datos_especificos_linkedin.empresa || "No especificado"}
+                        </span>
                       </p>
                     )}
                   </div>
@@ -109,6 +113,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         setSelectedStakeholder(stakeholder);
                         setDialogOpen(true);
                       }}
+                      className="hover:bg-primary/10"
                     >
                       Editar
                     </Button>
@@ -116,6 +121,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       variant="destructive"
                       size="sm"
                       onClick={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}
+                      className="hover:bg-destructive/90"
                     >
                       Eliminar
                     </Button>

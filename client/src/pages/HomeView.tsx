@@ -61,22 +61,30 @@ export function HomeView() {
         </div>
 
         {/* Estadísticas Generales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-secondary/30 rounded-lg">
-          <div className="text-center p-4">
-            <p className="text-2xl font-bold text-primary">{provincias.length}</p>
-            <p className="text-sm text-muted-foreground">Provincias Registradas</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-primary">
+            <div className="text-center space-y-2">
+              <p className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                {provincias.length}
+              </p>
+              <p className="text-sm font-medium">Provincias Registradas</p>
+            </div>
           </div>
-          <div className="text-center p-4">
-            <p className="text-2xl font-bold text-primary">
-              {provincias.reduce((acc, p) => acc + (p.stakeholders?.length || 0), 0)}
-            </p>
-            <p className="text-sm text-muted-foreground">Total de Stakeholders</p>
+          <div className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-primary">
+            <div className="text-center space-y-2">
+              <p className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                {provincias.reduce((acc, p) => acc + (p.stakeholders?.length || 0), 0)}
+              </p>
+              <p className="text-sm font-medium">Total de Stakeholders</p>
+            </div>
           </div>
-          <div className="text-center p-4">
-            <p className="text-2xl font-bold text-primary">
-              {Math.max(...provincias.map(p => p.stakeholders?.length || 0))}
-            </p>
-            <p className="text-sm text-muted-foreground">Máx. Stakeholders por Provincia</p>
+          <div className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-primary">
+            <div className="text-center space-y-2">
+              <p className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                {Math.max(...provincias.map(p => p.stakeholders?.length || 0))}
+              </p>
+              <p className="text-sm font-medium">Máx. Stakeholders por Provincia</p>
+            </div>
           </div>
         </div>
 
