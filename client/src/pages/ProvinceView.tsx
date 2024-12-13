@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PersonalidadTab } from "@/components/PersonalidadTab";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -335,6 +336,9 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 <TabsTrigger value="linkedin">
                                   LinkedIn
                                 </TabsTrigger>
+                                <TabsTrigger value="personalidad">
+                                  Personalidad
+                                </TabsTrigger>
                               </TabsList>
                               <TabsContent value="general">
                                 <div className="space-y-4">
@@ -520,6 +524,12 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                     este stakeholder.
                                   </p>
                                 )}
+                              </TabsContent>
+                              <TabsContent value="personalidad">
+                                <PersonalidadTab
+                                  stakeholderId={stakeholder.id!}
+                                  personalidad={stakeholder.personalidad}
+                                />
                               </TabsContent>
                             </Tabs>
                           </CardContent>

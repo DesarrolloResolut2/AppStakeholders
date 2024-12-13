@@ -31,4 +31,5 @@ export interface Stakeholder {
     formacion?: string;
     otros_campos?: string;
   };
+  personalidad?: any;
 }
