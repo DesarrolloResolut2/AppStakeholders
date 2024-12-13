@@ -31,15 +31,37 @@ export function PersonalidadTab({ stakeholderId, stakeholder, personalidad }: Pe
     }
   };
 
+  const validateJsonStructure = (jsonData: any) => {
+    const requiredFields = {
+      orientacion_principal: 'string',
+      fortalezas_clave: 'object',
+      rasgos_de_personalidad: 'object',
+      motivaciones: 'object',
+      posibles_areas_de_mejora: 'object',
+      preferencias_comunicativas: 'object'
+    };
+
+    const errors = [];
+    
+    for (const [field, expectedType] of Object.entries(requiredFields)) {
+      if (!jsonData[field]) {
+        errors.push(`Falta el campo '${field}'`);
+      } else if (typeof jsonData[field] !== expectedType) {
+        errors.push(`El campo '${field}' debe ser de tipo ${expectedType}`);
+      } else if (expectedType === 'object' && Object.keys(jsonData[field]).length === 0) {
+        errors.push(`El campo '${field}' no puede estar vacío`);
+      }
+    }
+
+    return errors;
+  };
+
   const saveJsonToDatabase = async (jsonData: any) => {
     try {
-      // Validar la estructura del JSON antes de guardarlo
-      const requiredFields = ['orientacion_principal', 'fortalezas_clave', 'rasgos_de_personalidad', 
-                            'motivaciones', 'posibles_areas_de_mejora', 'preferencias_comunicativas'];
+      const validationErrors = validateJsonStructure(jsonData);
       
-      const missingFields = requiredFields.filter(field => !jsonData[field]);
-      if (missingFields.length > 0) {
-        throw new Error(`JSON inválido. Faltan los siguientes campos: ${missingFields.join(', ')}`);
+      if (validationErrors.length > 0) {
+        throw new Error(`JSON inválido:\n${validationErrors.join('\n')}`);
       }
 
       // Actualizar solo el campo de personalidad
@@ -72,13 +94,55 @@ export function PersonalidadTab({ stakeholderId, stakeholder, personalidad }: Pe
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Personalidad</h2>
-          <Button
-            variant="outline"
-            onClick={() => document.getElementById("jsonFileInput")?.click()}
-            className="w-fit"
-          >
-            Subir archivo JSON
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const exampleJson = {
+                  orientacion_principal: "Descripción de la orientación principal",
+                  fortalezas_clave: {
+                    "fortaleza1": "Descripción de la fortaleza 1",
+                    "fortaleza2": "Descripción de la fortaleza 2"
+                  },
+                  rasgos_de_personalidad: {
+                    "proactividad": "Alto",
+                    "empatía": "Medio",
+                    "organización": "Alto"
+                  },
+                  motivaciones: {
+                    "motivacion1": "Descripción de la motivación 1",
+                    "motivacion2": "Descripción de la motivación 2"
+                  },
+                  posibles_areas_de_mejora: {
+                    "area1": "Descripción del área de mejora 1",
+                    "area2": "Descripción del área de mejora 2"
+                  },
+                  preferencias_comunicativas: {
+                    "estilo1": "Descripción del estilo de comunicación 1",
+                    "estilo2": "Descripción del estilo de comunicación 2"
+                  }
+                };
+                const blob = new Blob([JSON.stringify(exampleJson, null, 2)], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ejemplo_personalidad.json';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+              }}
+            >
+              Descargar Ejemplo JSON
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => document.getElementById("jsonFileInput")?.click()}
+              className="w-fit"
+            >
+              Subir archivo JSON
+            </Button>
+          </div>
           <input
             id="jsonFileInput"
             type="file"
@@ -87,6 +151,10 @@ export function PersonalidadTab({ stakeholderId, stakeholder, personalidad }: Pe
             className="hidden"
           />
         </div>
+        <p className="text-sm text-muted-foreground">
+          El archivo JSON debe contener los siguientes campos: orientación principal, fortalezas clave, 
+          rasgos de personalidad, motivaciones, áreas de mejora y preferencias comunicativas.
+        </p>
       </div>
 
       {jsonContent && (
