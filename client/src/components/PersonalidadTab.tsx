@@ -70,20 +70,101 @@ export function PersonalidadTab({ stakeholderId, personalidad }: PersonalidadTab
       </div>
 
       {jsonContent && (
-        <div className="space-y-4">
-          {Object.entries(jsonContent).map(([key, value]) => (
-            <div key={key} className="bg-secondary/20 p-4 rounded-lg">
-              <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                {key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}
+        <div className="space-y-6">
+          {/* Orientación Principal */}
+          {jsonContent.orientacion_principal && (
+            <div className="bg-secondary/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
+                Orientación Principal
               </h4>
-              <p className="text-lg">
-                {typeof value === 'object' 
-                  ? JSON.stringify(value, null, 2)
-                  : String(value)
-                }
-              </p>
+              <p className="text-lg">{jsonContent.orientacion_principal}</p>
             </div>
-          ))}
+          )}
+
+          {/* Fortalezas Clave */}
+          {jsonContent.fortalezas_clave && (
+            <div className="bg-secondary/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
+                Fortalezas Clave
+              </h4>
+              <div className="space-y-2">
+                {Object.entries(jsonContent.fortalezas_clave).map(([atributo, descripcion]) => (
+                  <div key={atributo} className="border-l-2 border-primary/50 pl-3">
+                    <p className="font-medium">{atributo}</p>
+                    <p className="text-muted-foreground">{descripcion as string}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Rasgos de Personalidad */}
+          {jsonContent.rasgos_de_personalidad && (
+            <div className="bg-secondary/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
+                Rasgos de Personalidad
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                {Object.entries(jsonContent.rasgos_de_personalidad).map(([rasgo, valor]) => (
+                  <div key={rasgo} className="bg-background/50 p-2 rounded">
+                    <p className="font-medium">{rasgo}</p>
+                    <p className="text-muted-foreground">{valor as string}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Motivaciones */}
+          {jsonContent.motivaciones && (
+            <div className="bg-secondary/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
+                Motivaciones
+              </h4>
+              <div className="space-y-2">
+                {Object.entries(jsonContent.motivaciones).map(([motivo, descripcion]) => (
+                  <div key={motivo} className="border-l-2 border-primary/50 pl-3">
+                    <p className="font-medium">{motivo}</p>
+                    <p className="text-muted-foreground">{descripcion as string}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Posibles Áreas de Mejora */}
+          {jsonContent.posibles_areas_de_mejora && (
+            <div className="bg-secondary/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
+                Posibles Áreas de Mejora
+              </h4>
+              <div className="space-y-2">
+                {Object.entries(jsonContent.posibles_areas_de_mejora).map(([area, descripcion]) => (
+                  <div key={area} className="border-l-2 border-primary/50 pl-3">
+                    <p className="font-medium">{area}</p>
+                    <p className="text-muted-foreground">{descripcion as string}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Preferencias Comunicativas */}
+          {jsonContent.preferencias_comunicativas && (
+            <div className="bg-secondary/20 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm text-muted-foreground mb-2">
+                Preferencias Comunicativas
+              </h4>
+              <div className="space-y-2">
+                {Object.entries(jsonContent.preferencias_comunicativas).map(([preferencia, descripcion]) => (
+                  <div key={preferencia} className="border-l-2 border-primary/50 pl-3">
+                    <p className="font-medium">{preferencia}</p>
+                    <p className="text-muted-foreground">{descripcion as string}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
