@@ -1,0 +1,186 @@
+Guía para Implementar la Pestaña "Personalidad"
+1. Crear la pestaña "Personalidad"
+En el componente que representa la ventana de cada stakeholder, añade una pestaña adicional utilizando un sistema de pestañas (por ejemplo, Material-UI o un diseño propio).
+
+2. Subida de archivos JSON
+Implementa un componente que permita al usuario cargar un archivo JSON con <input type="file" />. Usa FileReader para procesar el archivo en el frontend.
+
+3. Guardado del JSON en la base de datos
+Una vez cargado el JSON, envíalo al backend mediante una API para guardarlo en una base de datos PostgreSQL en un campo JSONB.
+
+4. Visualización agradable del JSON
+En la pestaña "Personalidad", despliega los datos del JSON en un formato visual atractivo. Usa librerías como react-json-view o estiliza manualmente los datos con CSS.
+
+Código del Frontend (React)
+Componente: PersonalidadTab
+Este componente maneja la carga, guardado y visualización del JSON.
+
+javascript
+Copiar código
+import React, { useState } from 'react';
+import ReactJson from 'react-json-view'; // Para una visualización elegante de JSON
+import './PersonalidadTab.css'; // Archivo CSS para el diseño personalizado
+
+const PersonalidadTab = ({ stakeholderId }) => {
+  const [jsonContent, setJsonContent] = useState(null);
+
+  // Manejar la carga del archivo JSON
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsedJson = JSON.parse(e.target.result);
+          setJsonContent(parsedJson);
+          saveJsonToDatabase(parsedJson); // Guardar en la base de datos
+        } catch (error) {
+          alert('El archivo no es un JSON válido');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Guardar el JSON en la base de datos
+  const saveJsonToDatabase = async (jsonData) => {
+    try {
+      const response = await fetch(`/api/stakeholders/${stakeholderId}/personalidad`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ personalidad: jsonData }),
+      });
+      if (!response.ok) {
+        throw new Error('Error al guardar el JSON en la base de datos');
+      }
+      alert('Archivo JSON guardado correctamente');
+    } catch (error) {
+      console.error(error);
+      alert('Hubo un problema al guardar el archivo JSON');
+    }
+  };
+
+  return (
+    <div className="personalidad-tab">
+      <h2>Personalidad</h2>
+      <input
+        type="file"
+        accept="application/json"
+        onChange={handleFileUpload}
+        className="file-input"
+      />
+      {jsonContent && (
+        <div className="json-display">
+          <h3>Datos de Personalidad</h3>
+          <ReactJson
+            src={jsonContent}
+            theme="monokai"
+            collapsed={false}
+            enableClipboard={true}
+            displayDataTypes={false}
+            name={false}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PersonalidadTab;
+Estilo CSS: PersonalidadTab.css
+Aplica un diseño agradable para el componente.
+
+css
+Copiar código
+.personalidad-tab {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f7f9fc;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.personalidad-tab h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.file-input {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.json-display {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  max-height: 500px;
+}
+
+.json-display h3 {
+  margin-bottom: 10px;
+  color: #555;
+}
+Backend para Guardar el JSON
+Ruta en Express
+Añade una ruta para guardar la información del JSON en PostgreSQL.
+
+javascript
+Copiar código
+const express = require('express');
+const router = express.Router();
+const db = require('./db'); // Configuración de conexión a PostgreSQL
+
+// Guardar el JSON en la base de datos
+router.post('/stakeholders/:id/personalidad', async (req, res) => {
+  const stakeholderId = req.params.id;
+  const { personalidad } = req.body;
+
+  try {
+    await db.query(
+      'UPDATE stakeholders SET personalidad = $1 WHERE id = $2',
+      [personalidad, stakeholderId]
+    );
+    res.status(200).send('Personalidad guardada correctamente');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al guardar la personalidad');
+  }
+});
+
+module.exports = router;
+Base de Datos
+Añade una columna para guardar los datos de personalidad en formato JSONB.
+
+sql
+Copiar código
+ALTER TABLE stakeholders ADD COLUMN personalidad JSONB;
+Resultado Esperado
+Pestaña "Personalidad":
+
+Permite cargar un archivo JSON.
+Guarda los datos en la base de datos.
+Muestra los datos del JSON con un diseño visual atractivo.
+Diseño Moderno:
+
+Uso de colores suaves y bordes redondeados.
+Visualización clara con scroll para manejar grandes cantidades de datos.
+Manejo de Errores:
+
+Validación de archivos JSON.
+Alertas si hay problemas al guardar o cargar datos.
+Dependencias Necesarias
+Instala las siguientes dependencias:
+
+react-json-view: Para mostrar los datos del JSON.
+bash
+Copiar código
+npm install react-json-view
