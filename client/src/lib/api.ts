@@ -49,13 +49,16 @@ export const exportProvinciaData = async (provinciaId: number, nombreProvincia: 
   window.URL.revokeObjectURL(url);
 };
 export const exportStakeholderContactData = async (stakeholder: Stakeholder) => {
-  if (!stakeholder.datos_contacto) return;
+  const exportData = {
+    datos_contacto: stakeholder.datos_contacto || {},
+    datos_linkedin: stakeholder.datos_especificos_linkedin || {},
+  };
   
-  const blob = new Blob([JSON.stringify(stakeholder.datos_contacto, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `contacto_${stakeholder.nombre.replace(/\s+/g, '_').toLowerCase()}.json`;
+  a.download = `contacto_linkedin_${stakeholder.nombre.replace(/\s+/g, '_').toLowerCase()}.json`;
   a.click();
   window.URL.revokeObjectURL(url);
 };
