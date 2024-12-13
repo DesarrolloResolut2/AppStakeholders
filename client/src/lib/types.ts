@@ -10,7 +10,8 @@ export interface Stakeholder {
   nombre: string;
   datos_contacto?: {
     linkedin?: string;
-    organizacion?: string;
+    organizacion_principal?: string;
+    otras_organizaciones?: string;
     persona_contacto?: string;
     email?: string;
     website?: string;

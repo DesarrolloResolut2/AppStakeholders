@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { updateStakeholder } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import type { Stakeholder } from "@/lib/types";
 
 interface PersonalidadTabProps {
   stakeholderId: number;
