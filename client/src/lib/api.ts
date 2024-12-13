@@ -67,3 +67,10 @@ export const exportStakeholderContactData = async (stakeholder: Stakeholder) => 
 export const deleteProvincia = async (id: number) => {
   await api.delete(`/provincias/${id}`);
 };
+
+export const updateStakeholderPersonality = async (id: number, personalityData: any) => {
+  const { data } = await api.put<Stakeholder>(`/stakeholders/${id}`, {
+    datos_personalidad: personalityData
+  });
+  return data;
+};

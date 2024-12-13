@@ -525,6 +525,29 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 )}
                               </TabsContent>
                               <TabsContent value="personalidad">
+                                <div className="mb-4">
+                                  <Input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file && stakeholder.id) {
+                                        const reader = new FileReader();
+                                        reader.onload = async (event) => {
+                                          try {
+                                            const jsonData = JSON.parse(event.target?.result as string);
+                                            await updateStakeholderPersonality(stakeholder.id!, jsonData);
+                                            queryClient.invalidateQueries({ queryKey: ["/provincias"] });
+                                          } catch (error) {
+                                            console.error("Error al procesar el archivo:", error);
+                                          }
+                                        };
+                                        reader.readAsText(file);
+                                      }
+                                    }}
+                                    className="max-w-xs"
+                                  />
+                                </div>
                                 {stakeholder.datos_personalidad ? (
                                   <div className="space-y-4">
                                     <div>
