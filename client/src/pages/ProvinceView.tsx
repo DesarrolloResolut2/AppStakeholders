@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { PersonalidadTab } from "@/components/PersonalidadTab";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -225,7 +224,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
             </TableHeader>
             <TableBody>
               {filteredStakeholders?.map((stakeholder) => (
-                <React.Fragment key={stakeholder.id}>
+                <>
                   <TableRow
                     key={stakeholder.id}
                     className="hover:bg-muted/50 transition-colors"
@@ -335,9 +334,6 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 </TabsTrigger>
                                 <TabsTrigger value="linkedin">
                                   LinkedIn
-                                </TabsTrigger>
-                                <TabsTrigger value="personalidad">
-                                  Personalidad
                                 </TabsTrigger>
                               </TabsList>
                               <TabsContent value="general">
@@ -525,20 +521,13 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                   </p>
                                 )}
                               </TabsContent>
-                              <TabsContent value="personalidad">
-                                <PersonalidadTab
-                                  stakeholderId={stakeholder.id!}
-                                  stakeholder={stakeholder}
-                                  personalidad={stakeholder.personalidad}
-                                />
-                              </TabsContent>
                             </Tabs>
                           </CardContent>
                         </Card>
                       </TableCell>
                     </TableRow>
                   )}
-                </React.Fragment>
+                </>
               ))}
             </TableBody>
           </Table>

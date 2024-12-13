@@ -10,8 +10,7 @@ export interface Stakeholder {
   nombre: string;
   datos_contacto?: {
     linkedin?: string;
-    organizacion_principal?: string;
-    otras_organizaciones?: string;
+    organizacion?: string;
     persona_contacto?: string;
     email?: string;
     website?: string;
@@ -32,5 +31,4 @@ export interface Stakeholder {
     formacion?: string;
     otros_campos?: string;
   };
-  personalidad?: any;
 }
