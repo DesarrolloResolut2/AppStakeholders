@@ -65,6 +65,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterInfluence, setFilterInfluence] = useState("all");
+  const [loadedPersonalityData, setLoadedPersonalityData] = useState<any>(null);
   const queryClient = useQueryClient();
 
   const { data: provincias = [], isLoading } = useQuery({
@@ -525,28 +526,42 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 )}
                               </TabsContent>
                               <TabsContent value="personalidad">
-                                <div className="mb-4">
-                                  <Input
-                                    type="file"
-                                    accept=".json"
-                                    onChange={async (e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file && stakeholder.id) {
-                                        const reader = new FileReader();
-                                        reader.onload = async (event) => {
-                                          try {
-                                            const jsonData = JSON.parse(event.target?.result as string);
-                                            await updateStakeholderPersonality(stakeholder.id!, jsonData);
+                                <div className="mb-4 space-y-4">
+                                  <div className="flex items-center gap-4">
+                                    <Input
+                                      type="file"
+                                      accept=".json"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onload = (event) => {
+                                            try {
+                                              const jsonData = JSON.parse(event.target?.result as string);
+                                              setLoadedPersonalityData(jsonData);
+                                            } catch (error) {
+                                              console.error("Error al procesar el archivo:", error);
+                                            }
+                                          };
+                                          reader.readAsText(file);
+                                        }
+                                      }}
+                                      className="max-w-xs"
+                                    />
+                                    {loadedPersonalityData && (
+                                      <Button
+                                        onClick={async () => {
+                                          if (stakeholder.id && loadedPersonalityData) {
+                                            await updateStakeholderPersonality(stakeholder.id, loadedPersonalityData);
                                             queryClient.invalidateQueries({ queryKey: ["/provincias"] });
-                                          } catch (error) {
-                                            console.error("Error al procesar el archivo:", error);
+                                            setLoadedPersonalityData(null);
                                           }
-                                        };
-                                        reader.readAsText(file);
-                                      }
-                                    }}
-                                    className="max-w-xs"
-                                  />
+                                        }}
+                                      >
+                                        Guardar Datos
+                                      </Button>
+                                    )}
+                                  </div>
                                 </div>
                                 {stakeholder.datos_personalidad ? (
                                   <div className="space-y-4">
