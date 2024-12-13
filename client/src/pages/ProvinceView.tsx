@@ -18,7 +18,8 @@ import {
   deleteStakeholder,
   exportProvinciaData,
   fetchProvincias,
-  exportStakeholderContactData, // Added import
+  exportStakeholderContactData,
+  updateStakeholderPersonality,
 } from "@/lib/api";
 import {
   Table,
