@@ -335,6 +335,9 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 <TabsTrigger value="linkedin">
                                   LinkedIn
                                 </TabsTrigger>
+                                <TabsTrigger value="Personalidad">
+                                  Personalidad
+                                </TabsTrigger>
                               </TabsList>
                               <TabsContent value="general">
                                 <div className="space-y-4">
@@ -389,11 +392,11 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 <div className="space-y-4">
                                   <div>
                                     <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                                      Organización
+                                      Organización principal
                                     </h4>
                                     <p className="text-lg">
                                       {stakeholder.datos_contacto
-                                        ?.organizacion || "No especificada"}
+                                        ?.organizacion_principal || "No especificada"}
                                     </p>
                                   </div>
                                   <div>
@@ -521,6 +524,8 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                   </p>
                                 )}
                               </TabsContent>
+                              <TabsContent value="Personalidad">HOLA</TabsContent>
+                              
                             </Tabs>
                           </CardContent>
                         </Card>

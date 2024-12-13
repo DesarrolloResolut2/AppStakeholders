@@ -18,7 +18,7 @@ const stakeholderSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido"),
   datos_contacto: z.object({
     linkedin: z.string().url("URL de LinkedIn inválida").optional(),
-    organizacion: z.string().optional(),
+    organizacion_principal: z.string().optional(),
     persona_contacto: z.string().optional(),
     email: z.string().email("Email inválido").optional(),
     website: z.string().url("URL inválida").optional(),
@@ -106,10 +106,10 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
 
               <FormField
                 control={form.control}
-                name="datos_contacto.organizacion"
+                name="datos_contacto.organizacion_principal"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Organización</FormLabel>
+                    <FormLabel>Organización principal</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Nombre de la organización" />
                     </FormControl>
