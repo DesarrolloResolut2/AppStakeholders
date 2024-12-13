@@ -46,22 +46,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Stakeholders routes
-  app.get("/api/stakeholders/:id", async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    const result = await db.query.stakeholders.findFirst({
-      where: eq(stakeholders.id, id),
-    });
-    if (!result) {
-      return res.status(404).json({ error: "Stakeholder no encontrado" });
-    }
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: "Error al obtener stakeholder" });
-  }
-});
-
-app.get("/api/provincias/:id/stakeholders", async (req, res) => {
+  app.get("/api/provincias/:id/stakeholders", async (req, res) => {
     try {
       const provinciaId = parseInt(req.params.id);
       const result = await db.query.stakeholders.findMany({

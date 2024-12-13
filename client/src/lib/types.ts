@@ -31,12 +31,4 @@ export interface Stakeholder {
     formacion?: string;
     otros_campos?: string;
   };
-  datos_personalidad?: {
-    tipo_personalidad?: string;
-    estilo_comunicacion?: string;
-    motivaciones?: string;
-    fortalezas?: string;
-    areas_mejora?: string;
-    preferencias_trabajo?: string;
-  };
 }

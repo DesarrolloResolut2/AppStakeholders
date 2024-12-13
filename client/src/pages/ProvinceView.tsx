@@ -18,8 +18,7 @@ import {
   deleteStakeholder,
   exportProvinciaData,
   fetchProvincias,
-  exportStakeholderContactData,
-  updateStakeholderPersonality,
+  exportStakeholderContactData, // Added import
 } from "@/lib/api";
 import {
   Table,
@@ -66,7 +65,6 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterInfluence, setFilterInfluence] = useState("all");
-  const [loadedPersonalityData, setLoadedPersonalityData] = useState<any>(null);
   const queryClient = useQueryClient();
 
   const { data: provincias = [], isLoading } = useQuery({
@@ -324,7 +322,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                           </CardHeader>
                           <CardContent>
                             <Tabs defaultValue="general" className="w-full">
-                              <TabsList className="grid w-full grid-cols-5">
+                              <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="general">
                                   General
                                 </TabsTrigger>
@@ -336,9 +334,6 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 </TabsTrigger>
                                 <TabsTrigger value="linkedin">
                                   LinkedIn
-                                </TabsTrigger>
-                                <TabsTrigger value="personalidad">
-                                  Personalidad
                                 </TabsTrigger>
                               </TabsList>
                               <TabsContent value="general">
@@ -523,101 +518,6 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                   <p className="text-lg">
                                     No hay datos de LinkedIn disponibles para
                                     este stakeholder.
-                                  </p>
-                                )}
-                              </TabsContent>
-                              <TabsContent value="personalidad">
-                                <div className="mb-4 space-y-4">
-                                  <div className="flex items-center gap-4">
-                                    <Input
-                                      type="file"
-                                      accept=".json"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onload = (event) => {
-                                            try {
-                                              const jsonData = JSON.parse(event.target?.result as string);
-                                              setLoadedPersonalityData(jsonData);
-                                            } catch (error) {
-                                              console.error("Error al procesar el archivo:", error);
-                                            }
-                                          };
-                                          reader.readAsText(file);
-                                        }
-                                      }}
-                                      className="max-w-xs"
-                                    />
-                                    {loadedPersonalityData && (
-                                      <Button
-                                        onClick={async () => {
-                                          if (stakeholder.id && loadedPersonalityData) {
-                                            await updateStakeholderPersonality(stakeholder.id, loadedPersonalityData);
-                                            queryClient.invalidateQueries({ queryKey: ["/provincias"] });
-                                            setLoadedPersonalityData(null);
-                                          }
-                                        }}
-                                      >
-                                        Guardar Datos
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                                {stakeholder.datos_personalidad ? (
-                                  <div className="space-y-4">
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                                        Tipo de Personalidad
-                                      </h4>
-                                      <p className="text-lg">
-                                        {stakeholder.datos_personalidad.tipo_personalidad || "No especificado"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                                        Estilo de Comunicación
-                                      </h4>
-                                      <p className="text-lg">
-                                        {stakeholder.datos_personalidad.estilo_comunicacion || "No especificado"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                                        Motivaciones
-                                      </h4>
-                                      <p className="text-lg">
-                                        {stakeholder.datos_personalidad.motivaciones || "No especificadas"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                                        Fortalezas
-                                      </h4>
-                                      <p className="text-lg">
-                                        {stakeholder.datos_personalidad.fortalezas || "No especificadas"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                                        Áreas de Mejora
-                                      </h4>
-                                      <p className="text-lg">
-                                        {stakeholder.datos_personalidad.areas_mejora || "No especificadas"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
-                                        Preferencias de Trabajo
-                                      </h4>
-                                      <p className="text-lg">
-                                        {stakeholder.datos_personalidad.preferencias_trabajo || "No especificadas"}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <p className="text-lg">
-                                    No hay datos de personalidad disponibles para este stakeholder.
                                   </p>
                                 )}
                               </TabsContent>
