@@ -1,0 +1,38 @@
+Estructura de la Base de Datos para los Campos del JSON (Modificada)
+La siguiente estructura refleja que el campo nombre se refiere al nombre de una persona dentro de la organización.
+
+1. Tabla stakeholders
+Esta tabla almacena información básica sobre el stakeholder y la organización.
+
+Campo	Tipo de Dato	Descripción
+id	SERIAL	Identificador único para cada stakeholder (clave primaria).
+organizacion	VARCHAR(255)	Nombre de la organización del stakeholder.
+2. Tabla personalidades
+Esta tabla almacena la información de personalidad asociada a cada stakeholder.
+
+Campo	Tipo de Dato	Descripción
+id	SERIAL	Identificador único para los datos de personalidad (clave primaria).
+stakeholder_id	INT	Referencia al id del stakeholder (clave foránea).
+nombre	VARCHAR(255)	Nombre de la persona asociada a la personalidad.
+orientacion_principal	TEXT	Texto que describe la orientación principal del stakeholder.
+fortalezas_clave	JSONB	Lista de fortalezas clave (atributo y descripción).
+rasgos_de_personalidad	JSONB	Detalles de los rasgos de personalidad (proactividad, empatía, organización, creatividad, etc.).
+motivaciones	JSONB	Lista de motivaciones (motivo y descripción).
+posibles_areas_de_mejora	JSONB	Lista de posibles áreas de mejora (atributo y descripción).
+preferencias_comunicativas	JSONB	Detalles sobre las preferencias de comunicación del stakeholder (estilo preferido y descripción).
+Relación entre las Tablas
+Tabla stakeholders:
+
+Almacena información general sobre la organización.
+Tabla personalidades:
+
+Relacionada con stakeholders mediante la clave foránea stakeholder_id.
+Almacena información específica sobre la personalidad de una persona asociada a una organización.
+Notas Adicionales
+Diferenciación del Campo nombre:
+
+Este campo en la tabla personalidades hace referencia al nombre de una persona específica dentro de la organización.
+La información de la organización sigue almacenada en la tabla stakeholders.
+Ventajas del Uso de JSONB:
+
+Los campos como fortalezas_clave, rasgos_de_personalidad, etc., se almacenan como JSONB para manejar datos estructurados con flexibilidad.
