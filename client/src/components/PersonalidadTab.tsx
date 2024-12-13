@@ -32,13 +32,14 @@ export function PersonalidadTab({ stakeholderId, personalidad }: PersonalidadTab
 
   const saveJsonToDatabase = async (jsonData: any) => {
     try {
+      const response = await fetch(`/api/stakeholders/${stakeholderId}`);
+      const currentStakeholder = await response.json();
+      
       await updateStakeholder(stakeholderId, {
-        provincia_id: stakeholderId,
-        nombre: "temp",
-        nivel_influencia: "Alto",
-        nivel_interes: "Alto",
+        ...currentStakeholder,
         personalidad: jsonData
       });
+      
       queryClient.invalidateQueries({ queryKey: ["/provincias"] });
       alert("Archivo JSON guardado correctamente");
     } catch (error) {

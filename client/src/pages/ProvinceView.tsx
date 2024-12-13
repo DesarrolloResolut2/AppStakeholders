@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { PersonalidadTab } from "@/components/PersonalidadTab";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
@@ -225,7 +225,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
             </TableHeader>
             <TableBody>
               {filteredStakeholders?.map((stakeholder) => (
-                <>
+                <React.Fragment key={stakeholder.id}>
                   <TableRow
                     key={stakeholder.id}
                     className="hover:bg-muted/50 transition-colors"
@@ -537,7 +537,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </TableBody>
           </Table>
