@@ -322,7 +322,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                           </CardHeader>
                           <CardContent>
                             <Tabs defaultValue="general" className="w-full">
-                              <TabsList className="grid w-full grid-cols-4">
+                              <TabsList className="grid w-full grid-cols-5">
                                 <TabsTrigger value="general">
                                   General
                                 </TabsTrigger>
@@ -334,6 +334,9 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                 </TabsTrigger>
                                 <TabsTrigger value="linkedin">
                                   LinkedIn
+                                </TabsTrigger>
+                                <TabsTrigger value="personalidad">
+                                  Personalidad
                                 </TabsTrigger>
                               </TabsList>
                               <TabsContent value="general">
@@ -518,6 +521,64 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                                   <p className="text-lg">
                                     No hay datos de LinkedIn disponibles para
                                     este stakeholder.
+                                  </p>
+                                )}
+                              </TabsContent>
+                              <TabsContent value="personalidad">
+                                {stakeholder.datos_personalidad ? (
+                                  <div className="space-y-4">
+                                    <div>
+                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
+                                        Tipo de Personalidad
+                                      </h4>
+                                      <p className="text-lg">
+                                        {stakeholder.datos_personalidad.tipo_personalidad || "No especificado"}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
+                                        Estilo de Comunicación
+                                      </h4>
+                                      <p className="text-lg">
+                                        {stakeholder.datos_personalidad.estilo_comunicacion || "No especificado"}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
+                                        Motivaciones
+                                      </h4>
+                                      <p className="text-lg">
+                                        {stakeholder.datos_personalidad.motivaciones || "No especificadas"}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
+                                        Fortalezas
+                                      </h4>
+                                      <p className="text-lg">
+                                        {stakeholder.datos_personalidad.fortalezas || "No especificadas"}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
+                                        Áreas de Mejora
+                                      </h4>
+                                      <p className="text-lg">
+                                        {stakeholder.datos_personalidad.areas_mejora || "No especificadas"}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold text-sm text-muted-foreground mb-1">
+                                        Preferencias de Trabajo
+                                      </h4>
+                                      <p className="text-lg">
+                                        {stakeholder.datos_personalidad.preferencias_trabajo || "No especificadas"}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-lg">
+                                    No hay datos de personalidad disponibles para este stakeholder.
                                   </p>
                                 )}
                               </TabsContent>
