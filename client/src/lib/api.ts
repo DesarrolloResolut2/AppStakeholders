@@ -69,8 +69,15 @@ export const deleteProvincia = async (id: number) => {
 };
 
 export const updateStakeholderPersonality = async (id: number, personalityData: any) => {
-  const { data } = await api.put<Stakeholder>(`/stakeholders/${id}`, {
+  // Primero obtenemos el stakeholder actual
+  const { data: currentStakeholder } = await api.get<Stakeholder>(`/stakeholders/${id}`);
+  
+  // Actualizamos solo los datos de personalidad manteniendo el resto de la información
+  const updatedStakeholder = {
+    ...currentStakeholder,
     datos_personalidad: personalityData
-  });
+  };
+  
+  const { data } = await api.put<Stakeholder>(`/stakeholders/${id}`, updatedStakeholder);
   return data;
 };
