@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 
 interface PersonalidadTabProps {
   stakeholderId: number;
+  stakeholder: Stakeholder;
   personalidad: any;
 }
 
-export function PersonalidadTab({ stakeholderId, personalidad }: PersonalidadTabProps) {
+export function PersonalidadTab({ stakeholderId, stakeholder, personalidad }: PersonalidadTabProps) {
   const [jsonContent, setJsonContent] = useState(personalidad);
   const queryClient = useQueryClient();
 
@@ -32,11 +33,29 @@ export function PersonalidadTab({ stakeholderId, personalidad }: PersonalidadTab
 
   const saveJsonToDatabase = async (jsonData: any) => {
     try {
-      const response = await fetch(`/api/stakeholders/${stakeholderId}`);
-      const currentStakeholder = await response.json();
+      // Validar la estructura del JSON antes de guardarlo
+      const requiredFields = ['orientacion_principal', 'fortalezas_clave', 'rasgos_de_personalidad', 
+                            'motivaciones', 'posibles_areas_de_mejora', 'preferencias_comunicativas'];
       
+      const missingFields = requiredFields.filter(field => !jsonData[field]);
+      if (missingFields.length > 0) {
+        throw new Error(`JSON inválido. Faltan los siguientes campos: ${missingFields.join(', ')}`);
+      }
+
+      // Actualizar solo el campo de personalidad
       await updateStakeholder(stakeholderId, {
-        ...currentStakeholder,
+        provincia_id: stakeholder.provincia_id,
+        nombre: stakeholder.nombre,
+        nivel_influencia: stakeholder.nivel_influencia,
+        nivel_interes: stakeholder.nivel_interes,
+        datos_contacto: stakeholder.datos_contacto,
+        datos_especificos_linkedin: stakeholder.datos_especificos_linkedin,
+        objetivos_generales: stakeholder.objetivos_generales,
+        intereses_expectativas: stakeholder.intereses_expectativas,
+        recursos: stakeholder.recursos,
+        expectativas_comunicacion: stakeholder.expectativas_comunicacion,
+        relaciones: stakeholder.relaciones,
+        riesgos_conflictos: stakeholder.riesgos_conflictos,
         personalidad: jsonData
       });
       
@@ -44,7 +63,7 @@ export function PersonalidadTab({ stakeholderId, personalidad }: PersonalidadTab
       alert("Archivo JSON guardado correctamente");
     } catch (error) {
       console.error("Error al guardar JSON:", error);
-      alert("Hubo un problema al guardar el archivo JSON");
+      alert(error instanceof Error ? error.message : "Hubo un problema al guardar el archivo JSON");
     }
   };
 

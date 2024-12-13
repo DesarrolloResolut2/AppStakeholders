@@ -528,6 +528,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                               <TabsContent value="personalidad">
                                 <PersonalidadTab
                                   stakeholderId={stakeholder.id!}
+                                  stakeholder={stakeholder}
                                   personalidad={stakeholder.personalidad}
                                 />
                               </TabsContent>
