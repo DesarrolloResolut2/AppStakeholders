@@ -128,12 +128,18 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Nivel de Influencia</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              placeholder="Describir el nivel de influencia del stakeholder..."
-                            />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar nivel de influencia" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Alto">Alto</SelectItem>
+                              <SelectItem value="Medio">Medio</SelectItem>
+                              <SelectItem value="Bajo">Bajo</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -144,12 +150,18 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Nivel de Interés</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              placeholder="Describir el nivel de interés del stakeholder..."
-                            />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Seleccionar nivel de interés" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Alto">Alto</SelectItem>
+                              <SelectItem value="Medio">Medio</SelectItem>
+                              <SelectItem value="Bajo">Bajo</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
