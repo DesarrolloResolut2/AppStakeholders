@@ -46,10 +46,18 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
   const handleUpdateStakeholder = async (data: Omit<Stakeholder, "id">) => {
     if (selectedStakeholder?.id) {
-      await updateStakeholder(selectedStakeholder.id, data);
-      setSelectedStakeholder(undefined);
-      setDialogOpen(false);
-      onUpdate();
+      try {
+        const updatedData = {
+          ...data,
+          provincia_id: provincia.id,
+        };
+        await updateStakeholder(selectedStakeholder.id, updatedData);
+        setSelectedStakeholder(undefined);
+        setDialogOpen(false);
+        onUpdate();
+      } catch (error) {
+        console.error("Error al actualizar stakeholder:", error);
+      }
     }
   };
 

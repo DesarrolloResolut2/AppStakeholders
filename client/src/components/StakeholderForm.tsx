@@ -18,40 +18,32 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Stakeholder } from "@/lib/types";
 
 const stakeholderSchema = z.object({
-  nombre: z.string().optional().or(z.literal("")),
-  datos_contacto: z
-    .object({
-      linkedin: z.string().url("URL de LinkedIn inválida").optional().or(z.literal("")),
-      organizacion_principal: z.string().optional().or(z.literal("")),
-      otras_organizaciones: z.string().optional().or(z.literal("")),
-      persona_contacto: z.string().optional().or(z.literal("")),
-      email: z.string().email("Email inválido").optional().or(z.literal("")),
-      website: z.string().url("URL inválida").optional().or(z.literal("")),
-      telefono: z.string().optional().or(z.literal("")),
-    })
-    .optional()
-    .or(z.literal({}))
-    .or(z.undefined()),
-  objetivos_generales: z.string().optional().or(z.literal("")),
-  intereses_expectativas: z.string().optional().or(z.literal("")),
-  nivel_influencia: z.string().optional().or(z.literal("")),
-  nivel_interes: z.string().optional().or(z.literal("")),
-  recursos: z.string().optional().or(z.literal("")),
-  expectativas_comunicacion: z.string().optional().or(z.literal("")),
-  relaciones: z.string().optional().or(z.literal("")),
-  riesgos_conflictos: z.string().optional().or(z.literal("")),
-  datos_especificos_linkedin: z
-    .object({
-      about_me: z.string().optional().or(z.literal("")),
-      headline: z.string().optional().or(z.literal("")),
-      experiencia: z.string().optional().or(z.literal("")),
-      formacion: z.string().optional().or(z.literal("")),
-      otros_campos: z.string().optional().or(z.literal("")),
-    })
-    .optional()
-    .or(z.literal({}))
-    .or(z.undefined()),
-});
+  nombre: z.string().optional(),
+  datos_contacto: z.object({
+    linkedin: z.string().optional(),
+    organizacion_principal: z.string().optional(),
+    otras_organizaciones: z.string().optional(),
+    persona_contacto: z.string().optional(),
+    email: z.string().optional(),
+    website: z.string().optional(),
+    telefono: z.string().optional(),
+  }).optional(),
+  objetivos_generales: z.string().optional(),
+  intereses_expectativas: z.string().optional(),
+  nivel_influencia: z.string().optional(),
+  nivel_interes: z.string().optional(),
+  recursos: z.string().optional(),
+  expectativas_comunicacion: z.string().optional(),
+  relaciones: z.string().optional(),
+  riesgos_conflictos: z.string().optional(),
+  datos_especificos_linkedin: z.object({
+    about_me: z.string().optional(),
+    headline: z.string().optional(),
+    experiencia: z.string().optional(),
+    formacion: z.string().optional(),
+    otros_campos: z.string().optional(),
+  }).optional(),
+}).partial();
 
 interface Props {
   provinciaId: number;
