@@ -13,7 +13,8 @@ export const stakeholders = pgTable("stakeholders", {
   nombre: text("nombre").notNull(),
   datos_contacto: jsonb("datos_contacto").$type<{
     linkedin?: string;
-    organizacion?: string;
+    organizacion_principal?: string;
+    otras_organizaciones?: string;
     persona_contacto?: string;
     email?: string;
     website?: string;

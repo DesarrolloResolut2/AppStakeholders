@@ -15,9 +15,16 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { StakeholderForm } from "./StakeholderForm";
+import { StakeholderForm } from "./StakeholderForm.tsx";
 import type { Provincia, Stakeholder } from "@/lib/types";
-import { createStakeholder, updateStakeholder, deleteStakeholder, exportProvinciaData, deleteProvincia, exportStakeholderContactData } from "@/lib/api";
+import {
+  createStakeholder,
+  updateStakeholder,
+  deleteStakeholder,
+  exportProvinciaData,
+  deleteProvincia,
+  exportStakeholderContactData,
+} from "@/lib/api";
 
 interface Props {
   provincia: Provincia;
@@ -25,7 +32,9 @@ interface Props {
 }
 
 export function ProvinceCard({ provincia, onUpdate }: Props) {
-  const [selectedStakeholder, setSelectedStakeholder] = useState<Stakeholder | undefined>();
+  const [selectedStakeholder, setSelectedStakeholder] = useState<
+    Stakeholder | undefined
+  >();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
@@ -57,11 +66,15 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     <Card className="w-full max-w-lg hover:shadow-lg transition-shadow border-t-4 border-t-primary/20">
       <CardHeader className="relative">
         <div className="absolute right-4 top-4">
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             size="sm"
             onClick={async () => {
-              if (confirm('¿Estás seguro de que deseas eliminar esta provincia? Se eliminarán también todos los stakeholders asociados.')) {
+              if (
+                confirm(
+                  "¿Estás seguro de que deseas eliminar esta provincia? Se eliminarán también todos los stakeholders asociados.",
+                )
+              ) {
                 await deleteProvincia(provincia.id);
                 onUpdate();
               }
@@ -79,24 +92,34 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
         <div className="flex justify-between">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => setSelectedStakeholder(undefined)}>
+              <Button
+                onClick={() => setSelectedStakeholder(undefined)}
+                size="lg"
+                className="w-full md:w-auto"
+              >
                 Agregar Stakeholder
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
+            <DialogContent className="max-w-[90vw] w-full max-h-[90vh] p-0 overflow-hidden">
+              <DialogHeader className="p-6 pb-0">
                 <DialogTitle>
                   {selectedStakeholder ? "Editar" : "Nuevo"} Stakeholder
                 </DialogTitle>
                 <DialogDescription>
-                  Complete los siguientes campos para {selectedStakeholder ? "actualizar" : "registrar"} un stakeholder
+                  Complete los siguientes campos para{" "}
+                  {selectedStakeholder ? "actualizar" : "registrar"} un
+                  stakeholder
                 </DialogDescription>
               </DialogHeader>
-              <div className="py-4">
+              <div className="p-6 pt-0">
                 <StakeholderForm
                   provinciaId={provincia.id}
                   stakeholder={selectedStakeholder}
-                  onSubmit={selectedStakeholder ? handleUpdateStakeholder : handleCreateStakeholder}
+                  onSubmit={
+                    selectedStakeholder
+                      ? handleUpdateStakeholder
+                      : handleCreateStakeholder
+                  }
                 />
               </div>
             </DialogContent>
@@ -108,7 +131,10 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
         <div className="space-y-2">
           {provincia.stakeholders?.map((stakeholder) => (
-            <Card key={stakeholder.id} className="p-4 hover:shadow-lg transition-shadow">
+            <Card
+              key={stakeholder.id}
+              className="p-4 hover:shadow-lg transition-shadow"
+            >
               <div className="space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
@@ -136,23 +162,30 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}
+                      onClick={() =>
+                        stakeholder.id &&
+                        handleDeleteStakeholder(stakeholder.id)
+                      }
                       className="hover:bg-destructive/90"
                     >
                       Eliminar
                     </Button>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-secondary p-2 rounded-md">
                     <p className="text-sm font-medium">Nivel de Influencia</p>
-                    <p className="text-sm mt-1 text-muted-foreground">{stakeholder.nivel_influencia}</p>
+                    <p className="text-sm mt-1 text-muted-foreground">
+                      {stakeholder.nivel_influencia}
+                    </p>
                   </div>
-                  
+
                   <div className="bg-secondary p-2 rounded-md">
                     <p className="text-sm font-medium">Nivel de Interés</p>
-                    <p className="text-sm mt-1 text-muted-foreground">{stakeholder.nivel_interes}</p>
+                    <p className="text-sm mt-1 text-muted-foreground">
+                      {stakeholder.nivel_interes}
+                    </p>
                   </div>
                 </div>
 
@@ -192,7 +225,9 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => exportStakeholderContactData(stakeholder)}
+                        onClick={() =>
+                          exportStakeholderContactData(stakeholder)
+                        }
                       >
                         Exportar Contacto
                       </Button>
@@ -218,36 +253,48 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
             <div className="space-y-6 py-4">
               {/* Datos de Contacto */}
               <div className="bg-secondary/20 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">Datos de Contacto</h3>
+                <h3 className="text-lg font-semibold mb-4">
+                  Datos de Contacto
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   {selectedStakeholder?.datos_contacto?.organizacion && (
                     <div>
                       <p className="font-medium">Organización</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.organizacion}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.datos_contacto.organizacion}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.datos_contacto?.persona_contacto && (
                     <div>
                       <p className="font-medium">Persona de Contacto</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.persona_contacto}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.datos_contacto.persona_contacto}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.datos_contacto?.email && (
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.email}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.datos_contacto.email}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.datos_contacto?.website && (
                     <div>
                       <p className="font-medium">Website</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.website}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.datos_contacto.website}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.datos_contacto?.telefono && (
                     <div>
                       <p className="font-medium">Teléfono</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.datos_contacto.telefono}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.datos_contacto.telefono}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -255,26 +302,36 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
               {/* Información Principal */}
               <div className="bg-secondary/20 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">Información Principal</h3>
+                <h3 className="text-lg font-semibold mb-4">
+                  Información Principal
+                </h3>
                 <div className="space-y-4">
                   <div>
                     <p className="font-medium">Nivel de Influencia</p>
-                    <p className="text-muted-foreground">{selectedStakeholder?.nivel_influencia}</p>
+                    <p className="text-muted-foreground">
+                      {selectedStakeholder?.nivel_influencia}
+                    </p>
                   </div>
                   <div>
                     <p className="font-medium">Nivel de Interés</p>
-                    <p className="text-muted-foreground">{selectedStakeholder?.nivel_interes}</p>
+                    <p className="text-muted-foreground">
+                      {selectedStakeholder?.nivel_interes}
+                    </p>
                   </div>
                   {selectedStakeholder?.objetivos_generales && (
                     <div>
                       <p className="font-medium">Objetivos Generales</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.objetivos_generales}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.objetivos_generales}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.intereses_expectativas && (
                     <div>
                       <p className="font-medium">Intereses y Expectativas</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.intereses_expectativas}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.intereses_expectativas}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -282,30 +339,46 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
               {/* Información Adicional */}
               <div className="bg-secondary/20 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">Información Adicional</h3>
+                <h3 className="text-lg font-semibold mb-4">
+                  Información Adicional
+                </h3>
                 <div className="space-y-4">
                   {selectedStakeholder?.recursos && (
                     <div>
                       <p className="font-medium">Recursos</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.recursos}</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.recursos}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.expectativas_comunicacion && (
                     <div>
-                      <p className="font-medium">Expectativas de Comunicación</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.expectativas_comunicacion}</p>
+                      <p className="font-medium">
+                        Expectativas de Comunicación
+                      </p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.expectativas_comunicacion}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.relaciones && (
                     <div>
-                      <p className="font-medium">Relaciones con Otros Actores</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.relaciones}</p>
+                      <p className="font-medium">
+                        Relaciones con Otros Actores
+                      </p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.relaciones}
+                      </p>
                     </div>
                   )}
                   {selectedStakeholder?.riesgos_conflictos && (
                     <div>
-                      <p className="font-medium">Riesgos y Conflictos Potenciales</p>
-                      <p className="text-muted-foreground">{selectedStakeholder.riesgos_conflictos}</p>
+                      <p className="font-medium">
+                        Riesgos y Conflictos Potenciales
+                      </p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.riesgos_conflictos}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -316,38 +389,71 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
                 selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
                 selectedStakeholder?.datos_especificos_linkedin?.formacion ||
-                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
+                selectedStakeholder?.datos_especificos_linkedin
+                  ?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-4">Datos de LinkedIn</h3>
+                  <h3 className="text-lg font-semibold mb-4">
+                    Datos de LinkedIn
+                  </h3>
                   <div className="space-y-4">
-                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
-                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.about_me}</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .about_me
+                          }
+                        </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
-                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.headline}</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .headline
+                          }
+                        </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.experiencia && (
                       <div>
                         <p className="font-medium">Experiencia</p>
-                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.experiencia}</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .experiencia
+                          }
+                        </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.formacion && (
                       <div>
                         <p className="font-medium">Formación</p>
-                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.formacion}</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .formacion
+                          }
+                        </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.otros_campos && (
                       <div>
                         <p className="font-medium">Otros Campos</p>
-                        <p className="text-muted-foreground">{selectedStakeholder.datos_especificos_linkedin.otros_campos}</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .otros_campos
+                          }
+                        </p>
                       </div>
                     )}
                   </div>
