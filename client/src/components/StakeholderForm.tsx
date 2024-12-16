@@ -18,35 +18,39 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Stakeholder } from "@/lib/types";
 
 const stakeholderSchema = z.object({
-  nombre: z.string().optional(),
+  nombre: z.string().optional().or(z.literal("")),
   datos_contacto: z
     .object({
       linkedin: z.string().url("URL de LinkedIn inválida").optional().or(z.literal("")),
-      organizacion_principal: z.string().optional(),
-      otras_organizaciones: z.string().optional(),
-      persona_contacto: z.string().optional(),
+      organizacion_principal: z.string().optional().or(z.literal("")),
+      otras_organizaciones: z.string().optional().or(z.literal("")),
+      persona_contacto: z.string().optional().or(z.literal("")),
       email: z.string().email("Email inválido").optional().or(z.literal("")),
       website: z.string().url("URL inválida").optional().or(z.literal("")),
-      telefono: z.string().optional(),
+      telefono: z.string().optional().or(z.literal("")),
     })
-    .optional(),
-  objetivos_generales: z.string().optional(),
-  intereses_expectativas: z.string().optional(),
-  nivel_influencia: z.string().optional(),
-  nivel_interes: z.string().optional(),
-  recursos: z.string().optional(),
-  expectativas_comunicacion: z.string().optional(),
-  relaciones: z.string().optional(),
-  riesgos_conflictos: z.string().optional(),
+    .optional()
+    .or(z.literal({}))
+    .or(z.undefined()),
+  objetivos_generales: z.string().optional().or(z.literal("")),
+  intereses_expectativas: z.string().optional().or(z.literal("")),
+  nivel_influencia: z.string().optional().or(z.literal("")),
+  nivel_interes: z.string().optional().or(z.literal("")),
+  recursos: z.string().optional().or(z.literal("")),
+  expectativas_comunicacion: z.string().optional().or(z.literal("")),
+  relaciones: z.string().optional().or(z.literal("")),
+  riesgos_conflictos: z.string().optional().or(z.literal("")),
   datos_especificos_linkedin: z
     .object({
-      about_me: z.string().optional(),
-      headline: z.string().optional(),
-      experiencia: z.string().optional(),
-      formacion: z.string().optional(),
-      otros_campos: z.string().optional(),
+      about_me: z.string().optional().or(z.literal("")),
+      headline: z.string().optional().or(z.literal("")),
+      experiencia: z.string().optional().or(z.literal("")),
+      formacion: z.string().optional().or(z.literal("")),
+      otros_campos: z.string().optional().or(z.literal("")),
     })
-    .optional(),
+    .optional()
+    .or(z.literal({}))
+    .or(z.undefined()),
 });
 
 interface Props {
@@ -126,6 +130,22 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                             <Textarea
                               {...field}
                               placeholder="Describir el nivel de interés del stakeholder..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="objetivos_generales"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Objetivos Generales</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              placeholder="Describir los objetivos principales del stakeholder..."
                             />
                           </FormControl>
                           <FormMessage />
@@ -262,22 +282,8 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                     <CardTitle>Información Detallada</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="objetivos_generales"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Objetivos Generales</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              placeholder="Describir los objetivos principales del stakeholder..."
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                   
+                    
                     <FormField
                       control={form.control}
                       name="intereses_expectativas"
