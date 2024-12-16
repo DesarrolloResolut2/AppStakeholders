@@ -266,7 +266,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                         name="datos_contacto.website"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Website</FormLabel>
+                            <FormLabel>Website & Redes</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
