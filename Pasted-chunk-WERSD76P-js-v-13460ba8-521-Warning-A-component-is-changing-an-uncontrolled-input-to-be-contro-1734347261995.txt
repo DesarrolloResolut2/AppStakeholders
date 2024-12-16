@@ -1,0 +1,72 @@
+chunk-WERSD76P.js?v=13460ba8:521 Warning: A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+    at input
+    at _c (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/input.tsx:20:11)
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-4WIT4MX7.js?v=13460ba8:52:11
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-4WIT4MX7.js?v=13460ba8:33:11
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/form.tsx:127:9
+    at div
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/form.tsx:71:6
+    at Controller (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…GestorDeTareas/node_modules/.vite/deps/chunk-RBMNEPGM.js?v=13460ba8:313:35)
+    at FormField (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/form.tsx:32:6)
+    at div
+    at div
+    at _c9 (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-AYSQM7VZ.js?v=13460ba8:41:13
+    at Presence (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-XSG6QMOP.js?v=13460ba8:24:11)
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…DeTareas/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=13460ba8:175:13
+    at _c5 (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/tabs.tsx:68:12)
+    at div
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-AYSQM7VZ.js?v=13460ba8:41:13
+    at Provider (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-PQZAADP2.js?v=13460ba8:38:15)
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…orDeTareas/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=13460ba8:53:7
+    at div
+    at div
+    at div
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-AYSQM7VZ.js?v=13460ba8:41:13
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…s/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=13460ba8:114:13
+    at div
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-AYSQM7VZ.js?v=13460ba8:41:13
+    at Provider (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-PQZAADP2.js?v=13460ba8:38:15)
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…eas/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=13460ba8:52:7
+    at _c (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/scroll-area.tsx:21:11)
+    at form
+    at FormProvider (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…GestorDeTareas/node_modules/.vite/deps/chunk-RBMNEPGM.js?v=13460ba8:102:11)
+    at StakeholderForm (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/StakeholderForm.tsx:62:35)
+    at div
+    at div
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-AYSQM7VZ.js?v=13460ba8:41:13
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…r/GestorDeTareas/node_modules/.vite/deps/chunk-NOMXMQGP.js?v=13460ba8:61:7
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-4WIT4MX7.js?v=13460ba8:52:11
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-4WIT4MX7.js?v=13460ba8:33:11
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-AYSQM7VZ.js?v=13460ba8:41:13
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…r/GestorDeTareas/node_modules/.vite/deps/chunk-CU7SW54U.js?v=13460ba8:29:5
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…Tareas/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=13460ba8:236:13
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…Tareas/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=13460ba8:159:58
+    at Presence (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-XSG6QMOP.js?v=13460ba8:24:11)
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…Tareas/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=13460ba8:150:64
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-4WIT4MX7.js?v=13460ba8:52:11
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-4WIT4MX7.js?v=13460ba8:33:11
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-AYSQM7VZ.js?v=13460ba8:41:13
+    at https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…GestorDeTareas/node_modules/.vite/deps/chunk-NOMXMQGP.js?v=13460ba8:260:22
+    at Presence (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-XSG6QMOP.js?v=13460ba8:24:11)
+    at Provider (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-PQZAADP2.js?v=13460ba8:38:15)
+    at DialogPortal (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…Tareas/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=13460ba8:113:11)
+    at _c3 (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/components/ui/dialog.tsx:49:12)
+    at Provider (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/GestorDeTareas/node_modules/.vite/deps/chunk-PQZAADP2.js?v=13460ba8:38:15)
+    at Dialog (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…DeTareas/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=13460ba8:54:5)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at ProvinceView (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/src/pages/ProvinceView.tsx:78:32)
+    at Route (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/runner/GestorDeTareas/node_modules/.vite/deps/wouter.js?v=13460ba8:323:16)
+    at Switch (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…/runner/GestorDeTareas/node_modules/.vite/deps/wouter.js?v=13460ba8:379:17)
+    at QueryClientProvider (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…eTareas/node_modules/.vite/deps/@tanstack_react-query.js?v=13460ba8:2805:3)
+    at App
+    at QueryClientProvider (https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.d…eTareas/node_modules/.vite/deps/@tanstack_react-query.js?v=13460ba8:2805:3)
+
+﻿

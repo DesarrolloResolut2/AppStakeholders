@@ -54,7 +54,33 @@ interface Props {
 export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
   const form = useForm<z.infer<typeof stakeholderSchema>>({
     resolver: zodResolver(stakeholderSchema),
-    defaultValues: stakeholder || {},
+    defaultValues: {
+      nombre: stakeholder?.nombre || '',
+      datos_contacto: {
+        linkedin: stakeholder?.datos_contacto?.linkedin || '',
+        organizacion_principal: stakeholder?.datos_contacto?.organizacion_principal || '',
+        otras_organizaciones: stakeholder?.datos_contacto?.otras_organizaciones || '',
+        persona_contacto: stakeholder?.datos_contacto?.persona_contacto || '',
+        email: stakeholder?.datos_contacto?.email || '',
+        website: stakeholder?.datos_contacto?.website || '',
+        telefono: stakeholder?.datos_contacto?.telefono || '',
+      },
+      objetivos_generales: stakeholder?.objetivos_generales || '',
+      intereses_expectativas: stakeholder?.intereses_expectativas || '',
+      nivel_influencia: stakeholder?.nivel_influencia || '',
+      nivel_interes: stakeholder?.nivel_interes || '',
+      recursos: stakeholder?.recursos || '',
+      expectativas_comunicacion: stakeholder?.expectativas_comunicacion || '',
+      relaciones: stakeholder?.relaciones || '',
+      riesgos_conflictos: stakeholder?.riesgos_conflictos || '',
+      datos_especificos_linkedin: {
+        about_me: stakeholder?.datos_especificos_linkedin?.about_me || '',
+        headline: stakeholder?.datos_especificos_linkedin?.headline || '',
+        experiencia: stakeholder?.datos_especificos_linkedin?.experiencia || '',
+        formacion: stakeholder?.datos_especificos_linkedin?.formacion || '',
+        otros_campos: stakeholder?.datos_especificos_linkedin?.otros_campos || '',
+      },
+    },
   });
 
   const handleSubmit = (values: z.infer<typeof stakeholderSchema>) => {
