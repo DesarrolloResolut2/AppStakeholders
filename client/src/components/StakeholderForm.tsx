@@ -423,7 +423,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Stakeholder } from "@/lib/types";
 
 const stakeholderSchema = z.object({
-  nombre: z.string().min(1, "El nombre es requerido"),
+  nombre: z.string().optional(),
   datos_contacto: z
     .object({
       linkedin: z.string().url("URL de LinkedIn inválida").optional(),
@@ -437,8 +437,8 @@ const stakeholderSchema = z.object({
     .optional(),
   objetivos_generales: z.string().optional(),
   intereses_expectativas: z.string().optional(),
-  nivel_influencia: z.string().min(1, "El nivel de influencia es requerido"),
-  nivel_interes: z.string().min(1, "El nivel de interés es requerido"),
+  nivel_influencia: z.string().optional(),
+  nivel_interes: z.string().optional(),
   recursos: z.string().optional(),
   expectativas_comunicacion: z.string().optional(),
   relaciones: z.string().optional(),
@@ -480,7 +480,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-        <ScrollArea className="h-[70vh] pr-4">
+        <ScrollArea className="h-[75vh] pr-4 overflow-y-auto">
           <Tabs defaultValue="principal" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="principal">Principal</TabsTrigger>
