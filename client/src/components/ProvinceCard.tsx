@@ -70,15 +70,23 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     exportProvinciaData(provincia.id);
   };
 
-  const renderExperiencia = (experiencia: any) => {
-    if (!experiencia || !Array.isArray(experiencia)) return null;
+  const renderExperiencia = (experiencias: any[] | undefined) => {
+    if (!experiencias || !Array.isArray(experiencias) || experiencias.length === 0) {
+      return null;
+    }
 
-    return experiencia.map((exp: any, index: number) => (
-      <div key={index} className="text-sm">
-        <span className="font-medium">{exp.cargo || ''}</span>
-        {exp.nombre_empresa ? ` en ${exp.nombre_empresa}` : ''}
-      </div>
-    ));
+    // Tomar solo las últimas 2 experiencias para la vista previa
+    return experiencias
+      .slice(0, 2)
+      .map((exp: any, index: number) => {
+        const cargo = exp?.cargo || '';
+        const empresa = exp?.nombre_empresa || '';
+        return (
+          <div key={index} className="text-sm text-muted-foreground">
+            {cargo}{empresa ? ` en ${empresa}` : ''}
+          </div>
+        );
+      });
   };
 
   return (
@@ -165,11 +173,8 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         {stakeholder.datos_especificos_linkedin.headline}
                       </p>
                     )}
-                    {stakeholder.datos_especificos_linkedin?.experiencia && (
-                      <div className="mt-2">
-                        {renderExperiencia(stakeholder.datos_especificos_linkedin.experiencia)}
-                      </div>
-                    )}
+                    {stakeholder.datos_especificos_linkedin?.experiencia && 
+                      renderExperiencia(stakeholder.datos_especificos_linkedin.experiencia)}
                   </div>
                   <div className="space-x-2">
                     <Button
@@ -419,8 +424,10 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                (selectedStakeholder?.datos_especificos_linkedin?.experiencia && selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0) ||
-                (selectedStakeholder?.datos_especificos_linkedin?.formacion && selectedStakeholder.datos_especificos_linkedin.formacion.length > 0) ||
+                (selectedStakeholder?.datos_especificos_linkedin?.experiencia && 
+                 selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0) ||
+                (selectedStakeholder?.datos_especificos_linkedin?.formacion && 
+                 selectedStakeholder.datos_especificos_linkedin.formacion.length > 0) ||
                 selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
@@ -451,24 +458,28 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         <h4 className="text-md font-semibold mb-3">Experiencia Profesional</h4>
                         <div className="space-y-4">
                           {selectedStakeholder.datos_especificos_linkedin.experiencia
-                            .sort((a: any, b: any) => parseInt(b.anio_inicio || '0') - parseInt(a.anio_inicio || '0'))
+                            .sort((a: any, b: any) => {
+                              const aYear = parseInt(a?.anio_inicio || '0');
+                              const bYear = parseInt(b?.anio_inicio || '0');
+                              return bYear - aYear;
+                            })
                             .map((exp: any, index: number) => (
                               <div key={index} className="border-l-2 border-primary/30 pl-4">
                                 <div className="flex justify-between items-start">
                                   <div>
-                                    <p className="font-medium">{exp.cargo || ''}</p>
-                                    <p className="text-muted-foreground">{exp.nombre_empresa || ''}</p>
+                                    <p className="font-medium">{exp?.cargo || ''}</p>
+                                    <p className="text-muted-foreground">{exp?.nombre_empresa || ''}</p>
                                   </div>
                                   <p className="text-sm text-muted-foreground">
-                                    {exp.anio_inicio || ''} - {exp.anio_fin || 'Presente'}
+                                    {exp?.anio_inicio || ''} - {exp?.anio_fin || 'Presente'}
                                   </p>
                                 </div>
-                                {exp.ubicacion && (
+                                {exp?.ubicacion && (
                                   <p className="text-sm text-muted-foreground mt-1">
                                     {exp.ubicacion}
                                   </p>
                                 )}
-                                {exp.descripcion && (
+                                {exp?.descripcion && (
                                   <p className="text-sm text-muted-foreground mt-2">
                                     {exp.descripcion}
                                   </p>
@@ -480,30 +491,34 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     )}
 
                     {/* Sección de Formación */}
-                    {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && 
                      selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
                       <div className="mt-6">
                         <h4 className="text-md font-semibold mb-3">Formación Académica</h4>
                         <div className="space-y-4">
                           {selectedStakeholder.datos_especificos_linkedin.formacion
-                            .sort((a: any, b: any) => parseInt(b.anio_inicio || '0') - parseInt(a.anio_inicio || '0'))
+                            .sort((a: any, b: any) => {
+                              const aYear = parseInt(a?.anio_inicio || '0');
+                              const bYear = parseInt(b?.anio_inicio || '0');
+                              return bYear - aYear;
+                            })
                             .map((form: any, index: number) => (
                               <div key={index} className="border-l-2 border-primary/30 pl-4">
                                 <div className="flex justify-between items-start">
                                   <div>
-                                    <p className="font-medium">{form.titulo || ''}</p>
-                                    <p className="text-muted-foreground">{form.nombre_institucion || ''}</p>
+                                    <p className="font-medium">{form?.titulo || ''}</p>
+                                    <p className="text-muted-foreground">{form?.nombre_institucion || ''}</p>
                                   </div>
                                   <p className="text-sm text-muted-foreground">
-                                    {form.anio_inicio || ''} - {form.anio_fin || 'Presente'}
+                                    {form?.anio_inicio || ''} - {form?.anio_fin || 'Presente'}
                                   </p>
                                 </div>
-                                {form.tipo && (
+                                {form?.tipo && (
                                   <p className="text-sm text-muted-foreground mt-1">
                                     Tipo: {(form.tipo || '').charAt(0).toUpperCase() + (form.tipo || '').slice(1)}
                                   </p>
                                 )}
-                                {form.descripcion && (
+                                {form?.descripcion && (
                                   <p className="text-sm text-muted-foreground mt-2">
                                     {form.descripcion}
                                   </p>
