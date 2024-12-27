@@ -395,72 +395,104 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
-                selectedStakeholder?.datos_especificos_linkedin?.formacion ||
-                selectedStakeholder?.datos_especificos_linkedin
-                  ?.otros_campos) && (
+                selectedStakeholder?.datos_especificos_linkedin?.experiencia?.length ||
+                selectedStakeholder?.datos_especificos_linkedin?.formacion?.length ||
+                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
                     Datos de LinkedIn
                   </h3>
                   <div className="space-y-4">
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.about_me && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .about_me
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.about_me}
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.headline && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .headline
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.headline}
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.experiencia && (
-                      <div>
-                        <p className="font-medium">Experiencia</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .experiencia
-                          }
-                        </p>
+
+                    {/* Sección de Experiencia */}
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia?.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="text-md font-semibold mb-3">Experiencia Profesional</h4>
+                        <div className="space-y-4">
+                          {selectedStakeholder.datos_especificos_linkedin.experiencia
+                            .sort((a, b) => parseInt(b.anio_inicio) - parseInt(a.anio_inicio))
+                            .map((exp, index) => (
+                              <div key={index} className="border-l-2 border-primary/30 pl-4">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <p className="font-medium">{exp.cargo}</p>
+                                    <p className="text-muted-foreground">{exp.nombre_empresa}</p>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    {exp.anio_inicio} - {exp.anio_fin || 'Presente'}
+                                  </p>
+                                </div>
+                                {exp.ubicacion && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {exp.ubicacion}
+                                  </p>
+                                )}
+                                {exp.descripcion && (
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    {exp.descripcion}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                        </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.formacion && (
-                      <div>
-                        <p className="font-medium">Formación</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .formacion
-                          }
-                        </p>
+
+                    {/* Sección de Formación */}
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion?.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="text-md font-semibold mb-3">Formación Académica</h4>
+                        <div className="space-y-4">
+                          {selectedStakeholder.datos_especificos_linkedin.formacion
+                            .sort((a, b) => parseInt(b.anio_inicio) - parseInt(a.anio_inicio))
+                            .map((form, index) => (
+                              <div key={index} className="border-l-2 border-primary/30 pl-4">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <p className="font-medium">{form.titulo}</p>
+                                    <p className="text-muted-foreground">{form.nombre_institucion}</p>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    {form.anio_inicio} - {form.anio_fin || 'Presente'}
+                                  </p>
+                                </div>
+                                {form.tipo && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    Tipo: {form.tipo.charAt(0).toUpperCase() + form.tipo.slice(1)}
+                                  </p>
+                                )}
+                                {form.descripcion && (
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    {form.descripcion}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                        </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.otros_campos && (
-                      <div>
-                        <p className="font-medium">Otros Campos</p>
+
+                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
+                      <div className="mt-4">
+                        <p className="font-medium">Información Adicional</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .otros_campos
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.otros_campos}
                         </p>
                       </div>
                     )}
