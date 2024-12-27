@@ -1,0 +1,213 @@
+import React from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { Button, Card, Input, Textarea, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './UIComponents'; // Ajusta según tu estructura
+import { Trash2, Plus } from 'lucide-react';
+
+const StakeholderForm = ({ onSubmit }) => {
+  const form = useForm({
+    defaultValues: {
+      datos_especificos_linkedin: {
+        experiencia: [],
+        formacion: [],
+      },
+    },
+  });
+
+  const { fields: experienciaFields, append: appendExperiencia, remove: removeExperiencia } =
+    useFieldArray({
+      control: form.control,
+      name: 'datos_especificos_linkedin.experiencia',
+    });
+
+  const { fields: formacionFields, append: appendFormacion, remove: removeFormacion } =
+    useFieldArray({
+      control: form.control,
+      name: 'datos_especificos_linkedin.formacion',
+    });
+
+  // Normalizar datos antes de enviar
+  const normalizeData = (data) =>
+    data.map((item) => ({
+      ...item,
+      anio_inicio: item.anio_inicio || 'N/A',
+      anio_fin: item.anio_fin || 'Presente',
+      ubicacion: item.ubicacion || '',
+      descripcion: item.descripcion || '',
+      tipo: item.tipo || '',
+    }));
+
+  const handleSubmit = (data) => {
+    const experienciaNormalizada = normalizeData(data.datos_especificos_linkedin.experiencia);
+    const formacionNormalizada = normalizeData(data.datos_especificos_linkedin.formacion);
+
+    const datosNormalizados = {
+      ...data,
+      datos_especificos_linkedin: {
+        experiencia: experienciaNormalizada,
+        formacion: formacionNormalizada,
+      },
+    };
+
+    onSubmit(datosNormalizados);
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(handleSubmit)}>
+      {/* Sección de Experiencia */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold">Experiencia</h3>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              appendExperiencia({
+                nombre_empresa: '',
+                cargo: '',
+                anio_inicio: '',
+                anio_fin: '',
+                ubicacion: '',
+                descripcion: '',
+              })
+            }
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Añadir Experiencia
+          </Button>
+        </div>
+
+        {experienciaFields.map((field, index) => (
+          <Card key={field.id} className="p-4">
+            <div className="flex justify-between items-start mb-4">
+              <h4 className="text-sm font-medium">Experiencia {index + 1}</h4>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removeExperiencia(index)}
+                className="h-8 w-8 p-0"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Reutiliza los campos de experiencia */}
+              {['nombre_empresa', 'cargo', 'anio_inicio', 'anio_fin', 'ubicacion'].map((name, i) => (
+                <FormField
+                  key={i}
+                  control={form.control}
+                  name={`datos_especificos_linkedin.experiencia.${index}.${name}`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{name.replace('_', ' ').toUpperCase()}</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder={`Ingrese ${name}`} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+            <FormField
+              control={form.control}
+              name={`datos_especificos_linkedin.experiencia.${index}.descripcion`}
+              render={({ field }) => (
+                <FormItem className="mt-4">
+                  <FormLabel>Descripción</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} placeholder="Describe tus responsabilidades y logros..." />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Card>
+        ))}
+      </div>
+
+      {/* Sección de Formación */}
+      <div className="flex justify-between items-center mt-8">
+        <h3 className="text-lg font-semibold">Formación</h3>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            appendFormacion({
+              nombre_institucion: '',
+              titulo: '',
+              anio_inicio: '',
+              anio_fin: '',
+              tipo: '',
+              descripcion: '',
+            })
+          }
+          className="flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Añadir Formación
+        </Button>
+      </div>
+
+      {formacionFields.map((field, index) => (
+        <Card key={field.id} className="p-4">
+          <div className="flex justify-between items-start mb-4">
+            <h4 className="text-sm font-medium">Formación {index + 1}</h4>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => removeFormacion(index)}
+              className="h-8 w-8 p-0"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {['nombre_institucion', 'titulo', 'anio_inicio', 'anio_fin', 'tipo'].map((name, i) => (
+              <FormField
+                key={i}
+                control={form.control}
+                name={`datos_especificos_linkedin.formacion.${index}.${name}`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{name.replace('_', ' ').toUpperCase()}</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={`Ingrese ${name}`} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
+          <FormField
+            control={form.control}
+            name={`datos_especificos_linkedin.formacion.${index}.descripcion`}
+            render={({ field }) => (
+              <FormItem className="mt-4">
+                <FormLabel>Descripción</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Describe los detalles de tu formación..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </Card>
+      ))}
+
+      <Button type="submit" className="mt-8">
+        Guardar
+      </Button>
+    </form>
+  );
+};
+
+export default StakeholderForm;

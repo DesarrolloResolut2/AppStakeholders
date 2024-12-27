@@ -121,11 +121,34 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
       name: "datos_especificos_linkedin.formacion",
     });
 
+  // Normalizar datos antes de enviar
+  const normalizeData = (data: any[]) =>
+    data.map((item) => ({
+      ...item,
+      anio_inicio: item.anio_inicio || 'N/A',
+      anio_fin: item.anio_fin || 'Presente',
+      ubicacion: item.ubicacion || '',
+      descripcion: item.descripcion || '',
+      tipo: item.tipo || '',
+    }));
+
   const handleSubmit = (values: z.infer<typeof stakeholderSchema>) => {
-    onSubmit({
+    const experienciaNormalizada = values.datos_especificos_linkedin?.experiencia ? 
+      normalizeData(values.datos_especificos_linkedin.experiencia) : [];
+    const formacionNormalizada = values.datos_especificos_linkedin?.formacion ?
+      normalizeData(values.datos_especificos_linkedin.formacion) : [];
+
+    const datosNormalizados = {
       ...values,
+      datos_especificos_linkedin: {
+        ...values.datos_especificos_linkedin,
+        experiencia: experienciaNormalizada,
+        formacion: formacionNormalizada,
+      },
       provincia_id: provinciaId,
-    } as Omit<Stakeholder, "id">);
+    };
+
+    onSubmit(datosNormalizados as Omit<Stakeholder, "id">);
   };
 
   const handleAddExperiencia = () => {
@@ -754,24 +777,24 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                           />
                         </Card>
                       ))}
-
-                      <FormField
-                        control={form.control}
-                        name="datos_especificos_linkedin.otros_campos"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Otros Campos</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                {...field}
-                                placeholder="Información adicional..."
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                     </div>
+
+                    <FormField
+                      control={form.control}
+                      name="datos_especificos_linkedin.otros_campos"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Otros Campos</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              placeholder="Información adicional..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>

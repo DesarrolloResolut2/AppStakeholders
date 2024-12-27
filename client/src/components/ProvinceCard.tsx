@@ -450,81 +450,84 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </p>
                       </div>
                     )}
-
                     {/* Sección de Experiencia */}
-                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia && 
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
                      selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
                       <div className="mt-6">
                         <h4 className="text-md font-semibold mb-3">Experiencia Profesional</h4>
                         <div className="space-y-4">
                           {selectedStakeholder.datos_especificos_linkedin.experiencia
-                            .sort((a: any, b: any) => {
-                              const aYear = parseInt(a?.anio_inicio || '0');
-                              const bYear = parseInt(b?.anio_inicio || '0');
+                            .filter((exp) => typeof exp === 'object' && exp !== null) // Validar que cada item es un objeto válido
+                            .sort((a, b) => {
+                              const aYear = parseInt(a?.anio_inicio, 10) || 0;
+                              const bYear = parseInt(b?.anio_inicio, 10) || 0;
                               return bYear - aYear;
                             })
-                            .map((exp: any, index: number) => (
-                              <div key={index} className="border-l-2 border-primary/30 pl-4">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <p className="font-medium">{exp?.cargo || ''}</p>
-                                    <p className="text-muted-foreground">{exp?.nombre_empresa || ''}</p>
+                            .map((exp, index) => {
+                              // Validar que las propiedades necesarias existen antes de renderizar
+                              const { cargo, nombre_empresa, anio_inicio, anio_fin, ubicacion, descripcion } = exp || {};
+                              return (
+                                <div key={`exp-${index}`} className="border-l-2 border-primary/30 pl-4">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <p className="font-medium">{cargo || 'Sin especificar'}</p>
+                                      <p className="text-muted-foreground">{nombre_empresa || 'Sin empresa'}</p>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                      {anio_inicio || 'N/A'} - {anio_fin || 'Presente'}
+                                    </p>
                                   </div>
-                                  <p className="text-sm text-muted-foreground">
-                                    {exp?.anio_inicio || ''} - {exp?.anio_fin || 'Presente'}
-                                  </p>
+                                  {ubicacion && (
+                                    <p className="text-sm text-muted-foreground mt-1">{ubicacion}</p>
+                                  )}
+                                  {descripcion && (
+                                    <p className="text-sm text-muted-foreground mt-2">{descripcion}</p>
+                                  )}
                                 </div>
-                                {exp?.ubicacion && (
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    {exp.ubicacion}
-                                  </p>
-                                )}
-                                {exp?.descripcion && (
-                                  <p className="text-sm text-muted-foreground mt-2">
-                                    {exp.descripcion}
-                                  </p>
-                                )}
-                              </div>
-                            ))}
+                              );
+                            })}
                         </div>
                       </div>
                     )}
 
                     {/* Sección de Formación */}
-                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && 
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
                      selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
                       <div className="mt-6">
                         <h4 className="text-md font-semibold mb-3">Formación Académica</h4>
                         <div className="space-y-4">
                           {selectedStakeholder.datos_especificos_linkedin.formacion
-                            .sort((a: any, b: any) => {
-                              const aYear = parseInt(a?.anio_inicio || '0');
-                              const bYear = parseInt(b?.anio_inicio || '0');
+                            .filter((form) => typeof form === 'object' && form !== null) // Validar que cada item es un objeto válido
+                            .sort((a, b) => {
+                              const aYear = parseInt(a?.anio_inicio, 10) || 0;
+                              const bYear = parseInt(b?.anio_inicio, 10) || 0;
                               return bYear - aYear;
                             })
-                            .map((form: any, index: number) => (
-                              <div key={index} className="border-l-2 border-primary/30 pl-4">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <p className="font-medium">{form?.titulo || ''}</p>
-                                    <p className="text-muted-foreground">{form?.nombre_institucion || ''}</p>
+                            .map((form, index) => {
+                              // Validar que las propiedades necesarias existen antes de renderizar
+                              const { titulo, nombre_institucion, anio_inicio, anio_fin, tipo, descripcion } = form || {};
+                              return (
+                                <div key={`form-${index}`} className="border-l-2 border-primary/30 pl-4">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <p className="font-medium">{titulo || 'Sin título'}</p>
+                                      <p className="text-muted-foreground">{nombre_institucion || 'Sin institución'}</p>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                      {anio_inicio || 'N/A'} - {anio_fin || 'Presente'}
+                                    </p>
                                   </div>
-                                  <p className="text-sm text-muted-foreground">
-                                    {form?.anio_inicio || ''} - {form?.anio_fin || 'Presente'}
-                                  </p>
+                                  {tipo && (
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      Tipo: {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                                    </p>
+                                  )}
+                                  {descripcion && (
+                                    <p className="text-sm text-muted-foreground mt-2">{descripcion}</p>
+                                  )}
                                 </div>
-                                {form?.tipo && (
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    Tipo: {(form.tipo || '').charAt(0).toUpperCase() + (form.tipo || '').slice(1)}
-                                  </p>
-                                )}
-                                {form?.descripcion && (
-                                  <p className="text-sm text-muted-foreground mt-2">
-                                    {form.descripcion}
-                                  </p>
-                                )}
-                              </div>
-                            ))}
+                              );
+                            })}
                         </div>
                       </div>
                     )}
