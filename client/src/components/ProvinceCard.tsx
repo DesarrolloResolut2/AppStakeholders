@@ -70,31 +70,40 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     exportProvinciaData(provincia.id);
   };
 
-  const renderLinkedInPreview = (stakeholder: Stakeholder) => {
+  // Renderiza un resumen de la experiencia y formación
+  const renderLinkedInSummary = (stakeholder: Stakeholder) => {
     const linkedin = stakeholder.datos_especificos_linkedin;
     if (!linkedin) return null;
 
-    const experiencia = linkedin.experiencia?.[0];
-    const formacion = linkedin.formacion?.[0];
+    let experienciaTexto = "";
+    let formacionTexto = "";
+
+    if (linkedin.experiencia && linkedin.experiencia.length > 0) {
+      const primeraExp = linkedin.experiencia[0];
+      experienciaTexto = `${primeraExp.cargo} en ${primeraExp.empresa}`;
+      if (linkedin.experiencia.length > 1) {
+        experienciaTexto += ` y ${linkedin.experiencia.length - 1} experiencia(s) más`;
+      }
+    }
+
+    if (linkedin.formacion && linkedin.formacion.length > 0) {
+      const primeraForm = linkedin.formacion[0];
+      formacionTexto = `${primeraForm.titulo} - ${primeraForm.universidad}`;
+      if (linkedin.formacion.length > 1) {
+        formacionTexto += ` y ${linkedin.formacion.length - 1} formación(es) más`;
+      }
+    }
 
     return (
       <div className="mt-2 space-y-2">
         {linkedin.headline && (
           <p className="text-sm text-muted-foreground">{linkedin.headline}</p>
         )}
-        {experiencia && (
-          <p className="text-sm">
-            {experiencia.cargo} en {experiencia.empresa}
-            {linkedin.experiencia && linkedin.experiencia.length > 1 && 
-              ` y ${linkedin.experiencia.length - 1} más`}
-          </p>
+        {experienciaTexto && (
+          <p className="text-sm">{experienciaTexto}</p>
         )}
-        {formacion && (
-          <p className="text-sm">
-            {formacion.titulo} - {formacion.universidad}
-            {linkedin.formacion && linkedin.formacion.length > 1 && 
-              ` y ${linkedin.formacion.length - 1} más`}
-          </p>
+        {formacionTexto && (
+          <p className="text-sm">{formacionTexto}</p>
         )}
       </div>
     );
@@ -179,7 +188,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                       {stakeholder.nombre}
                     </h3>
-                    {renderLinkedInPreview(stakeholder)}
+                    {renderLinkedInSummary(stakeholder)}
                   </div>
                   <div className="space-x-2">
                     <Button
@@ -380,19 +389,13 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               </div>
 
               {/* Datos de LinkedIn */}
-              {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
-                selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                (selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
-                  selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0) ||
-                (selectedStakeholder?.datos_especificos_linkedin?.formacion &&
-                  selectedStakeholder.datos_especificos_linkedin.formacion.length > 0) ||
-                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
+              {selectedStakeholder?.datos_especificos_linkedin && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
                     Datos de LinkedIn
                   </h3>
-                  <div className="space-y-4">
-                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
+                  <div className="space-y-6">
+                    {selectedStakeholder.datos_especificos_linkedin.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
@@ -400,7 +403,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
+                    {selectedStakeholder.datos_especificos_linkedin.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
@@ -408,56 +411,55 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
-                      selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
+
+                    {/* Experiencia */}
+                    {selectedStakeholder.datos_especificos_linkedin.experiencia?.length > 0 && (
                       <div>
                         <p className="font-medium mb-3">Experiencia Profesional</p>
                         <div className="space-y-4">
-                          {selectedStakeholder.datos_especificos_linkedin.experiencia.map(
-                            (exp, index) => (
-                              <div key={index} className="bg-secondary/10 p-4 rounded-lg">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <p className="font-semibold text-primary">{exp.cargo}</p>
-                                    <p className="text-sm text-muted-foreground mt-1">{exp.empresa}</p>
-                                  </div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {exp.fecha_inicio} - {exp.fecha_fin || 'Presente'}
-                                  </div>
+                          {selectedStakeholder.datos_especificos_linkedin.experiencia.map((exp, index) => (
+                            <div key={index} className="bg-secondary/10 p-4 rounded-lg">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-semibold text-primary">{exp.cargo || ''}</p>
+                                  <p className="text-sm text-muted-foreground mt-1">{exp.empresa || ''}</p>
                                 </div>
-                                {exp.descripcion && (
-                                  <p className="text-sm mt-3 text-muted-foreground">{exp.descripcion}</p>
-                                )}
+                                <div className="text-sm text-muted-foreground">
+                                  {exp.fecha_inicio || ''} - {exp.fecha_fin || 'Presente'}
+                                </div>
                               </div>
-                            )
-                          )}
+                              {exp.descripcion && (
+                                <p className="text-sm mt-3 text-muted-foreground">{exp.descripcion}</p>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
-                      selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
+
+                    {/* Formación */}
+                    {selectedStakeholder.datos_especificos_linkedin.formacion?.length > 0 && (
                       <div className="mt-6">
                         <p className="font-medium mb-3">Formación Académica</p>
                         <div className="space-y-4">
-                          {selectedStakeholder.datos_especificos_linkedin.formacion.map(
-                            (edu, index) => (
-                              <div key={index} className="bg-secondary/10 p-4 rounded-lg">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <p className="font-semibold text-primary">{edu.titulo}</p>
-                                    <p className="text-sm text-muted-foreground mt-1">{edu.universidad}</p>
-                                  </div>
-                                  <div className="text-sm text-muted-foreground">
-                                    {edu.año_inicio} - {edu.año_fin || 'Presente'}
-                                  </div>
+                          {selectedStakeholder.datos_especificos_linkedin.formacion.map((edu, index) => (
+                            <div key={index} className="bg-secondary/10 p-4 rounded-lg">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-semibold text-primary">{edu.titulo || ''}</p>
+                                  <p className="text-sm text-muted-foreground mt-1">{edu.universidad || ''}</p>
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {edu.año_inicio || ''} - {edu.año_fin || 'Presente'}
                                 </div>
                               </div>
-                            )
-                          )}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
+
+                    {selectedStakeholder.datos_especificos_linkedin.otros_campos && (
                       <div>
                         <p className="font-medium">Otros Campos</p>
                         <p className="text-muted-foreground">
