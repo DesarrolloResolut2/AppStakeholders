@@ -4,6 +4,21 @@ export interface Provincia {
   stakeholders?: Stakeholder[];
 }
 
+export interface LinkedInExperience {
+  empresa: string;
+  cargo: string;
+  fecha_inicio: string;
+  fecha_fin?: string;
+  descripcion?: string;
+}
+
+export interface LinkedInEducation {
+  universidad: string;
+  titulo: string;
+  año_inicio: string;
+  año_fin?: string;
+}
+
 export interface Stakeholder {
   id?: number;
   provincia_id: number;
@@ -28,8 +43,8 @@ export interface Stakeholder {
   datos_especificos_linkedin?: {
     about_me?: string;
     headline?: string;
-    experiencia?: string;
-    formacion?: string;
+    experiencia?: LinkedInExperience[];
+    formacion?: LinkedInEducation[];
     otros_campos?: string;
   };
 }

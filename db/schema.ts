@@ -31,8 +31,19 @@ export const stakeholders = pgTable("stakeholders", {
   datos_especificos_linkedin: jsonb("datos_especificos_linkedin").$type<{
     about_me?: string;
     headline?: string;
-    experiencia?: string;
-    formacion?: string;
+    experiencia?: Array<{
+      empresa: string;
+      cargo: string;
+      fecha_inicio: string;
+      fecha_fin?: string;
+      descripcion?: string;
+    }>;
+    formacion?: Array<{
+      universidad: string;
+      titulo: string;
+      año_inicio: string;
+      año_fin?: string;
+    }>;
     otros_campos?: string;
   }>(),
 });

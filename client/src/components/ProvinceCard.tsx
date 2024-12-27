@@ -404,8 +404,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     Datos de LinkedIn
                   </h3>
                   <div className="space-y-4">
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.about_me && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
@@ -416,8 +415,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.headline && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
@@ -428,32 +426,54 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.experiencia && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia && (
                       <div>
                         <p className="font-medium">Experiencia</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .experiencia
-                          }
-                        </p>
+                        <div className="space-y-4">
+                          {selectedStakeholder.datos_especificos_linkedin.experiencia.map(
+                            (exp, index) => (
+                              <div key={index} className="bg-secondary/10 p-3 rounded-lg">
+                                <div className="flex justify-between">
+                                  <div>
+                                    <p className="font-semibold">{exp.cargo}</p>
+                                    <p className="text-sm text-muted-foreground">{exp.empresa}</p>
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {exp.fecha_inicio} - {exp.fecha_fin || 'Presente'}
+                                  </div>
+                                </div>
+                                {exp.descripcion && (
+                                  <p className="text-sm mt-2 text-muted-foreground">{exp.descripcion}</p>
+                                )}
+                              </div>
+                            )
+                          )}
+                        </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.formacion && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && (
                       <div>
                         <p className="font-medium">Formación</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .formacion
-                          }
-                        </p>
+                        <div className="space-y-4">
+                          {selectedStakeholder.datos_especificos_linkedin.formacion.map(
+                            (edu, index) => (
+                              <div key={index} className="bg-secondary/10 p-3 rounded-lg">
+                                <div className="flex justify-between">
+                                  <div>
+                                    <p className="font-semibold">{edu.titulo}</p>
+                                    <p className="text-sm text-muted-foreground">{edu.universidad}</p>
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {edu.año_inicio} - {edu.año_fin || 'Presente'}
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.otros_campos && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
                       <div>
                         <p className="font-medium">Otros Campos</p>
                         <p className="text-muted-foreground">
