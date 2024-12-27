@@ -70,6 +70,31 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     exportProvinciaData(provincia.id);
   };
 
+  const renderLinkedInPreview = (stakeholder: Stakeholder) => {
+    const linkedin = stakeholder.datos_especificos_linkedin;
+    if (!linkedin) return null;
+
+    return (
+      <div className="mt-2 space-y-2">
+        {linkedin.headline && (
+          <p className="text-sm text-muted-foreground">{linkedin.headline}</p>
+        )}
+        {linkedin.experiencia && linkedin.experiencia.length > 0 && (
+          <p className="text-sm">
+            {linkedin.experiencia[0].cargo} en {linkedin.experiencia[0].empresa}
+            {linkedin.experiencia.length > 1 && ` y ${linkedin.experiencia.length - 1} más`}
+          </p>
+        )}
+        {linkedin.formacion && linkedin.formacion.length > 0 && (
+          <p className="text-sm">
+            {linkedin.formacion[0].titulo} - {linkedin.formacion[0].universidad}
+            {linkedin.formacion.length > 1 && ` y ${linkedin.formacion.length - 1} más`}
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card className="w-full max-w-lg hover:shadow-lg transition-shadow border-t-4 border-t-primary/20">
       <CardHeader className="relative">
@@ -149,11 +174,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                       {stakeholder.nombre}
                     </h3>
-                    {stakeholder.datos_especificos_linkedin?.headline && (
-                      <p className="text-sm text-muted-foreground">
-                        {stakeholder.datos_especificos_linkedin.headline}
-                      </p>
-                    )}
+                    {renderLinkedInPreview(stakeholder)}
                   </div>
                   <div className="space-x-2">
                     <Button
