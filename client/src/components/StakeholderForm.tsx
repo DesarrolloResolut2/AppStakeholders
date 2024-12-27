@@ -23,8 +23,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Stakeholder } from "@/lib/types";
-import { User, Phone, Book, Linkedin, Plus, Trash2 } from 'lucide-react'
+import { User, Phone, Book, Linkedin, Plus, Trash2 } from 'lucide-react';
 
+// Schemas de validación
 const experienciaSchema = z.object({
   nombre_empresa: z.string().min(1, "El nombre de la empresa es requerido"),
   cargo: z.string().min(1, "El cargo es requerido"),
@@ -133,7 +134,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
     }));
 
   const handleSubmit = (values: z.infer<typeof stakeholderSchema>) => {
-    const experienciaNormalizada = values.datos_especificos_linkedin?.experiencia ? 
+    const experienciaNormalizada = values.datos_especificos_linkedin?.experiencia ?
       normalizeData(values.datos_especificos_linkedin.experiencia) : [];
     const formacionNormalizada = values.datos_especificos_linkedin?.formacion ?
       normalizeData(values.datos_especificos_linkedin.formacion) : [];
@@ -491,11 +492,8 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                 </Card>
               </TabsContent>
               <TabsContent value="linkedin">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Datos Específicos de LinkedIn</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <Card className="p-4">
+                  <div className="space-y-4">
                     <FormField
                       control={form.control}
                       name="datos_especificos_linkedin.about_me"
@@ -512,6 +510,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
                       name="datos_especificos_linkedin.headline"
@@ -743,7 +742,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                   >
                                     <FormControl>
                                       <SelectTrigger>
-                                        <SelectValue placeholder="Seleccionar tipo" />
+                                        <SelectValue placeholder="Selecciona el tipo" />
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -751,7 +750,9 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                       <SelectItem value="master">Máster</SelectItem>
                                       <SelectItem value="doctorado">Doctorado</SelectItem>
                                       <SelectItem value="curso">Curso</SelectItem>
-                                      <SelectItem value="certificacion">Certificación</SelectItem>
+                                      <SelectItem value="certificacion">
+                                        Certificación
+                                      </SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />
@@ -795,15 +796,15 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                         </FormItem>
                       )}
                     />
-                  </CardContent>
+                  </div>
                 </Card>
               </TabsContent>
-            </Tabs>
+              </Tabs>
           </div>
         </ScrollArea>
         <div className="sticky bottom-0 bg-background pt-4 border-t">
           <Button type="submit" className="w-full">
-            {stakeholder ? "Actualizar" : "Crear"} Stakeholder
+            Guardar
           </Button>
         </div>
       </form>
