@@ -70,45 +70,6 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     exportProvinciaData(provincia.id);
   };
 
-  // Renderiza un resumen de la experiencia y formación
-  const renderLinkedInSummary = (stakeholder: Stakeholder) => {
-    const linkedin = stakeholder.datos_especificos_linkedin;
-    if (!linkedin) return null;
-
-    let experienciaTexto = "";
-    let formacionTexto = "";
-
-    if (linkedin.experiencia && linkedin.experiencia.length > 0) {
-      const primeraExp = linkedin.experiencia[0];
-      experienciaTexto = `${primeraExp.cargo} en ${primeraExp.empresa}`;
-      if (linkedin.experiencia.length > 1) {
-        experienciaTexto += ` y ${linkedin.experiencia.length - 1} experiencia(s) más`;
-      }
-    }
-
-    if (linkedin.formacion && linkedin.formacion.length > 0) {
-      const primeraForm = linkedin.formacion[0];
-      formacionTexto = `${primeraForm.titulo} - ${primeraForm.universidad}`;
-      if (linkedin.formacion.length > 1) {
-        formacionTexto += ` y ${linkedin.formacion.length - 1} formación(es) más`;
-      }
-    }
-
-    return (
-      <div className="mt-2 space-y-2">
-        {linkedin.headline && (
-          <p className="text-sm text-muted-foreground">{linkedin.headline}</p>
-        )}
-        {experienciaTexto && (
-          <p className="text-sm">{experienciaTexto}</p>
-        )}
-        {formacionTexto && (
-          <p className="text-sm">{formacionTexto}</p>
-        )}
-      </div>
-    );
-  };
-
   return (
     <Card className="w-full max-w-lg hover:shadow-lg transition-shadow border-t-4 border-t-primary/20">
       <CardHeader className="relative">
@@ -188,7 +149,11 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                       {stakeholder.nombre}
                     </h3>
-                    {renderLinkedInSummary(stakeholder)}
+                    {stakeholder.datos_especificos_linkedin?.headline && (
+                      <p className="text-sm text-muted-foreground">
+                        {stakeholder.datos_especificos_linkedin.headline}
+                      </p>
+                    )}
                   </div>
                   <div className="space-x-2">
                     <Button
@@ -300,19 +265,11 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                   Datos de Contacto
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {selectedStakeholder?.datos_contacto?.organizacion_principal && (
+                  {selectedStakeholder?.datos_contacto?.organizacion && (
                     <div>
-                      <p className="font-medium">Organización Principal</p>
+                      <p className="font-medium">Organización</p>
                       <p className="text-muted-foreground">
-                        {selectedStakeholder.datos_contacto.organizacion_principal}
-                      </p>
-                    </div>
-                  )}
-                  {selectedStakeholder?.datos_contacto?.otras_organizaciones && (
-                    <div>
-                      <p className="font-medium">Otras Organizaciones</p>
-                      <p className="text-muted-foreground">
-                        {selectedStakeholder.datos_contacto.otras_organizaciones}
+                        {selectedStakeholder.datos_contacto.organizacion}
                       </p>
                     </div>
                   )}
@@ -388,82 +345,122 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 </div>
               </div>
 
+              {/* Información Adicional */}
+              <div className="bg-secondary/20 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">
+                  Información Adicional
+                </h3>
+                <div className="space-y-4">
+                  {selectedStakeholder?.recursos && (
+                    <div>
+                      <p className="font-medium">Recursos</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.recursos}
+                      </p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.expectativas_comunicacion && (
+                    <div>
+                      <p className="font-medium">
+                        Expectativas de Comunicación
+                      </p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.expectativas_comunicacion}
+                      </p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.relaciones && (
+                    <div>
+                      <p className="font-medium">
+                        Relaciones con Otros Actores
+                      </p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.relaciones}
+                      </p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.riesgos_conflictos && (
+                    <div>
+                      <p className="font-medium">
+                        Riesgos y Conflictos Potenciales
+                      </p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.riesgos_conflictos}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Datos de LinkedIn */}
-              {selectedStakeholder?.datos_especificos_linkedin && (
+              {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
+                selectedStakeholder?.datos_especificos_linkedin?.headline ||
+                selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
+                selectedStakeholder?.datos_especificos_linkedin?.formacion ||
+                selectedStakeholder?.datos_especificos_linkedin
+                  ?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
                     Datos de LinkedIn
                   </h3>
-                  <div className="space-y-6">
-                    {selectedStakeholder.datos_especificos_linkedin.about_me && (
+                  <div className="space-y-4">
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
-                          {selectedStakeholder.datos_especificos_linkedin.about_me}
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .about_me
+                          }
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder.datos_especificos_linkedin.headline && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
-                          {selectedStakeholder.datos_especificos_linkedin.headline}
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .headline
+                          }
                         </p>
                       </div>
                     )}
-
-                    {/* Experiencia */}
-                    {selectedStakeholder.datos_especificos_linkedin.experiencia?.length > 0 && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.experiencia && (
                       <div>
-                        <p className="font-medium mb-3">Experiencia Profesional</p>
-                        <div className="space-y-4">
-                          {selectedStakeholder.datos_especificos_linkedin.experiencia.map((exp, index) => (
-                            <div key={index} className="bg-secondary/10 p-4 rounded-lg">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-semibold text-primary">{exp.cargo || ''}</p>
-                                  <p className="text-sm text-muted-foreground mt-1">{exp.empresa || ''}</p>
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {exp.fecha_inicio || ''} - {exp.fecha_fin || 'Presente'}
-                                </div>
-                              </div>
-                              {exp.descripcion && (
-                                <p className="text-sm mt-3 text-muted-foreground">{exp.descripcion}</p>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                        <p className="font-medium">Experiencia</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .experiencia
+                          }
+                        </p>
                       </div>
                     )}
-
-                    {/* Formación */}
-                    {selectedStakeholder.datos_especificos_linkedin.formacion?.length > 0 && (
-                      <div className="mt-6">
-                        <p className="font-medium mb-3">Formación Académica</p>
-                        <div className="space-y-4">
-                          {selectedStakeholder.datos_especificos_linkedin.formacion.map((edu, index) => (
-                            <div key={index} className="bg-secondary/10 p-4 rounded-lg">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-semibold text-primary">{edu.titulo || ''}</p>
-                                  <p className="text-sm text-muted-foreground mt-1">{edu.universidad || ''}</p>
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {edu.año_inicio || ''} - {edu.año_fin || 'Presente'}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.formacion && (
+                      <div>
+                        <p className="font-medium">Formación</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .formacion
+                          }
+                        </p>
                       </div>
                     )}
-
-                    {selectedStakeholder.datos_especificos_linkedin.otros_campos && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.otros_campos && (
                       <div>
                         <p className="font-medium">Otros Campos</p>
                         <p className="text-muted-foreground">
-                          {selectedStakeholder.datos_especificos_linkedin.otros_campos}
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .otros_campos
+                          }
                         </p>
                       </div>
                     )}
