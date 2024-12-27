@@ -99,8 +99,12 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
       datos_especificos_linkedin: {
         about_me: stakeholder?.datos_especificos_linkedin?.about_me || '',
         headline: stakeholder?.datos_especificos_linkedin?.headline || '',
-        experiencia: stakeholder?.datos_especificos_linkedin?.experiencia || [],
-        formacion: stakeholder?.datos_especificos_linkedin?.formacion || [],
+        experiencia: stakeholder?.datos_especificos_linkedin?.experiencia?.length ? 
+          stakeholder.datos_especificos_linkedin.experiencia : 
+          [{ empresa: '', cargo: '', fecha_inicio: '', fecha_fin: '', descripcion: '' }],
+        formacion: stakeholder?.datos_especificos_linkedin?.formacion?.length ? 
+          stakeholder.datos_especificos_linkedin.formacion : 
+          [{ universidad: '', titulo: '', año_inicio: '', año_fin: '' }],
         otros_campos: stakeholder?.datos_especificos_linkedin?.otros_campos || '',
       },
     },
@@ -501,24 +505,26 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                           className="flex items-center gap-2"
                         >
                           <Plus className="w-4 h-4" />
-                          Añadir Experiencia
+                          Añadir otra experiencia
                         </Button>
                       </div>
 
                       {experienciaFields.map((field, index) => (
                         <Card key={field.id} className="p-4">
                           <div className="space-y-4">
-                            <div className="flex justify-end">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeExperiencia(index)}
-                                className="text-destructive"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
+                            {index > 0 && (
+                              <div className="flex justify-end">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeExperiencia(index)}
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            )}
                             <div className="grid grid-cols-2 gap-4">
                               <FormField
                                 control={form.control}
@@ -610,24 +616,26 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                           className="flex items-center gap-2"
                         >
                           <Plus className="w-4 h-4" />
-                          Añadir Formación
+                          Añadir otra formación
                         </Button>
                       </div>
 
                       {formacionFields.map((field, index) => (
                         <Card key={field.id} className="p-4">
                           <div className="space-y-4">
-                            <div className="flex justify-end">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeFormacion(index)}
-                                className="text-destructive"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
+                            {index > 0 && (
+                              <div className="flex justify-end">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeFormacion(index)}
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            )}
                             <div className="grid grid-cols-2 gap-4">
                               <FormField
                                 control={form.control}
@@ -664,7 +672,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                   <FormItem>
                                     <FormLabel>Año de inicio</FormLabel>
                                     <FormControl>
-                                      <Input {...field} type="number" />
+                                      <Input {...field} type="number" min="1900" max="2100" />
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>
@@ -677,7 +685,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                   <FormItem>
                                     <FormLabel>Año de fin</FormLabel>
                                     <FormControl>
-                                      <Input {...field} type="number" />
+                                      <Input {...field} type="number" min="1900" max="2100" />
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>

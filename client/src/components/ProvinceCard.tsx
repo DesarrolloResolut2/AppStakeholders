@@ -428,22 +428,22 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                     )}
                     {selectedStakeholder?.datos_especificos_linkedin?.experiencia && (
                       <div>
-                        <p className="font-medium">Experiencia</p>
+                        <p className="font-medium mb-3">Experiencia Profesional</p>
                         <div className="space-y-4">
                           {selectedStakeholder.datos_especificos_linkedin.experiencia.map(
                             (exp, index) => (
-                              <div key={index} className="bg-secondary/10 p-3 rounded-lg">
-                                <div className="flex justify-between">
+                              <div key={index} className="bg-secondary/10 p-4 rounded-lg">
+                                <div className="flex justify-between items-start">
                                   <div>
-                                    <p className="font-semibold">{exp.cargo}</p>
-                                    <p className="text-sm text-muted-foreground">{exp.empresa}</p>
+                                    <p className="font-semibold text-primary">{exp.cargo}</p>
+                                    <p className="text-sm text-muted-foreground mt-1">{exp.empresa}</p>
                                   </div>
                                   <div className="text-sm text-muted-foreground">
                                     {exp.fecha_inicio} - {exp.fecha_fin || 'Presente'}
                                   </div>
                                 </div>
                                 {exp.descripcion && (
-                                  <p className="text-sm mt-2 text-muted-foreground">{exp.descripcion}</p>
+                                  <p className="text-sm mt-3 text-muted-foreground">{exp.descripcion}</p>
                                 )}
                               </div>
                             )
@@ -452,16 +452,16 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       </div>
                     )}
                     {selectedStakeholder?.datos_especificos_linkedin?.formacion && (
-                      <div>
-                        <p className="font-medium">Formación</p>
+                      <div className="mt-6">
+                        <p className="font-medium mb-3">Formación Académica</p>
                         <div className="space-y-4">
                           {selectedStakeholder.datos_especificos_linkedin.formacion.map(
                             (edu, index) => (
-                              <div key={index} className="bg-secondary/10 p-3 rounded-lg">
-                                <div className="flex justify-between">
+                              <div key={index} className="bg-secondary/10 p-4 rounded-lg">
+                                <div className="flex justify-between items-start">
                                   <div>
-                                    <p className="font-semibold">{edu.titulo}</p>
-                                    <p className="text-sm text-muted-foreground">{edu.universidad}</p>
+                                    <p className="font-semibold text-primary">{edu.titulo}</p>
+                                    <p className="text-sm text-muted-foreground mt-1">{edu.universidad}</p>
                                   </div>
                                   <div className="text-sm text-muted-foreground">
                                     {edu.año_inicio} - {edu.año_fin || 'Presente'}
