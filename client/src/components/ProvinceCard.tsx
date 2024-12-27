@@ -74,21 +74,26 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     const linkedin = stakeholder.datos_especificos_linkedin;
     if (!linkedin) return null;
 
+    const experiencia = linkedin.experiencia?.[0];
+    const formacion = linkedin.formacion?.[0];
+
     return (
       <div className="mt-2 space-y-2">
         {linkedin.headline && (
           <p className="text-sm text-muted-foreground">{linkedin.headline}</p>
         )}
-        {linkedin.experiencia && linkedin.experiencia.length > 0 && (
+        {experiencia && (
           <p className="text-sm">
-            {linkedin.experiencia[0].cargo} en {linkedin.experiencia[0].empresa}
-            {linkedin.experiencia.length > 1 && ` y ${linkedin.experiencia.length - 1} más`}
+            {experiencia.cargo} en {experiencia.empresa}
+            {linkedin.experiencia && linkedin.experiencia.length > 1 && 
+              ` y ${linkedin.experiencia.length - 1} más`}
           </p>
         )}
-        {linkedin.formacion && linkedin.formacion.length > 0 && (
+        {formacion && (
           <p className="text-sm">
-            {linkedin.formacion[0].titulo} - {linkedin.formacion[0].universidad}
-            {linkedin.formacion.length > 1 && ` y ${linkedin.formacion.length - 1} más`}
+            {formacion.titulo} - {formacion.universidad}
+            {linkedin.formacion && linkedin.formacion.length > 1 && 
+              ` y ${linkedin.formacion.length - 1} más`}
           </p>
         )}
       </div>
@@ -286,11 +291,19 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                   Datos de Contacto
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {selectedStakeholder?.datos_contacto?.organizacion && (
+                  {selectedStakeholder?.datos_contacto?.organizacion_principal && (
                     <div>
-                      <p className="font-medium">Organización</p>
+                      <p className="font-medium">Organización Principal</p>
                       <p className="text-muted-foreground">
-                        {selectedStakeholder.datos_contacto.organizacion}
+                        {selectedStakeholder.datos_contacto.organizacion_principal}
+                      </p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.datos_contacto?.otras_organizaciones && (
+                    <div>
+                      <p className="font-medium">Otras Organizaciones</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.datos_contacto.otras_organizaciones}
                       </p>
                     </div>
                   )}
@@ -366,58 +379,13 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 </div>
               </div>
 
-              {/* Información Adicional */}
-              <div className="bg-secondary/20 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">
-                  Información Adicional
-                </h3>
-                <div className="space-y-4">
-                  {selectedStakeholder?.recursos && (
-                    <div>
-                      <p className="font-medium">Recursos</p>
-                      <p className="text-muted-foreground">
-                        {selectedStakeholder.recursos}
-                      </p>
-                    </div>
-                  )}
-                  {selectedStakeholder?.expectativas_comunicacion && (
-                    <div>
-                      <p className="font-medium">
-                        Expectativas de Comunicación
-                      </p>
-                      <p className="text-muted-foreground">
-                        {selectedStakeholder.expectativas_comunicacion}
-                      </p>
-                    </div>
-                  )}
-                  {selectedStakeholder?.relaciones && (
-                    <div>
-                      <p className="font-medium">
-                        Relaciones con Otros Actores
-                      </p>
-                      <p className="text-muted-foreground">
-                        {selectedStakeholder.relaciones}
-                      </p>
-                    </div>
-                  )}
-                  {selectedStakeholder?.riesgos_conflictos && (
-                    <div>
-                      <p className="font-medium">
-                        Riesgos y Conflictos Potenciales
-                      </p>
-                      <p className="text-muted-foreground">
-                        {selectedStakeholder.riesgos_conflictos}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
               {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                selectedStakeholder?.datos_especificos_linkedin?.experiencia?.length ||
-                selectedStakeholder?.datos_especificos_linkedin?.formacion?.length ||
+                (selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
+                  selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0) ||
+                (selectedStakeholder?.datos_especificos_linkedin?.formacion &&
+                  selectedStakeholder.datos_especificos_linkedin.formacion.length > 0) ||
                 selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
@@ -441,7 +409,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       </div>
                     )}
                     {selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
-                     selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
+                      selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
                       <div>
                         <p className="font-medium mb-3">Experiencia Profesional</p>
                         <div className="space-y-4">
@@ -467,7 +435,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       </div>
                     )}
                     {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
-                     selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
+                      selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
                       <div className="mt-6">
                         <p className="font-medium mb-3">Formación Académica</p>
                         <div className="space-y-4">
