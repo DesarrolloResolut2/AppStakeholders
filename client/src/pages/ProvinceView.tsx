@@ -1090,8 +1090,20 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                       <p>{selectedStakeholder?.datos_contacto?.website || "No especificado"}</p>
                     </CardContent>
                   </Card>
+                  <Card className="md:col-span-2">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Globe className="h-5 w-5" />
+                        Linkedin
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p>{selectedStakeholder?.datos_contacto?.linkedin || "No especificado"}</p>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
+              
 
               <TabsContent value="objetivos">
                 <div className="space-y-6">
