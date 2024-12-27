@@ -395,10 +395,9 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
-                selectedStakeholder?.datos_especificos_linkedin?.formacion ||
-                selectedStakeholder?.datos_especificos_linkedin
-                  ?.otros_campos) && (
+                selectedStakeholder?.datos_especificos_linkedin?.experiencia?.length ||
+                selectedStakeholder?.datos_especificos_linkedin?.formacion?.length ||
+                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
                     Datos de LinkedIn
@@ -408,10 +407,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .about_me
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.about_me}
                         </p>
                       </div>
                     )}
@@ -419,14 +415,12 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .headline
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.headline}
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
+                     selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
                       <div>
                         <p className="font-medium mb-3">Experiencia Profesional</p>
                         <div className="space-y-4">
@@ -451,7 +445,8 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
+                     selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
                       <div className="mt-6">
                         <p className="font-medium mb-3">Formación Académica</p>
                         <div className="space-y-4">
@@ -477,10 +472,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                       <div>
                         <p className="font-medium">Otros Campos</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .otros_campos
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.otros_campos}
                         </p>
                       </div>
                     )}
