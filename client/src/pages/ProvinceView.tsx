@@ -629,22 +629,12 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                             {selectedStakeholder.datos_especificos_linkedin.experiencia.map((exp: any, index: number) => (
                               <div key={index} className="bg-secondary/10 p-4 rounded-md space-y-2">
                                 <div className="flex justify-between items-start">
-                                  <h5 className="font-semibold">{exp.cargo || ''}</h5>
+                                  <h5 className="font-semibold">{exp.cargo || 'No especificado'}</h5>
                                   <Badge variant="outline">
-                                    {exp.fecha_inicio || ''} - {exp.fecha_fin || 'Presente'}
+                                    {exp.fecha_inicio ? new Date(exp.fecha_inicio).toLocaleDateString() : ''} - {exp.fecha_fin ? new Date(exp.fecha_fin).toLocaleDateString() : 'Presente'}
                                   </Badge>
                                 </div>
-                                <p className="text-muted-foreground">{exp.empresa || ''}</p>
-                                {exp.descripcion && (
-                                  <p className="text-sm text-muted-foreground">
-                                    {exp.descripcion}
-                                  </p>
-                                )}
-                                {exp.ubicacion && (
-                                  <p className="text-sm text-muted-foreground">
-                                    📍 {exp.ubicacion}
-                                  </p>
-                                )}
+                                <p className="text-muted-foreground">{exp.empresa || 'No especificada'}</p>
                               </div>
                             ))}
                           </div>
@@ -664,6 +654,9 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                               <div key={index} className="bg-secondary/10 p-4 rounded-md space-y-2">
                                 <div className="flex justify-between items-start">
                                   <h5 className="font-semibold">{form.titulacion || 'No especificada'}</h5>
+                                  <Badge variant="outline">
+                                    {form.fecha_inicio ? new Date(form.fecha_inicio).toLocaleDateString() : ''} - {form.fecha_fin ? new Date(form.fecha_fin).toLocaleDateString() : 'Presente'}
+                                  </Badge>
                                 </div>
                                 <p className="text-muted-foreground">{form.universidad || 'No especificada'}</p>
                               </div>

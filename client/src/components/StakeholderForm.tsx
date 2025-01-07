@@ -28,11 +28,15 @@ import { User, Phone, Book, Linkedin } from 'lucide-react'
 const experienciaSchema = z.object({
   cargo: z.string().optional(),
   empresa: z.string().optional(),
+  fecha_inicio: z.string().optional(),
+  fecha_fin: z.string().optional()
 });
 
 const formacionSchema = z.object({
   titulacion: z.string().optional(),
   universidad: z.string().optional(),
+  fecha_inicio: z.string().optional(),
+  fecha_fin: z.string().optional()
 });
 
 const stakeholderSchema = z.object({
@@ -111,7 +115,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
     const experienciaActual = form.getValues('datos_especificos_linkedin.experiencia') || [];
     form.setValue('datos_especificos_linkedin.experiencia', [
       ...experienciaActual,
-      { cargo: '', empresa: '' }
+      { cargo: '', empresa: '', fecha_inicio: '', fecha_fin: '' }
     ]);
   };
 
@@ -127,7 +131,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
     const formacionActual = form.getValues('datos_especificos_linkedin.formacion') || [];
     form.setValue('datos_especificos_linkedin.formacion', [
       ...formacionActual,
-      { titulacion: '', universidad: '' }
+      { titulacion: '', universidad: '', fecha_inicio: '', fecha_fin: '' }
     ]);
   };
 
@@ -555,6 +559,34 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                 </FormItem>
                               )}
                             />
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.experiencia.${index}.fecha_inicio`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Inicio</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.experiencia.${index}.fecha_fin`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Fin</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
                           </div>
                         </Card>
                       ))}
@@ -613,6 +645,34 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                 </FormItem>
                               )}
                             />
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.formacion.${index}.fecha_inicio`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Inicio</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.formacion.${index}.fecha_fin`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Fin</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
                           </div>
                         </Card>
                       ))}
