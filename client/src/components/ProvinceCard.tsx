@@ -395,45 +395,41 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
-                selectedStakeholder?.datos_especificos_linkedin?.formacion ||
-                selectedStakeholder?.datos_especificos_linkedin
-                  ?.otros_campos) && (
+                (selectedStakeholder?.datos_especificos_linkedin?.experiencia && 
+                 Array.isArray(selectedStakeholder.datos_especificos_linkedin.experiencia) &&
+                 selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0) ||
+                (selectedStakeholder?.datos_especificos_linkedin?.formacion &&
+                 Array.isArray(selectedStakeholder.datos_especificos_linkedin.formacion) &&
+                 selectedStakeholder.datos_especificos_linkedin.formacion.length > 0) ||
+                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
                     Datos de LinkedIn
                   </h3>
                   <div className="space-y-4">
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.about_me && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .about_me
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.about_me}
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.headline && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .headline
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.headline}
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia && 
-                      selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
+                     Array.isArray(selectedStakeholder.datos_especificos_linkedin.experiencia) &&
+                     selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
                       <div>
                         <p className="font-medium mb-2">Experiencia</p>
                         <div className="space-y-2">
-                          {selectedStakeholder.datos_especificos_linkedin.experiencia.map((exp, index) => (
+                          {selectedStakeholder.datos_especificos_linkedin.experiencia.map((exp: { cargo: string; empresa: string }, index: number) => (
                             <div key={index} className="bg-white/50 p-3 rounded-md">
                               <p className="font-medium text-primary">{exp.cargo}</p>
                               <p className="text-sm text-muted-foreground">{exp.empresa}</p>
@@ -442,12 +438,13 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && 
-                      selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
+                     Array.isArray(selectedStakeholder.datos_especificos_linkedin.formacion) &&
+                     selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
                       <div>
                         <p className="font-medium mb-2">Formación</p>
                         <div className="space-y-2">
-                          {selectedStakeholder.datos_especificos_linkedin.formacion.map((form, index) => (
+                          {selectedStakeholder.datos_especificos_linkedin.formacion.map((form: { titulacion: string; universidad: string }, index: number) => (
                             <div key={index} className="bg-white/50 p-3 rounded-md">
                               <p className="font-medium text-primary">{form.titulacion}</p>
                               <p className="text-sm text-muted-foreground">{form.universidad}</p>
@@ -456,15 +453,11 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.otros_campos && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
                       <div>
                         <p className="font-medium">Otros Campos</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .otros_campos
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.otros_campos}
                         </p>
                       </div>
                     )}
