@@ -15,7 +15,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { StakeholderForm } from "./StakeholderForm";
+import { StakeholderForm } from "./StakeholderForm.tsx";
 import type { Provincia, Stakeholder } from "@/lib/types";
 import {
   createStakeholder,
@@ -68,25 +68,6 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
   const handleExport = () => {
     exportProvinciaData(provincia.id);
-  };
-
-  const renderExperiencia = (experiencias: any[] | undefined) => {
-    if (!experiencias || !Array.isArray(experiencias) || experiencias.length === 0) {
-      return null;
-    }
-
-    // Tomar solo las últimas 2 experiencias para la vista previa
-    return experiencias
-      .slice(0, 2)
-      .map((exp: any, index: number) => {
-        const cargo = exp?.cargo || '';
-        const empresa = exp?.nombre_empresa || '';
-        return (
-          <div key={index} className="text-sm text-muted-foreground">
-            {cargo}{empresa ? ` en ${empresa}` : ''}
-          </div>
-        );
-      });
   };
 
   return (
@@ -166,15 +147,13 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                      {stakeholder.nombre || ''}
+                      {stakeholder.nombre}
                     </h3>
                     {stakeholder.datos_especificos_linkedin?.headline && (
                       <p className="text-sm text-muted-foreground">
                         {stakeholder.datos_especificos_linkedin.headline}
                       </p>
                     )}
-                    {stakeholder.datos_especificos_linkedin?.experiencia && 
-                      renderExperiencia(stakeholder.datos_especificos_linkedin.experiencia)}
                   </div>
                   <div className="space-x-2">
                     <Button
@@ -206,14 +185,14 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                   <div className="bg-secondary p-2 rounded-md">
                     <p className="text-sm font-medium">Nivel de Influencia</p>
                     <p className="text-sm mt-1 text-muted-foreground">
-                      {stakeholder.nivel_influencia || ''}
+                      {stakeholder.nivel_influencia}
                     </p>
                   </div>
 
                   <div className="bg-secondary p-2 rounded-md">
                     <p className="text-sm font-medium">Nivel de Interés</p>
                     <p className="text-sm mt-1 text-muted-foreground">
-                      {stakeholder.nivel_interes || ''}
+                      {stakeholder.nivel_interes}
                     </p>
                   </div>
                 </div>
@@ -273,7 +252,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl">
-                {selectedStakeholder?.nombre || ''}
+                {selectedStakeholder?.nombre}
               </DialogTitle>
               <DialogDescription>
                 Detalles completos del stakeholder
@@ -286,19 +265,11 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                   Datos de Contacto
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {selectedStakeholder?.datos_contacto?.organizacion_principal && (
+                  {selectedStakeholder?.datos_contacto?.organizacion && (
                     <div>
-                      <p className="font-medium">Organización Principal</p>
+                      <p className="font-medium">Organización</p>
                       <p className="text-muted-foreground">
-                        {selectedStakeholder.datos_contacto.organizacion_principal}
-                      </p>
-                    </div>
-                  )}
-                  {selectedStakeholder?.datos_contacto?.otras_organizaciones && (
-                    <div>
-                      <p className="font-medium">Otras Organizaciones</p>
-                      <p className="text-muted-foreground">
-                        {selectedStakeholder.datos_contacto.otras_organizaciones}
+                        {selectedStakeholder.datos_contacto.organizacion}
                       </p>
                     </div>
                   )}
@@ -346,13 +317,13 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                   <div>
                     <p className="font-medium">Nivel de Influencia</p>
                     <p className="text-muted-foreground">
-                      {selectedStakeholder?.nivel_influencia || ''}
+                      {selectedStakeholder?.nivel_influencia}
                     </p>
                   </div>
                   <div>
                     <p className="font-medium">Nivel de Interés</p>
                     <p className="text-muted-foreground">
-                      {selectedStakeholder?.nivel_interes || ''}
+                      {selectedStakeholder?.nivel_interes}
                     </p>
                   </div>
                   {selectedStakeholder?.objetivos_generales && (
@@ -424,119 +395,72 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                (selectedStakeholder?.datos_especificos_linkedin?.experiencia && 
-                 selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0) ||
-                (selectedStakeholder?.datos_especificos_linkedin?.formacion && 
-                 selectedStakeholder.datos_especificos_linkedin.formacion.length > 0) ||
-                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
+                selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
+                selectedStakeholder?.datos_especificos_linkedin?.formacion ||
+                selectedStakeholder?.datos_especificos_linkedin
+                  ?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
                     Datos de LinkedIn
                   </h3>
                   <div className="space-y-4">
-                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
-                          {selectedStakeholder.datos_especificos_linkedin.about_me}
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .about_me
+                          }
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
-                          {selectedStakeholder.datos_especificos_linkedin.headline}
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .headline
+                          }
                         </p>
                       </div>
                     )}
-                    {/* Sección de Experiencia */}
-                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia &&
-                     selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="text-md font-semibold mb-3">Experiencia Profesional</h4>
-                        <div className="space-y-4">
-                          {selectedStakeholder.datos_especificos_linkedin.experiencia
-                            .filter((exp) => typeof exp === 'object' && exp !== null) // Validar que cada item es un objeto válido
-                            .sort((a, b) => {
-                              const aYear = parseInt(a?.anio_inicio, 10) || 0;
-                              const bYear = parseInt(b?.anio_inicio, 10) || 0;
-                              return bYear - aYear;
-                            })
-                            .map((exp, index) => {
-                              // Validar que las propiedades necesarias existen antes de renderizar
-                              const { cargo, nombre_empresa, anio_inicio, anio_fin, ubicacion, descripcion } = exp || {};
-                              return (
-                                <div key={`exp-${index}`} className="border-l-2 border-primary/30 pl-4">
-                                  <div className="flex justify-between items-start">
-                                    <div>
-                                      <p className="font-medium">{cargo || 'Sin especificar'}</p>
-                                      <p className="text-muted-foreground">{nombre_empresa || 'Sin empresa'}</p>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">
-                                      {anio_inicio || 'N/A'} - {anio_fin || 'Presente'}
-                                    </p>
-                                  </div>
-                                  {ubicacion && (
-                                    <p className="text-sm text-muted-foreground mt-1">{ubicacion}</p>
-                                  )}
-                                  {descripcion && (
-                                    <p className="text-sm text-muted-foreground mt-2">{descripcion}</p>
-                                  )}
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Sección de Formación */}
-                    {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
-                     selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="text-md font-semibold mb-3">Formación Académica</h4>
-                        <div className="space-y-4">
-                          {selectedStakeholder.datos_especificos_linkedin.formacion
-                            .filter((form) => typeof form === 'object' && form !== null) // Validar que cada item es un objeto válido
-                            .sort((a, b) => {
-                              const aYear = parseInt(a?.anio_inicio, 10) || 0;
-                              const bYear = parseInt(b?.anio_inicio, 10) || 0;
-                              return bYear - aYear;
-                            })
-                            .map((form, index) => {
-                              // Validar que las propiedades necesarias existen antes de renderizar
-                              const { titulo, nombre_institucion, anio_inicio, anio_fin, tipo, descripcion } = form || {};
-                              return (
-                                <div key={`form-${index}`} className="border-l-2 border-primary/30 pl-4">
-                                  <div className="flex justify-between items-start">
-                                    <div>
-                                      <p className="font-medium">{titulo || 'Sin título'}</p>
-                                      <p className="text-muted-foreground">{nombre_institucion || 'Sin institución'}</p>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">
-                                      {anio_inicio || 'N/A'} - {anio_fin || 'Presente'}
-                                    </p>
-                                  </div>
-                                  {tipo && (
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                      Tipo: {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-                                    </p>
-                                  )}
-                                  {descripcion && (
-                                    <p className="text-sm text-muted-foreground mt-2">{descripcion}</p>
-                                  )}
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    )}
-
-                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
-                      <div className="mt-4">
-                        <p className="font-medium">Información Adicional</p>
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.experiencia && (
+                      <div>
+                        <p className="font-medium">Experiencia</p>
                         <p className="text-muted-foreground">
-                          {selectedStakeholder.datos_especificos_linkedin.otros_campos}
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .experiencia
+                          }
+                        </p>
+                      </div>
+                    )}
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.formacion && (
+                      <div>
+                        <p className="font-medium">Formación</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .formacion
+                          }
+                        </p>
+                      </div>
+                    )}
+                    {selectedStakeholder?.datos_especificos_linkedin
+                      ?.otros_campos && (
+                      <div>
+                        <p className="font-medium">Otros Campos</p>
+                        <p className="text-muted-foreground">
+                          {
+                            selectedStakeholder.datos_especificos_linkedin
+                              .otros_campos
+                          }
                         </p>
                       </div>
                     )}
