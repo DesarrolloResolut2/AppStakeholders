@@ -711,7 +711,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                       )}
 
                     {/* Formación */}
-                    {selectedStakeholder.datos_especificos_linkedin.formacion &&
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion &&
                       Array.isArray(selectedStakeholder.datos_especificos_linkedin.formacion) &&
                       selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
                         <div className="space-y-4">
