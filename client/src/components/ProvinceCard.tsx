@@ -25,6 +25,7 @@ import {
   deleteProvincia,
   exportStakeholderContactData,
 } from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   provincia: Provincia;
@@ -395,72 +396,93 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
-                selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
-                selectedStakeholder?.datos_especificos_linkedin?.formacion ||
-                selectedStakeholder?.datos_especificos_linkedin
-                  ?.otros_campos) && (
+                selectedStakeholder?.datos_especificos_linkedin?.experiencias ||
+                selectedStakeholder?.datos_especificos_linkedin?.formaciones ||
+                selectedStakeholder?.datos_especificos_linkedin?.otros_campos) && (
                 <div className="bg-secondary/20 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4">
                     Datos de LinkedIn
                   </h3>
-                  <div className="space-y-4">
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.about_me && (
+                  <div className="space-y-6">
+                    {selectedStakeholder?.datos_especificos_linkedin?.about_me && (
                       <div>
                         <p className="font-medium">About Me</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .about_me
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.about_me}
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.headline && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.headline && (
                       <div>
                         <p className="font-medium">Headline</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .headline
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.headline}
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.experiencia && (
-                      <div>
-                        <p className="font-medium">Experiencia</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .experiencia
-                          }
-                        </p>
+
+                    {/* Experiencias */}
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencias &&
+                     selectedStakeholder.datos_especificos_linkedin.experiencias.length > 0 && (
+                      <div className="space-y-4">
+                        <p className="font-medium">Experiencia Profesional</p>
+                        <div className="space-y-6">
+                          {selectedStakeholder.datos_especificos_linkedin.experiencias.map((exp, index) => (
+                            <div key={index} className="bg-background/50 p-4 rounded-md space-y-2">
+                              <div className="flex justify-between items-start">
+                                <h4 className="font-semibold">{exp.cargo}</h4>
+                                <Badge variant="outline">
+                                  {exp.fecha_inicio} - {exp.fecha_fin || 'Presente'}
+                                </Badge>
+                              </div>
+                              <p className="text-muted-foreground">{exp.empresa}</p>
+                              {exp.descripcion && (
+                                <p className="text-sm text-muted-foreground">
+                                  {exp.descripcion}
+                                </p>
+                              )}
+                              {exp.ubicacion && (
+                                <p className="text-sm text-muted-foreground">
+                                  📍 {exp.ubicacion}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.formacion && (
-                      <div>
-                        <p className="font-medium">Formación</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .formacion
-                          }
-                        </p>
+
+                    {/* Formaciones */}
+                    {selectedStakeholder?.datos_especificos_linkedin?.formaciones &&
+                     selectedStakeholder.datos_especificos_linkedin.formaciones.length > 0 && (
+                      <div className="space-y-4">
+                        <p className="font-medium">Formación Académica</p>
+                        <div className="space-y-6">
+                          {selectedStakeholder.datos_especificos_linkedin.formaciones.map((form, index) => (
+                            <div key={index} className="bg-background/50 p-4 rounded-md space-y-2">
+                              <div className="flex justify-between items-start">
+                                <h4 className="font-semibold">{form.titulo}</h4>
+                                <Badge variant="outline">
+                                  {form.fecha_inicio} - {form.fecha_fin || 'Presente'}
+                                </Badge>
+                              </div>
+                              <p className="text-muted-foreground">{form.institucion}</p>
+                              {form.descripcion && (
+                                <p className="text-sm text-muted-foreground">
+                                  {form.descripcion}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.otros_campos && (
+
+                    {selectedStakeholder?.datos_especificos_linkedin?.otros_campos && (
                       <div>
                         <p className="font-medium">Otros Campos</p>
                         <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .otros_campos
-                          }
+                          {selectedStakeholder.datos_especificos_linkedin.otros_campos}
                         </p>
                       </div>
                     )}
