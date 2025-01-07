@@ -265,11 +265,19 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                   Datos de Contacto
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {selectedStakeholder?.datos_contacto?.organizacion && (
+                  {selectedStakeholder?.datos_contacto?.organizacion_principal && (
                     <div>
-                      <p className="font-medium">Organización</p>
+                      <p className="font-medium">Organización Principal</p>
                       <p className="text-muted-foreground">
-                        {selectedStakeholder.datos_contacto.organizacion}
+                        {selectedStakeholder.datos_contacto.organizacion_principal}
+                      </p>
+                    </div>
+                  )}
+                  {selectedStakeholder?.datos_contacto?.otras_organizaciones && (
+                    <div>
+                      <p className="font-medium">Otras Organizaciones</p>
+                      <p className="text-muted-foreground">
+                        {selectedStakeholder.datos_contacto.otras_organizaciones}
                       </p>
                     </div>
                   )}
