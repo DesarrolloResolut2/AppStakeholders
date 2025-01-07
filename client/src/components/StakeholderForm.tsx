@@ -214,13 +214,86 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
               </TabsList>
 
               <TabsContent value="principal">
-                {/* ... Principal Tab Content ... */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Información Principal</CardTitle>
+                    <CardContent>
+                      <FormField
+                        control={form.control}
+                        name="nombre"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nombre</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Nombre del Stakeholder" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Add other principal fields as needed */}
+                    </CardContent>
+                  </CardHeader>
+                </Card>
               </TabsContent>
               <TabsContent value="contacto">
-                {/* ... Contact Tab Content ... */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Datos de Contacto</CardTitle>
+                    <CardContent>
+                      <FormField
+                        control={form.control}
+                        name="datos_contacto.email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="email" placeholder="Email" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="datos_contacto.telefono"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Teléfono</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="tel" placeholder="Teléfono" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Add other contact fields as needed */}
+                    </CardContent>
+                  </CardHeader>
+                </Card>
               </TabsContent>
               <TabsContent value="detalles">
-                {/* ... Details Tab Content ... */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Detalles Adicionales</CardTitle>
+                    <CardContent>
+                      <FormField
+                        control={form.control}
+                        name="objetivos_generales"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Objetivos Generales</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} placeholder="Objetivos Generales" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* Add other details fields as needed */}
+                    </CardContent>
+                  </CardHeader>
+                </Card>
               </TabsContent>
               <TabsContent value="linkedin">
                 <Card>
@@ -333,7 +406,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                 </FormItem>
                               )}
                             />
-                              <FormField
+                            <FormField
                               control={form.control}
                               name={`datos_especificos_linkedin.experiencia.${index}.location`}
                               render={({ field }) => (
