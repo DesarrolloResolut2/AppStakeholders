@@ -23,7 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Stakeholder } from "@/lib/types";
-import { User, Phone, Book, Linkedin } from 'lucide-react'
+import { User, Phone, Book, Linkedin, Upload } from 'lucide-react'
+import { useCallback } from "react";
 
 const experienciaSchema = z.object({
   cargo: z.string().optional(),
@@ -149,6 +150,41 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
       provincia_id: provinciaId,
     } as Omit<Stakeholder, "id">);
   };
+
+  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const jsonData = JSON.parse(e.target?.result as string);
+
+        // Mapear los datos del JSON al formato requerido
+        const experiencia = jsonData.experiencia?.map((exp: any) => ({
+          cargo: exp.title || "",
+          empresa: exp.company || "",
+          fecha_inicio: exp.start_date || "",
+          fecha_fin: exp.end_date || "",
+        })) || [];
+
+        const formacion = jsonData.formacion?.map((form: any) => ({
+          titulacion: form.title || "",
+          universidad: form.company || "",
+          fecha_inicio: form.start_date || "",
+          fecha_fin: form.end_date || "",
+        })) || [];
+
+        // Actualizar el formulario con los datos importados
+        form.setValue('datos_especificos_linkedin.experiencia', experiencia);
+        form.setValue('datos_especificos_linkedin.formacion', formacion);
+
+      } catch (error) {
+        console.error('Error al parsear el archivo JSON:', error);
+      }
+    };
+    reader.readAsText(file);
+  }, [form]);
 
   return (
     <Form {...form}>
@@ -471,6 +507,26 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                 <Card>
                   <CardHeader>
                     <CardTitle>Datos Específicos de LinkedIn</CardTitle>
+                    <div className="mt-4">
+                      <Input
+                        type="file"
+                        accept=".json"
+                        onChange={handleFileUpload}
+                        id="json-upload"
+                        className="hidden"
+                      />
+                      <label htmlFor="json-upload">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => document.getElementById('json-upload')?.click()}
+                        >
+                          <Upload className="mr-2 h-4 w-4" />
+                          Importar datos desde JSON
+                        </Button>
+                      </label>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <FormField
@@ -506,7 +562,6 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                       )}
                     />
 
-                    {/* Sección de Experiencia */}
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <FormLabel>Experiencia</FormLabel>
@@ -592,7 +647,6 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                       ))}
                     </div>
 
-                    {/* Sección de Formación */}
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <FormLabel>Formación</FormLabel>

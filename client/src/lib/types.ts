@@ -4,6 +4,15 @@ export interface Provincia {
   stakeholders?: Stakeholder[];
 }
 
+export interface ExperienciaFormacion {
+  title?: string;
+  company?: string;
+  location?: string;
+  start_date?: string;
+  end_date?: string;
+  description?: string;
+}
+
 export interface Stakeholder {
   id?: number;
   provincia_id: number;
@@ -28,8 +37,8 @@ export interface Stakeholder {
   datos_especificos_linkedin?: {
     about_me?: string;
     headline?: string;
-    experiencia?: string;
-    formacion?: string;
+    experiencia?: ExperienciaFormacion[];
+    formacion?: ExperienciaFormacion[];
     otros_campos?: string;
   };
 }
