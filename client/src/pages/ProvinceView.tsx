@@ -663,17 +663,9 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                             {selectedStakeholder.datos_especificos_linkedin.formacion.map((form: any, index: number) => (
                               <div key={index} className="bg-secondary/10 p-4 rounded-md space-y-2">
                                 <div className="flex justify-between items-start">
-                                  <h5 className="font-semibold">{form.titulo}</h5>
-                                  <Badge variant="outline">
-                                    {form.fecha_inicio || ''} - {form.fecha_fin || 'Presente'}
-                                  </Badge>
+                                  <h5 className="font-semibold">{form.titulacion || 'No especificada'}</h5>
                                 </div>
-                                <p className="text-muted-foreground">{form.institucion}</p>
-                                {form.descripcion && (
-                                  <p className="text-sm text-muted-foreground">
-                                    {form.descripcion}
-                                  </p>
-                                )}
+                                <p className="text-muted-foreground">{form.universidad || 'No especificada'}</p>
                               </div>
                             ))}
                           </div>
