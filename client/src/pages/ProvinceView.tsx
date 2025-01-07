@@ -1,62 +1,3 @@
-// import { useState } from "react";
-// import { useQuery, useQueryClient } from "@tanstack/react-query";
-// import { Link } from "wouter";
-// import { Button } from "@/components/ui/button";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-//   DialogDescription,
-// } from "@/components/ui/dialog";
-// import { StakeholderForm } from "@/components/StakeholderForm";
-// import type { Stakeholder } from "@/lib/types";
-// import {
-//   createStakeholder,
-//   updateStakeholder,
-//   deleteStakeholder,
-//   exportProvinciaData,
-//   fetchProvincias,
-//   exportStakeholderContactData, // Added import
-// } from "@/lib/api";
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "@/components/ui/table";
-// import { ScrollArea } from "@/components/ui/scroll-area";
-// import { Badge } from "@/components/ui/badge";
-// import {
-//   ArrowLeft,
-//   Plus,
-//   Download,
-//   Search,
-//   ChevronDown,
-//   ChevronUp,
-//   X,
-// } from "lucide-react";
-// import { Input } from "@/components/ui/input";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-//
-
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
@@ -722,12 +663,12 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                             {selectedStakeholder.datos_especificos_linkedin.formacion.map((form: any, index: number) => (
                               <div key={index} className="bg-secondary/10 p-4 rounded-md space-y-2">
                                 <div className="flex justify-between items-start">
-                                  <h5 className="font-semibold">{form.titulo || ''}</h5>
+                                  <h5 className="font-semibold">{form.titulo}</h5>
                                   <Badge variant="outline">
                                     {form.fecha_inicio || ''} - {form.fecha_fin || 'Presente'}
                                   </Badge>
                                 </div>
-                                <p className="text-muted-foreground">{form.institucion || ''}</p>
+                                <p className="text-muted-foreground">{form.institucion}</p>
                                 {form.descripcion && (
                                   <p className="text-sm text-muted-foreground">
                                     {form.descripcion}
