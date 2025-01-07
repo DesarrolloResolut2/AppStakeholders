@@ -428,28 +428,32 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                         </p>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.experiencia && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.experiencia && 
+                      selectedStakeholder.datos_especificos_linkedin.experiencia.length > 0 && (
                       <div>
-                        <p className="font-medium">Experiencia</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .experiencia
-                          }
-                        </p>
+                        <p className="font-medium mb-2">Experiencia</p>
+                        <div className="space-y-2">
+                          {selectedStakeholder.datos_especificos_linkedin.experiencia.map((exp, index) => (
+                            <div key={index} className="bg-white/50 p-3 rounded-md">
+                              <p className="font-medium text-primary">{exp.cargo}</p>
+                              <p className="text-sm text-muted-foreground">{exp.empresa}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
-                    {selectedStakeholder?.datos_especificos_linkedin
-                      ?.formacion && (
+                    {selectedStakeholder?.datos_especificos_linkedin?.formacion && 
+                      selectedStakeholder.datos_especificos_linkedin.formacion.length > 0 && (
                       <div>
-                        <p className="font-medium">Formación</p>
-                        <p className="text-muted-foreground">
-                          {
-                            selectedStakeholder.datos_especificos_linkedin
-                              .formacion
-                          }
-                        </p>
+                        <p className="font-medium mb-2">Formación</p>
+                        <div className="space-y-2">
+                          {selectedStakeholder.datos_especificos_linkedin.formacion.map((form, index) => (
+                            <div key={index} className="bg-white/50 p-3 rounded-md">
+                              <p className="font-medium text-primary">{form.titulacion}</p>
+                              <p className="text-sm text-muted-foreground">{form.universidad}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                     {selectedStakeholder?.datos_especificos_linkedin
