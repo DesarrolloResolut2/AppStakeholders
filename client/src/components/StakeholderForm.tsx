@@ -25,6 +25,20 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Stakeholder } from "@/lib/types";
 import { User, Phone, Book, Linkedin } from 'lucide-react'
 
+const experienciaSchema = z.object({
+  cargo: z.string().optional(),
+  empresa: z.string().optional(),
+  fecha_inicio: z.string().optional(),
+  fecha_fin: z.string().optional()
+});
+
+const formacionSchema = z.object({
+  titulacion: z.string().optional(),
+  universidad: z.string().optional(),
+  fecha_inicio: z.string().optional(),
+  fecha_fin: z.string().optional()
+});
+
 const stakeholderSchema = z.object({
   nombre: z.string().optional(),
   datos_contacto: z.object({
@@ -47,6 +61,8 @@ const stakeholderSchema = z.object({
   datos_especificos_linkedin: z.object({
     about_me: z.string().optional(),
     headline: z.string().optional(),
+    experiencia: z.array(experienciaSchema).optional().default([]),
+    formacion: z.array(formacionSchema).optional().default([]),
     otros_campos: z.string().optional(),
   }).optional(),
 }).partial();
@@ -82,10 +98,44 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
       datos_especificos_linkedin: {
         about_me: stakeholder?.datos_especificos_linkedin?.about_me || '',
         headline: stakeholder?.datos_especificos_linkedin?.headline || '',
+        experiencia: stakeholder?.datos_especificos_linkedin?.experiencia || [],
+        formacion: stakeholder?.datos_especificos_linkedin?.formacion || [],
         otros_campos: stakeholder?.datos_especificos_linkedin?.otros_campos || '',
       },
     },
   });
+
+  const agregarExperiencia = () => {
+    const experienciaActual = form.getValues('datos_especificos_linkedin.experiencia') || [];
+    form.setValue('datos_especificos_linkedin.experiencia', [
+      ...experienciaActual,
+      { cargo: '', empresa: '', fecha_inicio: '', fecha_fin: '' }
+    ]);
+  };
+
+  const eliminarExperiencia = (index: number) => {
+    const experienciaActual = form.getValues('datos_especificos_linkedin.experiencia') || [];
+    form.setValue(
+      'datos_especificos_linkedin.experiencia',
+      experienciaActual.filter((_, i) => i !== index)
+    );
+  };
+
+  const agregarFormacion = () => {
+    const formacionActual = form.getValues('datos_especificos_linkedin.formacion') || [];
+    form.setValue('datos_especificos_linkedin.formacion', [
+      ...formacionActual,
+      { titulacion: '', universidad: '', fecha_inicio: '', fecha_fin: '' }
+    ]);
+  };
+
+  const eliminarFormacion = (index: number) => {
+    const formacionActual = form.getValues('datos_especificos_linkedin.formacion') || [];
+    form.setValue(
+      'datos_especificos_linkedin.formacion',
+      formacionActual.filter((_, i) => i !== index)
+    );
+  };
 
   const handleSubmit = (values: z.infer<typeof stakeholderSchema>) => {
     onSubmit({
@@ -452,6 +502,179 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                         </FormItem>
                       )}
                     />
+
+                    {/* Sección de Experiencia */}
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <FormLabel>Experiencia</FormLabel>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={agregarExperiencia}
+                        >
+                          Agregar Experiencia
+                        </Button>
+                      </div>
+
+                      {form.watch('datos_especificos_linkedin.experiencia')?.map((experiencia, index) => (
+                        <Card key={index} className="p-4">
+                          <div className="space-y-4">
+                            <div className="flex justify-end">
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => eliminarExperiencia(index)}
+                              >
+                                Eliminar
+                              </Button>
+                            </div>
+                            <FormField
+                              control={form.control}
+                              name={`datos_especificos_linkedin.experiencia.${index}.cargo`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Cargo</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="Cargo o posición" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`datos_especificos_linkedin.experiencia.${index}.empresa`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Empresa u Organización</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="Nombre de la empresa" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.experiencia.${index}.fecha_inicio`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Inicio</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.experiencia.${index}.fecha_fin`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Fin</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+
+                    {/* Sección de Formación */}
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <FormLabel>Formación</FormLabel>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={agregarFormacion}
+                        >
+                          Agregar Formación
+                        </Button>
+                      </div>
+
+                      {form.watch('datos_especificos_linkedin.formacion')?.map((formacion, index) => (
+                        <Card key={index} className="p-4">
+                          <div className="space-y-4">
+                            <div className="flex justify-end">
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => eliminarFormacion(index)}
+                              >
+                                Eliminar
+                              </Button>
+                            </div>
+                            <FormField
+                              control={form.control}
+                              name={`datos_especificos_linkedin.formacion.${index}.titulacion`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Titulación</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="Nombre de la titulación" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`datos_especificos_linkedin.formacion.${index}.universidad`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Universidad o Centro</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="Nombre de la universidad" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.formacion.${index}.fecha_inicio`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Inicio</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`datos_especificos_linkedin.formacion.${index}.fecha_fin`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Fecha de Fin</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} type="date" />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+
                     <FormField
                       control={form.control}
                       name="datos_especificos_linkedin.otros_campos"
