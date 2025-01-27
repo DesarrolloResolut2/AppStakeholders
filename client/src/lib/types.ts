@@ -28,8 +28,6 @@ export interface Stakeholder {
   datos_especificos_linkedin?: {
     about_me?: string;
     headline?: string;
-    experiencia?: string;
-    formacion?: string;
     otros_campos?: string;
   };
 }
