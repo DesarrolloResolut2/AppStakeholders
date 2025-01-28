@@ -208,6 +208,96 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Añadir endpoint para eliminar usuario (solo admin)
+  app.delete("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      // No permitir eliminar al usuario admin principal
+      const [userToDelete] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (!userToDelete) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      if (userToDelete.username === "admin") {
+        return res.status(403).json({ error: "No se puede eliminar el usuario administrador principal" });
+      }
+
+      await db.delete(users).where(eq(users.id, userId));
+      res.json({ message: "Usuario eliminado exitosamente" });
+    } catch (error) {
+      console.error("Error al eliminar usuario:", error);
+      res.status(500).json({ error: "Error al eliminar usuario" });
+    }
+  });
+
+  // Añadir endpoint para actualizar usuario (solo admin)
+  app.put("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { username, password, role } = req.body;
+
+      // No permitir cambios en el usuario admin principal
+      const [userToUpdate] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (!userToUpdate) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      if (userToUpdate.username === "admin" && username !== "admin") {
+        return res.status(403).json({ error: "No se puede modificar el nombre del usuario administrador principal" });
+      }
+
+      // Verificar si el nuevo username ya existe (si se está cambiando)
+      if (username && username !== userToUpdate.username) {
+        const [existingUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.username, username))
+          .limit(1);
+
+        if (existingUser) {
+          return res.status(400).json({ error: "El nombre de usuario ya existe" });
+        }
+      }
+
+      // Construir objeto de actualización
+      const updateData: Partial<typeof userToUpdate> = {};
+      if (username) updateData.username = username;
+      if (role) updateData.role = role as "admin" | "user";
+      if (password) {
+        updateData.password = await crypto.hash(password);
+      }
+
+      const [updatedUser] = await db
+        .update(users)
+        .set(updateData)
+        .where(eq(users.id, userId))
+        .returning();
+
+      res.json({
+        message: "Usuario actualizado exitosamente",
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          role: updatedUser.role,
+        },
+      });
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error);
+      res.status(500).json({ error: "Error al actualizar usuario" });
+    }
+  });
+
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
       if (err) {
