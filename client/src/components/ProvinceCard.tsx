@@ -81,24 +81,19 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     return provincia.stakeholders?.filter((stakeholder) => {
       if (!stakeholder) return false;
 
-      // Debug log para ver la estructura de datos
-      console.log('Stakeholder data:', stakeholder);
-      console.log('Datos de contacto:', stakeholder.datos_contacto);
-
       // Búsqueda por nombre
-      const matchName = stakeholder.nombre?.toLowerCase().includes(searchLower) || false;
+      const nombre = stakeholder.nombre?.toLowerCase() || '';
+      const matchName = nombre.includes(searchLower);
 
-      // Búsqueda por organización principal y otras organizaciones
-      const matchOrgPrincipal = stakeholder.datos_contacto?.organizacion_principal?.toLowerCase().includes(searchLower) || false;
-      const matchOtrasOrg = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase().includes(searchLower) || false;
+      // Búsqueda en organización principal
+      const orgPrincipal = stakeholder.datos_contacto?.organizacion_principal?.toLowerCase() || '';
+      const matchOrgPrincipal = orgPrincipal.includes(searchLower);
 
-      console.log('Search matches:', {
-        name: matchName,
-        orgPrincipal: matchOrgPrincipal,
-        otrasOrg: matchOtrasOrg,
-        searchTerm: searchLower
-      });
+      // Búsqueda en otras organizaciones
+      const otrasOrg = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase() || '';
+      const matchOtrasOrg = otrasOrg.includes(searchLower);
 
+      // Si coincide con cualquiera de los campos, retornamos true
       return matchName || matchOrgPrincipal || matchOtrasOrg;
     }) || [];
   }, [provincia.stakeholders, searchTerm]);
