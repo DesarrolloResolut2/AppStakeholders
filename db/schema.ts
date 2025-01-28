@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, jsonb, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
+import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -56,8 +57,14 @@ export const stakeholdersRelations = relations(stakeholders, ({ one }) => ({
   }),
 }));
 
-// Schemas for validation
-export const insertUserSchema = createInsertSchema(users);
+// Schemas for validation - Actualizados para manejar login
+export const insertUserSchema = createInsertSchema(users, {
+  username: z.string().min(1, "El nombre de usuario es requerido"),
+  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  is_admin: z.boolean().optional(),
+  created_at: z.string().optional()
+});
+
 export const selectUserSchema = createSelectSchema(users);
 
 export const insertProvinciaSchema = createInsertSchema(provincias);

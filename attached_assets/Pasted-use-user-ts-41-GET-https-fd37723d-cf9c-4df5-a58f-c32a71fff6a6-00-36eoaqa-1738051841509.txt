@@ -1,0 +1,62 @@
+use-user.ts:41 
+        
+        
+       GET https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/api/user 401 (Unauthorized)
+fetchUser @ use-user.ts:41
+fetchFn @ @tanstack_react-query.js?v=51a59233:840
+run @ @tanstack_react-query.js?v=51a59233:494
+start @ @tanstack_react-query.js?v=51a59233:536
+fetch @ @tanstack_react-query.js?v=51a59233:926
+executeFetch_fn @ @tanstack_react-query.js?v=51a59233:2211
+onSubscribe @ @tanstack_react-query.js?v=51a59233:1898
+subscribe @ @tanstack_react-query.js?v=51a59233:24
+(anonymous) @ @tanstack_react-query.js?v=51a59233:3022
+subscribeToStore @ chunk-WERSD76P.js?v=51a59233:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=51a59233:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=51a59233:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=51a59233:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=51a59233:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=51a59233:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=51a59233:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=51a59233:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=51a59233:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=51a59233:9119
+commitRootImpl @ chunk-WERSD76P.js?v=51a59233:19432
+commitRoot @ chunk-WERSD76P.js?v=51a59233:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=51a59233:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=51a59233:18718
+workLoop @ chunk-WERSD76P.js?v=51a59233:197
+flushWork @ chunk-WERSD76P.js?v=51a59233:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=51a59233:384Understand this errorAI
+use-user.ts:17 
+        
+        
+       POST https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/api/login 400 (Bad Request)
+handleRequest @ use-user.ts:17
+mutationFn @ use-user.ts:71
+fn @ @tanstack_react-query.js?v=51a59233:1189
+run @ @tanstack_react-query.js?v=51a59233:494
+start @ @tanstack_react-query.js?v=51a59233:536
+execute @ @tanstack_react-query.js?v=51a59233:1225
+await in execute
+mutate @ @tanstack_react-query.js?v=51a59233:2630
+handleSubmit @ AuthPage.tsx:29
+callCallback2 @ chunk-WERSD76P.js?v=51a59233:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=51a59233:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=51a59233:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=51a59233:3736
+executeDispatch @ chunk-WERSD76P.js?v=51a59233:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=51a59233:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=51a59233:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=51a59233:7051
+(anonymous) @ chunk-WERSD76P.js?v=51a59233:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=51a59233:18913
+batchedUpdates @ chunk-WERSD76P.js?v=51a59233:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=51a59233:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=51a59233:5478
+dispatchEvent @ chunk-WERSD76P.js?v=51a59233:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=51a59233:5449Understand this errorAI
+use-user.ts:41 
+        
+        
+       GET https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/api/user 401 (Unauthorized)
