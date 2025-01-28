@@ -26,6 +26,28 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+async function changePassword(currentPassword: string, newPassword: string) {
+  const response = await fetch("/api/user/password", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Error al cambiar la contraseña");
+  }
+
+  return response.json();
+}
 
 function getBackgroundColor(stakeholderCount: number, maxStakeholders: number) {
   const ratio = stakeholderCount / maxStakeholders;
@@ -47,6 +69,12 @@ export function HomeView() {
   const [newProvincia, setNewProvincia] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showNewProvinciaModal, setShowNewProvinciaModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user, logout } = useUser();
@@ -115,6 +143,57 @@ export function HomeView() {
     return Math.max(...provincias.map((p) => p.stakeholders?.length || 0));
   }, [provincias]);
 
+  const changePasswordMutation = useMutation({
+    mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) =>
+      changePassword(currentPassword, newPassword),
+    onSuccess: () => {
+      setShowPasswordModal(false);
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      toast({
+        title: "Contraseña actualizada",
+        description: "Tu contraseña ha sido actualizada exitosamente.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Las contraseñas nuevas no coinciden",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast({
+        title: "Error",
+        description: "La contraseña debe tener al menos 6 caracteres",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    changePasswordMutation.mutate({
+      currentPassword: passwordForm.currentPassword,
+      newPassword: passwordForm.newPassword,
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -163,6 +242,13 @@ export function HomeView() {
               >
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Nueva Provincia
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-white text-blue-600 hover:bg-blue-50"
+                onClick={() => setShowPasswordModal(true)}
+              >
+                Cambiar Contraseña
               </Button>
               <Button
                 variant="outline"
@@ -299,6 +385,66 @@ export function HomeView() {
           </Card>
         </div>
       )}
+      <Dialog open={showPasswordModal} onOpenChange={setShowPasswordModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cambiar Contraseña</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Contraseña actual"
+                value={passwordForm.currentPassword}
+                onChange={(e) =>
+                  setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Nueva contraseña"
+                value={passwordForm.newPassword}
+                onChange={(e) =>
+                  setPasswordForm({ ...passwordForm, newPassword: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Confirmar nueva contraseña"
+                value={passwordForm.confirmPassword}
+                onChange={(e) =>
+                  setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowPasswordModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={changePasswordMutation.isPending}
+              >
+                {changePasswordMutation.isPending && (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                )}
+                Cambiar Contraseña
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

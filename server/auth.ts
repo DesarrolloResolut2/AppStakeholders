@@ -313,4 +313,46 @@ export function setupAuth(app: Express) {
     }
     res.status(401).send("No autenticado");
   });
+
+  // Añadir endpoint para que el usuario cambie su propia contraseña
+  app.put("/api/user/password", (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "No autenticado" });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Se requieren ambas contraseñas" });
+    }
+
+    const userId = req.user!.id;
+
+    (async () => {
+      try {
+        // Verificar la contraseña actual
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1);
+
+        const isMatch = await crypto.compare(currentPassword, user.password);
+        if (!isMatch) {
+          return res.status(400).json({ error: "Contraseña actual incorrecta" });
+        }
+
+        // Actualizar a la nueva contraseña
+        const hashedPassword = await crypto.hash(newPassword);
+        await db
+          .update(users)
+          .set({ password: hashedPassword })
+          .where(eq(users.id, userId));
+
+        res.json({ message: "Contraseña actualizada exitosamente" });
+      } catch (error) {
+        console.error("Error al cambiar contraseña:", error);
+        res.status(500).json({ error: "Error al cambiar la contraseña" });
+      }
+    })();
+  });
 }
