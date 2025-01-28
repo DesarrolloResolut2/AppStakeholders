@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -25,6 +25,9 @@ import {
   deleteProvincia,
   exportStakeholderContactData,
 } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Search } from "@/components/ui/search";
+
 
 interface Props {
   provincia: Provincia;
@@ -37,6 +40,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
   >();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleCreateStakeholder = async (data: Omit<Stakeholder, "id">) => {
     await createStakeholder(data);
@@ -70,6 +74,19 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
     exportProvinciaData(provincia.id);
   };
 
+  const filteredStakeholders = useMemo(() => {
+    if (!searchTerm.trim()) return provincia.stakeholders;
+
+    const searchLower = searchTerm.toLowerCase();
+    return provincia.stakeholders?.filter((stakeholder) => {
+      const matchName = stakeholder.nombre.toLowerCase().includes(searchLower);
+      const matchOrgPrincipal = stakeholder.datos_contacto?.organizacion_principal?.toLowerCase().includes(searchLower) || false;
+      const matchOtrasOrg = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase()?.includes(searchLower) || false;
+
+      return matchName || matchOrgPrincipal || matchOtrasOrg;
+    });
+  }, [provincia.stakeholders, searchTerm]);
+
   return (
     <Card className="w-full max-w-lg hover:shadow-lg transition-shadow border-t-4 border-t-primary/20">
       <CardHeader className="relative">
@@ -95,6 +112,18 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
         <CardDescription>
           {provincia.stakeholders?.length || 0} stakeholders registrados
         </CardDescription>
+        <div className="mt-4">
+          <div className="relative">
+            <Search className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <Input
+              type="text"
+              placeholder="Buscar por nombre u organización..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-full"
+            />
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex justify-between">
@@ -138,7 +167,7 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
         </div>
 
         <div className="space-y-2">
-          {provincia.stakeholders?.map((stakeholder) => (
+          {filteredStakeholders?.map((stakeholder) => (
             <Card
               key={stakeholder.id}
               className="p-4 hover:shadow-lg transition-shadow"
@@ -247,7 +276,6 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
           ))}
         </div>
 
-        {/* Diálogo para ver detalles completos del stakeholder */}
         <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -259,7 +287,6 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-6 py-4">
-              {/* Datos de Contacto */}
               <div className="bg-secondary/20 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold mb-4">
                   Datos de Contacto
@@ -308,7 +335,6 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 </div>
               </div>
 
-              {/* Información Principal */}
               <div className="bg-secondary/20 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold mb-4">
                   Información Principal
@@ -345,7 +371,6 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 </div>
               </div>
 
-              {/* Información Adicional */}
               <div className="bg-secondary/20 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold mb-4">
                   Información Adicional
@@ -392,7 +417,6 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
                 </div>
               </div>
 
-              {/* Datos de LinkedIn */}
               {(selectedStakeholder?.datos_especificos_linkedin?.about_me ||
                 selectedStakeholder?.datos_especificos_linkedin?.headline ||
                 selectedStakeholder?.datos_especificos_linkedin?.experiencia ||
