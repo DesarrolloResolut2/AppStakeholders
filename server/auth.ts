@@ -5,7 +5,7 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { users, insertUserSchema, type User } from "../db/schema";
+import { users, insertUserSchema } from "../db/schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 
@@ -20,6 +20,7 @@ const crypto = {
     try {
       const [hashedPassword, salt] = storedPassword.split(".");
       if (!hashedPassword || !salt) {
+        console.error('Formato de contraseña almacenada inválido');
         return false;
       }
       const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
@@ -54,7 +55,9 @@ export function setupAuth(app: Express) {
     secret: process.env.REPL_ID || "sistema-stakeholders-secret",
     resave: false,
     saveUninitialized: false,
-    cookie: {},
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    },
     store: new MemoryStore({
       checkPeriod: 86400000, // limpiar entradas expiradas cada 24h
     }),
@@ -63,6 +66,7 @@ export function setupAuth(app: Express) {
   if (app.get("env") === "production") {
     app.set("trust proxy", 1);
     sessionSettings.cookie = {
+      ...sessionSettings.cookie,
       secure: true,
     };
   }
@@ -74,6 +78,8 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        console.log(`Intento de login para usuario: ${username}`);
+
         const [user] = await db
           .select()
           .from(users)
@@ -81,12 +87,19 @@ export function setupAuth(app: Express) {
           .limit(1);
 
         if (!user) {
-          return done(null, false, { message: "Usuario incorrecto." });
+          console.log('Usuario no encontrado');
+          return done(null, false, { message: "Usuario incorrecto" });
         }
+
+        console.log('Usuario encontrado, verificando contraseña...');
         const isMatch = await crypto.compare(password, user.password);
+
         if (!isMatch) {
-          return done(null, false, { message: "Contraseña incorrecta." });
+          console.log('Contraseña incorrecta');
+          return done(null, false, { message: "Contraseña incorrecta" });
         }
+
+        console.log('Login exitoso');
         return done(null, user);
       } catch (err) {
         console.error('Error en estrategia local:', err);
@@ -112,6 +125,76 @@ export function setupAuth(app: Express) {
     }
   });
 
+  app.post("/api/login", (req, res, next) => {
+    console.log('Datos de login recibidos:', req.body);
+
+    const result = insertUserSchema.safeParse(req.body);
+    if (!result.success) {
+      const errorMessage = result.error.issues.map(i => i.message).join(", ");
+      console.log('Error de validación:', errorMessage);
+      return res.status(400).json({ 
+        ok: false,
+        message: "Datos inválidos: " + errorMessage 
+      });
+    }
+
+    passport.authenticate("local", (err: any, user: Express.User | false, info?: IVerifyOptions) => {
+      if (err) {
+        console.error('Error en autenticación:', err);
+        return next(err);
+      }
+
+      if (!user) {
+        return res.status(400).json({ 
+          ok: false,
+          message: info?.message || "Error de inicio de sesión" 
+        });
+      }
+
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error('Error en login:', err);
+          return next(err);
+        }
+
+        return res.json({
+          ok: true,
+          message: "Inicio de sesión exitoso",
+          user: {
+            id: user.id,
+            username: user.username,
+            is_admin: user.is_admin
+          }
+        });
+      });
+    })(req, res, next);
+  });
+
+  app.post("/api/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ 
+          ok: false,
+          message: "Error al cerrar sesión" 
+        });
+      }
+      res.json({ 
+        ok: true,
+        message: "Sesión cerrada exitosamente" 
+      });
+    });
+  });
+
+  app.get("/api/user", (req, res) => {
+    if (req.isAuthenticated()) {
+      const { id, username, is_admin } = req.user;
+      return res.json({ id, username, is_admin });
+    }
+    res.status(401).json({ 
+      ok: false,
+      message: "No ha iniciado sesión" 
+    });
+  });
   // Solo el administrador puede crear usuarios
   app.post("/api/register", async (req, res, next) => {
     try {
@@ -160,61 +243,6 @@ export function setupAuth(app: Express) {
       next(error);
     }
   });
-
-  app.post("/api/login", (req, res, next) => {
-    const result = insertUserSchema.safeParse(req.body);
-    if (!result.success) {
-      return res
-        .status(400)
-        .send("Datos inválidos: " + result.error.issues.map(i => i.message).join(", "));
-    }
-
-    const cb = (err: any, user: Express.User | false, info?: IVerifyOptions) => {
-      if (err) {
-        console.error('Error en callback de login:', err);
-        return next(err);
-      }
-
-      if (!user) {
-        return res.status(400).send(info?.message ?? "Error de inicio de sesión");
-      }
-
-      req.logIn(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-
-        return res.json({
-          message: "Inicio de sesión exitoso",
-          user: { 
-            id: user.id, 
-            username: user.username,
-            is_admin: user.is_admin 
-          },
-        });
-      });
-    };
-    passport.authenticate("local", cb)(req, res, next);
-  });
-
-  app.post("/api/logout", (req, res) => {
-    req.logout((err) => {
-      if (err) {
-        return res.status(500).send("Error al cerrar sesión");
-      }
-      res.json({ message: "Sesión cerrada exitosamente" });
-    });
-  });
-
-  app.get("/api/user", (req, res) => {
-    if (req.isAuthenticated()) {
-      const { id, username, is_admin } = req.user;
-      return res.json({ id, username, is_admin });
-    }
-    res.status(401).send("No ha iniciado sesión");
-  });
-
-  // Ruta para listar usuarios (solo admin)
   app.get("/api/users", async (req, res) => {
     if (!req.user?.is_admin) {
       return res.status(403).send("Acceso denegado");
