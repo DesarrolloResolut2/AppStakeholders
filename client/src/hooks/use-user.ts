@@ -57,6 +57,9 @@ async function fetchUser(): Promise<User | null> {
 
     return response.json();
   } catch (error) {
+    if (error instanceof Error && error.message.includes('401')) {
+      return null;
+    }
     console.warn('Error fetching user:', error);
     return null;
   }
@@ -72,7 +75,8 @@ export function useUser() {
     retry: 0,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
-    refetchOnReconnect: false
+    refetchOnReconnect: false,
+    gcTime: 0
   });
 
   const loginMutation = useMutation<RequestResult, Error, LoginCredentials>({
@@ -85,9 +89,12 @@ export function useUser() {
   const logoutMutation = useMutation<RequestResult, Error>({
     mutationFn: () => handleRequest('/api/logout', 'POST'),
     onSuccess: () => {
-      // Inmediatamente establecer el usuario como null y eliminar la query
+      // Limpiar inmediatamente el estado
       queryClient.setQueryData(['user'], null);
+      // Eliminar la query completamente
       queryClient.removeQueries({ queryKey: ['user'] });
+      // Resetear el cache
+      queryClient.clear();
     },
   });
 
