@@ -1,7 +1,7 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { db } from "@db/index";
-import { provincias, stakeholders } from "@db/schema";
+import { db } from "../db";
+import { provincias, stakeholders } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { setupAuth } from "./auth";
 
@@ -10,7 +10,7 @@ export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
   // Middleware para verificar autenticación
-  const requireAuth = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+  const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "No autenticado" });
     }

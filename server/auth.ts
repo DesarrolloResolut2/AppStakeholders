@@ -5,8 +5,8 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { users, insertUserSchema, type SelectUser } from "@db/schema";
-import { db } from "@db";
+import { users, insertUserSchema, selectUserSchema } from "../db/schema";
+import { db } from "../db";
 import { eq } from "drizzle-orm";
 
 const scryptAsync = promisify(scrypt);
@@ -30,7 +30,7 @@ const crypto = {
 
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    interface User extends ReturnType<typeof selectUserSchema.parse> {}
   }
 }
 
@@ -43,7 +43,7 @@ export async function createInitialAdminUser() {
       .limit(1);
 
     if (!existingAdmin) {
-      const hashedPassword = await crypto.hash("admin123"); // Contraseña temporal
+      const hashedPassword = await crypto.hash("admin123");
       await db.insert(users).values({
         username: "admin",
         password: hashedPassword,
