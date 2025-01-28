@@ -1,0 +1,52 @@
+Planteamiento de la modificación para añadir acceso de usuarios con contraseñas administradas por un único responsable (administrador):
+
+Objetivo principal
+Incorporar al sistema actual un mecanismo de acceso (login) donde cada usuario deba introducir su nombre de usuario y contraseña. Sin embargo, en lugar de permitir el registro libre de usuarios, se define que solo el administrador (o un responsable de la plataforma) sea capaz de crear nuevos perfiles de usuario y asignar credenciales.
+
+Puntos clave a nivel funcional
+
+Creación de usuarios: Se debe implementar una sección o módulo exclusivo para el administrador donde pueda:
+Agregar nuevos usuarios.
+Establecer manualmente el nombre de usuario y la contraseña.
+Actualizar o eliminar las credenciales de usuarios existentes en caso de ser necesario.
+Gestión de contraseñas: El administrador genera la contraseña inicial para cada usuario. Se contemplan dos opciones de flujo:
+El administrador asigna una contraseña que el usuario no puede cambiar y la comparte de forma segura.
+El administrador asigna una contraseña inicial y el sistema obliga al usuario a cambiarla la primera vez que inicia sesión (opcional si se desea incrementar la seguridad).
+Flujo de inicio de sesión (login): Cada usuario utiliza su nombre de usuario y contraseña. Si las credenciales son correctas, podrá acceder a las funcionalidades de la aplicación. De lo contrario, se mostrará un mensaje de error.
+Estructura en la parte del servidor (Node)
+
+Modelo o estructura de datos: Se agregaría en la base de datos (por ejemplo, en una tabla o colección específica) la información de cada usuario, que incluya al menos:
+Nombre de usuario.
+Contraseña (almacenada de forma segura, normalmente cifrada o con hash).
+Perfil o rol (por ejemplo: “administrador” o “usuario regular”).
+Rutas de administración: Se definen rutas (endpoints) protegidas que permitan:
+POST para crear un nuevo usuario (solo accesible para el administrador).
+PUT para modificar credenciales de un usuario existente.
+DELETE para eliminar un usuario, si fuera necesario.
+Ruta de inicio de sesión: Una ruta específica donde se valide la combinación nombre de usuario/contraseña.
+Autenticación y seguridad
+
+Validación de credenciales: Al momento de iniciar sesión, el servidor compara las credenciales proporcionadas con las almacenadas en la base de datos. Para reforzar la seguridad, la contraseña debe estar encriptada (p. ej., usando un hash tipo bcrypt).
+Control de acceso: Se debe garantizar que solo quien posea el rol de administrador tenga acceso a las rutas de creación y gestión de usuarios.
+Sesiones o tokens: Una vez que un usuario inicia sesión, el sistema debe manejar la persistencia de la sesión, por ejemplo, con cookies seguras o tokens JWT (JSON Web Tokens). Así se evita pedir credenciales en cada petición y se mantiene la información de la autenticación.
+Estructura en la parte del cliente (React)
+
+Pantalla de login:
+Un formulario con campos para nombre de usuario y contraseña.
+Al enviar el formulario, el sistema valida las credenciales contra el servidor.
+Si son correctas, se redirige al usuario a la sección correspondiente de la aplicación; de lo contrario, se muestra un mensaje de error.
+Panel de administración:
+Accesible únicamente para el usuario con rol de administrador.
+Incluye un formulario para dar de alta a un nuevo usuario (donde se define su nombre de usuario, contraseña inicial y rol).
+Sección para ver la lista de usuarios existentes y, si procede, modificar o eliminar usuarios según las necesidades.
+Gestión de la sesión:
+Si se usan tokens, React debe almacenar el token de forma segura (por ejemplo, en la memoria de la aplicación o en cookies con atributos de seguridad apropiados).
+Al hacer peticiones a rutas protegidas, se incluyen las credenciales (token) para que el servidor valide la autorización.
+Proceso de despliegue y transición
+
+Modificación progresiva: Añadir gradualmente la gestión de usuarios y el sistema de login para evitar afectar el funcionamiento actual de la aplicación.
+Base de datos: Actualizar el esquema (o la tabla/colección) para incluir el nuevo modelo de usuario y las contraseñas.
+Pruebas y validaciones:
+Probar primero con un ambiente de desarrollo para validar que la creación y el inicio de sesión funcionen correctamente.
+Asegurarse de que la restricción de acceso (solo administrador) a la creación de usuarios sea efectiva.
+Despliegue final: Una vez comprobado en un entorno de pruebas y corregidos los posibles errores, se actualiza la aplicación en el entorno productivo.
