@@ -3,37 +3,18 @@ import { IVerifyOptions, Strategy as LocalStrategy } from "passport-local";
 import { type Express } from "express";
 import session from "express-session";
 import createMemoryStore from "memorystore";
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
-import { promisify } from "util";
-import { users, insertUserSchema } from "../db/schema";
+import { createHash } from "crypto";
+import { users } from "../db/schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 
-const scryptAsync = promisify(scrypt);
 const crypto = {
-  hash: async (password: string) => {
-    const salt = randomBytes(16).toString("hex");
-    const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-    return `${buf.toString("hex")}.${salt}`;
+  hash: (password: string) => {
+    return createHash('sha256').update(password).digest('hex');
   },
-  compare: async (suppliedPassword: string, storedPassword: string) => {
-    try {
-      const [hashedPassword, salt] = storedPassword.split(".");
-      if (!hashedPassword || !salt) {
-        console.error('Formato de contraseña almacenada inválido');
-        return false;
-      }
-      const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
-      const suppliedPasswordBuf = (await scryptAsync(
-        suppliedPassword,
-        salt,
-        64
-      )) as Buffer;
-      return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
-    } catch (error) {
-      console.error('Error comparing passwords:', error);
-      return false;
-    }
+  compare: (suppliedPassword: string, storedPassword: string) => {
+    const hashedSupplied = createHash('sha256').update(suppliedPassword).digest('hex');
+    return hashedSupplied === storedPassword;
   },
 };
 
@@ -92,7 +73,7 @@ export function setupAuth(app: Express) {
         }
 
         console.log('Usuario encontrado, verificando contraseña...');
-        const isMatch = await crypto.compare(password, user.password);
+        const isMatch = crypto.compare(password, user.password);
 
         if (!isMatch) {
           console.log('Contraseña incorrecta');
@@ -126,15 +107,12 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    console.log('Datos de login recibidos:', req.body);
+    console.log('Datos de login recibidos:', { username: req.body.username });
 
-    const result = insertUserSchema.safeParse(req.body);
-    if (!result.success) {
-      const errorMessage = result.error.issues.map(i => i.message).join(", ");
-      console.log('Error de validación:', errorMessage);
+    if (!req.body.username || !req.body.password) {
       return res.status(400).json({ 
         ok: false,
-        message: "Datos inválidos: " + errorMessage 
+        message: "Usuario y contraseña son requeridos" 
       });
     }
 
@@ -195,7 +173,6 @@ export function setupAuth(app: Express) {
       message: "No ha iniciado sesión" 
     });
   });
-  // Solo el administrador puede crear usuarios
   app.post("/api/register", async (req, res, next) => {
     try {
       // Verificar si el usuario actual es admin
