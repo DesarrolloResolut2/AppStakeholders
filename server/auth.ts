@@ -5,11 +5,12 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { users, insertUserSchema, selectUserSchema } from "../db/schema";
+import { users } from "../db/schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 
 const scryptAsync = promisify(scrypt);
+
 const crypto = {
   hash: async (password: string) => {
     const salt = randomBytes(16).toString("hex");
@@ -21,33 +22,29 @@ const crypto = {
     if (!hashedPassword || !salt) {
       return false;
     }
-    const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
     const suppliedPasswordBuf = (await scryptAsync(
       suppliedPassword,
       salt,
       64
     )) as Buffer;
+    const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
     return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
   },
 };
 
 export async function createInitialAdminUser() {
   try {
-    const [existingAdmin] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, "admin"))
-      .limit(1);
+    // Eliminar usuario admin existente si existe
+    await db.delete(users).where(eq(users.username, "admin"));
 
-    if (!existingAdmin) {
-      const hashedPassword = await crypto.hash("admin123");
-      await db.insert(users).values({
-        username: "admin",
-        password: hashedPassword,
-        role: "admin",
-      });
-      console.log("Usuario administrador inicial creado");
-    }
+    // Crear nuevo usuario admin
+    const hashedPassword = await crypto.hash("admin123");
+    await db.insert(users).values({
+      username: "admin",
+      password: hashedPassword,
+      role: "admin",
+    });
+    console.log("Usuario administrador inicial creado/actualizado");
   } catch (error) {
     console.error("Error al crear usuario admin:", error);
   }
@@ -93,6 +90,7 @@ export function setupAuth(app: Express) {
         if (!isMatch) {
           return done(null, false, { message: "Contraseña incorrecta." });
         }
+
         return done(null, user);
       } catch (err) {
         return done(err);
@@ -100,7 +98,7 @@ export function setupAuth(app: Express) {
     })
   );
 
-  passport.serializeUser((user, done) => {
+  passport.serializeUser((user: Express.User, done) => {
     done(null, user.id);
   });
 
@@ -118,14 +116,7 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    const result = insertUserSchema.safeParse(req.body);
-    if (!result.success) {
-      return res
-        .status(400)
-        .send("Entrada inválida: " + result.error.issues.map(i => i.message).join(", "));
-    }
-
-    passport.authenticate("local", (err: any, user: Express.User, info: IVerifyOptions) => {
+    passport.authenticate("local", (err: any, user: Express.User | false, info: IVerifyOptions) => {
       if (err) {
         return next(err);
       }
