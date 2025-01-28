@@ -5,8 +5,8 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { users, insertUserSchema, type User as SelectUser } from "@db/schema";
-import { db } from "@db";
+import { users, insertUserSchema, type User } from "../db/schema";
+import { db } from "../db";
 import { eq } from "drizzle-orm";
 
 const scryptAsync = promisify(scrypt);
@@ -30,7 +30,8 @@ const crypto = {
 
 declare global {
   namespace Express {
-    interface User extends SelectUser { }
+    // Extender la interfaz User de Express con nuestro tipo User
+    interface User extends Omit<User, keyof Express.User> {}
   }
 }
 
