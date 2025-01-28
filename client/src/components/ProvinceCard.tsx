@@ -79,12 +79,19 @@ export function ProvinceCard({ provincia, onUpdate }: Props) {
 
     const searchLower = searchTerm.toLowerCase();
     return provincia.stakeholders?.filter((stakeholder) => {
-      const matchName = stakeholder.nombre.toLowerCase().includes(searchLower);
+      if (!stakeholder) return false;
+
+      // Búsqueda por nombre
+      const matchName = stakeholder.nombre?.toLowerCase().includes(searchLower) || false;
+
+      // Búsqueda por organización principal
       const matchOrgPrincipal = stakeholder.datos_contacto?.organizacion_principal?.toLowerCase().includes(searchLower) || false;
-      const matchOtrasOrg = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase()?.includes(searchLower) || false;
+
+      // Búsqueda por otras organizaciones
+      const matchOtrasOrg = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase().includes(searchLower) || false;
 
       return matchName || matchOrgPrincipal || matchOtrasOrg;
-    });
+    }) || [];
   }, [provincia.stakeholders, searchTerm]);
 
   return (
