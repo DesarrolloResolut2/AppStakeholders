@@ -48,10 +48,11 @@ async function fetchUser(): Promise<User | null> {
       credentials: 'include'
     });
 
+    if (response.status === 401) {
+      return null;
+    }
+
     if (!response.ok) {
-      if (response.status === 401) {
-        return null;
-      }
       throw new Error(`${response.status}: ${await response.text()}`);
     }
 
@@ -91,10 +92,12 @@ export function useUser() {
     onSuccess: () => {
       // Limpiar inmediatamente el estado
       queryClient.setQueryData(['user'], null);
-      // Eliminar la query completamente
-      queryClient.removeQueries({ queryKey: ['user'] });
-      // Resetear el cache
+      // Eliminar todas las queries
       queryClient.clear();
+      // Eliminar específicamente la query de usuario
+      queryClient.removeQueries({ queryKey: ['user'], exact: true });
+      // Forzar un rerender del componente
+      window.location.reload();
     },
   });
 
