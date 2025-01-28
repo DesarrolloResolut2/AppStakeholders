@@ -1,0 +1,40 @@
+use-user.ts:46 
+        
+        
+       GET https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/api/user 401 (Unauthorized)
+fetchUser @ use-user.ts:46
+fetchFn @ @tanstack_react-query.js?v=51a59233:840
+run @ @tanstack_react-query.js?v=51a59233:494
+start @ @tanstack_react-query.js?v=51a59233:536
+fetch @ @tanstack_react-query.js?v=51a59233:926
+(anonymous) @ @tanstack_react-query.js?v=51a59233:1726
+(anonymous) @ @tanstack_react-query.js?v=51a59233:1725
+batch @ @tanstack_react-query.js?v=51a59233:583
+refetchQueries @ @tanstack_react-query.js?v=51a59233:1724
+(anonymous) @ @tanstack_react-query.js?v=51a59233:1716
+batch @ @tanstack_react-query.js?v=51a59233:583
+invalidateQueries @ @tanstack_react-query.js?v=51a59233:1705
+onSuccess @ use-user.ts:80
+execute @ @tanstack_react-query.js?v=51a59233:1233
+await in execute
+mutate @ @tanstack_react-query.js?v=51a59233:2630
+onClick @ HomeView.tsx:170
+callCallback2 @ chunk-WERSD76P.js?v=51a59233:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=51a59233:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=51a59233:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=51a59233:3736
+executeDispatch @ chunk-WERSD76P.js?v=51a59233:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=51a59233:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=51a59233:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=51a59233:7051
+(anonymous) @ chunk-WERSD76P.js?v=51a59233:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=51a59233:18913
+batchedUpdates @ chunk-WERSD76P.js?v=51a59233:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=51a59233:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=51a59233:5478
+dispatchEvent @ chunk-WERSD76P.js?v=51a59233:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=51a59233:5449Understand this errorAI
+use-user.ts:46 
+        
+        
+       GET https://fd37723d-cf9c-4df5-a58f-c32a71fff6a6-00-36eoaqavuy5hb.worf.replit.dev/api/user 401 (Unauthorized)

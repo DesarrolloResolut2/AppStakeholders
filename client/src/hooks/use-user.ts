@@ -64,7 +64,9 @@ export function useUser() {
     queryKey: ['user'],
     queryFn: fetchUser,
     staleTime: Infinity,
-    retry: false
+    retry: false,
+    refetchOnWindowFocus: false, // Evitar refetch automático al enfocar la ventana
+    refetchOnMount: true, // Solo refetch al montar el componente
   });
 
   const loginMutation = useMutation<RequestResult, Error, LoginCredentials>({
@@ -77,6 +79,8 @@ export function useUser() {
   const logoutMutation = useMutation<RequestResult, Error>({
     mutationFn: () => handleRequest('/api/logout', 'POST'),
     onSuccess: () => {
+      // Inmediatamente establecer el usuario como null después del logout
+      queryClient.setQueryData(['user'], null);
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
