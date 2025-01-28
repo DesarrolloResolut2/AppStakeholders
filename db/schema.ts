@@ -1,6 +1,14 @@
-import { pgTable, text, serial, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, jsonb, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  is_admin: boolean("is_admin").notNull().default(false),
+  created_at: text("created_at").notNull().$default(() => new Date().toISOString()),
+});
 
 export const provincias = pgTable("provincias", {
   id: serial("id").primaryKey(),
@@ -48,8 +56,16 @@ export const stakeholdersRelations = relations(stakeholders, ({ one }) => ({
   }),
 }));
 
+// Schemas for validation
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
+
 export const insertProvinciaSchema = createInsertSchema(provincias);
 export const selectProvinciaSchema = createSelectSchema(provincias);
 
 export const insertStakeholderSchema = createInsertSchema(stakeholders);
 export const selectStakeholderSchema = createSelectSchema(stakeholders);
+
+// Type exports
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;

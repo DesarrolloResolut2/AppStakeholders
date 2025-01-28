@@ -1,12 +1,32 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { db } from "@db/index";
-import { provincias, stakeholders } from "@db/schema";
+import { db } from "../db";
+import { provincias, stakeholders } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { setupAuth } from "./auth";
+
+// Middleware para verificar autenticación
+const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ error: "No ha iniciado sesión" });
+};
+
+// Middleware para verificar rol de administrador
+const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (req.isAuthenticated() && req.user.is_admin) {
+    return next();
+  }
+  res.status(403).json({ error: "Acceso denegado" });
+};
 
 export function registerRoutes(app: Express): Server {
+  // Configurar autenticación
+  setupAuth(app);
+
   // Provincias routes
-  app.get("/api/provincias", async (_req, res) => {
+  app.get("/api/provincias", requireAuth, async (_req, res) => {
     try {
       const result = await db.query.provincias.findMany({
         with: {
@@ -19,21 +39,21 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.post("/api/provincias", async (req, res) => {
+  app.post("/api/provincias", requireAdmin, async (req, res) => {
     try {
       const { nombre } = req.body;
       console.log("Datos recibidos:", { nombre });
-      
+
       if (!nombre || typeof nombre !== 'string' || nombre.trim() === '') {
         return res.status(400).json({ error: "El nombre de la provincia es requerido y debe ser un texto válido" });
       }
 
       const nombreTrimmed = nombre.trim();
-      
+
       const result = await db.insert(provincias)
         .values({ nombre: nombreTrimmed })
         .returning();
-      
+
       console.log("Provincia creada:", result[0]);
       res.status(201).json(result[0]);
     } catch (error) {
@@ -46,7 +66,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Stakeholders routes
-  app.get("/api/provincias/:id/stakeholders", async (req, res) => {
+  app.get("/api/provincias/:id/stakeholders", requireAuth, async (req, res) => {
     try {
       const provinciaId = parseInt(req.params.id);
       const result = await db.query.stakeholders.findMany({
@@ -58,7 +78,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.post("/api/stakeholders", async (req, res) => {
+  app.post("/api/stakeholders", requireAdmin, async (req, res) => {
     try {
       const stakeholder = req.body;
       console.log("Datos recibidos:", stakeholder);
@@ -73,7 +93,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.put("/api/stakeholders/:id", async (req, res) => {
+  app.put("/api/stakeholders/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const stakeholder = req.body;
@@ -88,7 +108,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.delete("/api/stakeholders/:id", async (req, res) => {
+  app.delete("/api/stakeholders/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       await db.delete(stakeholders).where(eq(stakeholders.id, id));
@@ -99,12 +119,10 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Delete provincia
-  app.delete("/api/provincias/:id", async (req, res) => {
+  app.delete("/api/provincias/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      // Primero eliminamos todos los stakeholders asociados
       await db.delete(stakeholders).where(eq(stakeholders.provincia_id, id));
-      // Luego eliminamos la provincia
       await db.delete(provincias).where(eq(provincias.id, id));
       res.json({ success: true });
     } catch (error) {
@@ -117,7 +135,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Export routes
-  app.get("/api/provincias/:id/export", async (req, res) => {
+  app.get("/api/provincias/:id/export", requireAuth, async (req, res) => {
     try {
       const provinciaId = parseInt(req.params.id);
       const provincia = await db.query.provincias.findFirst({
