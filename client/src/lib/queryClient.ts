@@ -8,7 +8,7 @@ export const queryClient = new QueryClient({
           credentials: "include",
         });
 
-        // Para errores 401, simplemente retornamos null en lugar de lanzar un error
+        // Manejar errores 401 de manera silenciosa retornando null
         if (res.status === 401) {
           return null;
         }
@@ -30,6 +30,12 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       retry: false,
+      onError: (error) => {
+        // Silenciar errores 401 y solo mostrar otros errores
+        if (error instanceof Error && !error.message.includes('401')) {
+          console.error('Mutation error:', error);
+        }
+      }
     }
   },
 });

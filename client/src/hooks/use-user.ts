@@ -77,7 +77,8 @@ export function useUser() {
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: false,
-    gcTime: 0
+    gcTime: 0,
+    enabled: true // Always enabled to keep authentication state updated
   });
 
   const loginMutation = useMutation<RequestResult, Error, LoginCredentials>({
@@ -90,14 +91,16 @@ export function useUser() {
   const logoutMutation = useMutation<RequestResult, Error>({
     mutationFn: () => handleRequest('/api/logout', 'POST'),
     onSuccess: () => {
-      // Limpiar inmediatamente el estado
+      // Temporarily disable the user query
       queryClient.setQueryData(['user'], null);
-      // Eliminar todas las queries
+
+      // Remove all queries from the cache
       queryClient.clear();
-      // Eliminar específicamente la query de usuario
-      queryClient.removeQueries({ queryKey: ['user'], exact: true });
-      // Forzar un rerender del componente
-      window.location.reload();
+
+      // Reset the user query state
+      queryClient.resetQueries({ queryKey: ['user'] });
+
+      // Do not use window.location.reload() for a smoother experience
     },
   });
 
