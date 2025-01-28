@@ -33,3 +33,9 @@ export interface Stakeholder {
     otros_campos?: string;
   };
 }
+
+export interface User {
+  id: number;
+  username: string;
+  role: "admin" | "user";
+}
