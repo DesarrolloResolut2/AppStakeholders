@@ -17,20 +17,34 @@ const crypto = {
     return `${buf.toString("hex")}.${salt}`;
   },
   compare: async (suppliedPassword: string, storedPassword: string) => {
-    const [hashedPassword, salt] = storedPassword.split(".");
-    const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
-    const suppliedPasswordBuf = (await scryptAsync(
-      suppliedPassword,
-      salt,
-      64
-    )) as Buffer;
-    return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
+    try {
+      const [hashedPassword, salt] = storedPassword.split(".");
+      if (!hashedPassword || !salt) {
+        return false;
+      }
+      const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
+      const suppliedPasswordBuf = (await scryptAsync(
+        suppliedPassword,
+        salt,
+        64
+      )) as Buffer;
+      return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
+    } catch (error) {
+      console.error('Error comparing passwords:', error);
+      return false;
+    }
   },
 };
 
 declare global {
   namespace Express {
-    interface User extends User { }
+    interface User {
+      id: number;
+      username: string;
+      password: string;
+      is_admin: boolean;
+      created_at: string;
+    }
   }
 }
 
@@ -75,6 +89,7 @@ export function setupAuth(app: Express) {
         }
         return done(null, user);
       } catch (err) {
+        console.error('Error en estrategia local:', err);
         return done(err);
       }
     })
@@ -154,13 +169,14 @@ export function setupAuth(app: Express) {
         .send("Datos inválidos: " + result.error.issues.map(i => i.message).join(", "));
     }
 
-    const cb = (err: any, user: Express.User, info: IVerifyOptions) => {
+    const cb = (err: any, user: Express.User | false, info?: IVerifyOptions) => {
       if (err) {
+        console.error('Error en callback de login:', err);
         return next(err);
       }
 
       if (!user) {
-        return res.status(400).send(info.message ?? "Error de inicio de sesión");
+        return res.status(400).send(info?.message ?? "Error de inicio de sesión");
       }
 
       req.logIn(user, (err) => {
