@@ -1,185 +1,3 @@
-// import { useState } from "react";
-// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { fetchProvincias, createProvincia, deleteProvincia } from "@/lib/api";
-// import { useToast } from "@/hooks/use-toast";
-// import { Link } from "wouter";
-
-// export function HomeView() {
-//   const [newProvincia, setNewProvincia] = useState("");
-//   const { toast } = useToast();
-//   const queryClient = useQueryClient();
-
-//   const { data: provincias = [], isLoading } = useQuery({
-//     queryKey: ["/provincias"],
-//     queryFn: fetchProvincias,
-//   });
-
-//   const createProvinciaMutation = useMutation({
-//     mutationFn: (nombre: string) => createProvincia(nombre),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["/provincias"] });
-//       setNewProvincia("");
-//       toast({
-//         title: "Provincia creada",
-//         description: "La provincia se ha creado exitosamente.",
-//       });
-//     },
-//     onError: (error) => {
-//       console.error("Error al crear provincia:", error);
-//       toast({
-//         title: "Error",
-//         description: "No se pudo crear la provincia.",
-//         variant: "destructive",
-//       });
-//     },
-//   });
-
-//   const handleCreateProvincia = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-
-//     const trimmedProvincia = newProvincia.trim();
-//     if (!trimmedProvincia) {
-//       toast({
-//         title: "Error",
-//         description: "El nombre de la provincia no puede estar vacío",
-//         variant: "destructive",
-//       });
-//       return;
-//     }
-
-//     try {
-//       await createProvinciaMutation.mutateAsync(trimmedProvincia);
-//       toast({
-//         title: "Éxito",
-//         description: "Provincia creada correctamente",
-//       });
-//     } catch (error) {
-//       console.error("Error en handleCreateProvincia:", error);
-//       toast({
-//         title: "Error",
-//         description: "No se pudo crear la provincia. Por favor, intente nuevamente.",
-//         variant: "destructive",
-//       });
-//     }
-//   };
-
-//   if (isLoading) {
-//     return <div>Cargando...</div>;
-//   }
-
-//   return (
-//     <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-background to-secondary/5">
-//       <div className="space-y-10">
-//         {/* Header y Resumen */}
-//         <div className="text-center space-y-4">
-//           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-//             Gestión de Stakeholders por Provincia
-//           </h1>
-//           <p className="text-muted-foreground max-w-2xl mx-auto">
-//             Sistema integral para la gestión y seguimiento de stakeholders, permitiendo un análisis detallado
-//             por provincia y la exportación de datos en formato JSON.
-//           </p>
-//         </div>
-
-//         {/* Estadísticas Generales */}
-//         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//           <div className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-primary">
-//             <div className="text-center space-y-2">
-//               <p className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-//                 {provincias.length}
-//               </p>
-//               <p className="text-sm font-medium">Provincias Registradas</p>
-//             </div>
-//           </div>
-//           <div className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-primary">
-//             <div className="text-center space-y-2">
-//               <p className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-//                 {provincias.reduce((acc, p) => acc + (p.stakeholders?.length || 0), 0)}
-//               </p>
-//               <p className="text-sm font-medium">Total de Stakeholders</p>
-//             </div>
-//           </div>
-//           <div className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-primary">
-//             <div className="text-center space-y-2">
-//               <p className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-//                 {Math.max(...provincias.map(p => p.stakeholders?.length || 0))}
-//               </p>
-//               <p className="text-sm font-medium">Máx. Stakeholders por Provincia</p>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Formulario de Nueva Provincia */}
-//         <div className="bg-card p-6 rounded-lg shadow-sm">
-//           <h2 className="text-lg font-semibold mb-4">Agregar Nueva Provincia</h2>
-//           <form
-//             onSubmit={handleCreateProvincia}
-//             className="flex gap-4"
-//           >
-//             <Input
-//               value={newProvincia}
-//               onChange={(e) => setNewProvincia(e.target.value)}
-//               placeholder="Nombre de la nueva provincia"
-//               className="max-w-sm"
-//               required
-//               type="text"
-//             />
-//             <Button
-//               type="submit"
-//               disabled={createProvinciaMutation.isPending}
-//             >
-//               {createProvinciaMutation.isPending ? "Creando..." : "Agregar Provincia"}
-//             </Button>
-//           </form>
-//         </div>
-
-//         {/* Lista de Provincias */}
-//         <div>
-//           <h2 className="text-2xl font-semibold mb-6">Provincias Registradas</h2>
-//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//             {provincias.map((provincia) => (
-//               <Link key={provincia.id} href={`/provincia/${provincia.id}`}>
-//                 <Card className="hover:shadow-lg transition-shadow cursor-pointer border-t-4 border-t-primary/20">
-//                   <CardHeader className="relative">
-//                     <div className="absolute right-4 top-4">
-//                       <Button
-//                         variant="destructive"
-//                         size="sm"
-//                         onClick={(e) => {
-//                           e.preventDefault();
-//                           if (confirm('¿Estás seguro de que deseas eliminar esta provincia? Se eliminarán también todos los stakeholders asociados.')) {
-//                             deleteProvincia(provincia.id).then(() => {
-//                               queryClient.invalidateQueries({ queryKey: ["/provincias"] });
-//                             });
-//                           }
-//                         }}
-//                       >
-//                         Eliminar Provincia
-//                       </Button>
-//                     </div>
-//                     <CardTitle>{provincia.nombre}</CardTitle>
-//                     <p className="text-sm text-muted-foreground">
-//                       {provincia.stakeholders?.length || 0} stakeholders registrados
-//                     </p>
-//                   </CardHeader>
-//                   <CardContent>
-//                     <p className="text-sm text-muted-foreground">
-//                       Haz clic para ver detalles y gestionar stakeholders
-//                     </p>
-//                   </CardContent>
-//                 </Card>
-//               </Link>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -190,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchProvincias, createProvincia, deleteProvincia } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { useUser } from "@/hooks/use-user";
 import {
   PlusCircle,
   Trash2,
@@ -207,8 +26,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-import lplataformaLogo from "./lplataforma.png";
 
 function getBackgroundColor(stakeholderCount: number, maxStakeholders: number) {
   const ratio = stakeholderCount / maxStakeholders;
@@ -232,6 +49,7 @@ export function HomeView() {
   const [showNewProvinciaModal, setShowNewProvinciaModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useUser();
 
   const { data: provincias = [], isLoading } = useQuery({
     queryKey: ["/provincias"],
@@ -247,7 +65,7 @@ export function HomeView() {
         title: "Provincia creada",
         description: "La provincia se ha creado exitosamente.",
       });
-      setShowNewProvinciaModal(false); // Close modal after successful creation
+      setShowNewProvinciaModal(false);
     },
     onError: (error) => {
       console.error("Error al crear provincia:", error);
@@ -285,15 +103,12 @@ export function HomeView() {
 
   const filteredProvincias = useMemo(() => {
     return provincias.filter((provincia) =>
-      provincia.nombre.toLowerCase().includes(searchTerm.toLowerCase()),
+      provincia.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [provincias, searchTerm]);
 
   const totalStakeholders = useMemo(() => {
-    return provincias.reduce(
-      (acc, p) => acc + (p.stakeholders?.length || 0),
-      0,
-    );
+    return provincias.reduce((acc, p) => acc + (p.stakeholders?.length || 0), 0);
   }, [provincias]);
 
   const maxStakeholders = useMemo(() => {
@@ -314,11 +129,6 @@ export function HomeView() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-6">
-              <img
-                src={lplataformaLogo}
-                alt="La Plataforma Logo"
-                className="w-20 h-20 object-contain bg-white rounded-full p-2"
-              />
               <div>
                 <h1 className="text-4xl font-bold text-white mb-1">
                   Provincias
@@ -339,6 +149,14 @@ export function HomeView() {
                   className="pl-10 w-64 bg-white text-gray-800 placeholder-gray-500"
                 />
               </div>
+              {user?.role === "admin" && (
+                <Link href="/users">
+                  <Button variant="outline" className="bg-white text-blue-600 hover:bg-blue-50">
+                    <Users className="h-4 w-4 mr-2" />
+                    Gestionar Usuarios
+                  </Button>
+                </Link>
+              )}
               <Button
                 onClick={() => setShowNewProvinciaModal(true)}
                 className="bg-white text-blue-600 hover:bg-blue-50"
@@ -426,7 +244,7 @@ export function HomeView() {
                   />
                   <StatItem
                     title="Promedio de Stakeholders por Provincia"
-                    value={(totalStakeholders / provincias.length).toFixed(2)}
+                    value={(totalStakeholders / provincias.length || 0).toFixed(2)}
                     icon={<BarChart2 className="h-5 w-5 text-primary" />}
                   />
                 </CardContent>
@@ -478,7 +296,17 @@ export function HomeView() {
   );
 }
 
-function ProvinciaCard({ provincia, maxStakeholders, onDelete }) {
+interface ProvinciaCardProps {
+  provincia: {
+    id: number;
+    nombre: string;
+    stakeholders?: any[];
+  };
+  maxStakeholders: number;
+  onDelete: () => void;
+}
+
+function ProvinciaCard({ provincia, maxStakeholders, onDelete }: ProvinciaCardProps) {
   const stakeholderCount = provincia.stakeholders?.length || 0;
   const bgColor = getBackgroundColor(stakeholderCount, maxStakeholders);
   const distinctiveColor = getDistinctiveColor(provincia.nombre);
@@ -538,7 +366,7 @@ function ProvinciaCard({ provincia, maxStakeholders, onDelete }) {
                             e.stopPropagation();
                             if (
                               confirm(
-                                "¿Estás seguro de que deseas eliminar esta provincia? Se eliminarán también todos los stakeholders asociados.",
+                                "¿Estás seguro de que deseas eliminar esta provincia? Se eliminarán también todos los stakeholders asociados."
                               )
                             ) {
                               onDelete();
@@ -568,7 +396,13 @@ function ProvinciaCard({ provincia, maxStakeholders, onDelete }) {
   );
 }
 
-function StatItem({ title, value, icon }) {
+interface StatItemProps {
+  title: string;
+  value: number | string;
+  icon: React.ReactNode;
+}
+
+function StatItem({ title, value, icon }: StatItemProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-2">

@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { HomeView } from "./pages/HomeView";
 import { ProvinceView } from "./pages/ProvinceView";
+import { UsersView } from "./pages/UsersView";
 import AuthPage from "./pages/AuthPage";
 import { useUser } from "./hooks/use-user";
 import { Loader2 } from "lucide-react";
@@ -27,6 +28,7 @@ function Router() {
     <Switch>
       <Route path="/" component={HomeView} />
       <Route path="/provincia/:id" component={ProvinceView} />
+      {user.role === "admin" && <Route path="/users" component={UsersView} />}
       <Route>404 - Página no encontrada</Route>
     </Switch>
   );

@@ -50,6 +50,17 @@ export async function createInitialAdminUser() {
   }
 }
 
+// Middleware para verificar si el usuario es administrador
+const requireAdmin = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "No autenticado" });
+  }
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ error: "Se requieren permisos de administrador" });
+  }
+  next();
+};
+
 export function setupAuth(app: Express) {
   const MemoryStore = createMemoryStore(session);
   const sessionSettings: session.SessionOptions = {
@@ -115,6 +126,7 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Rutas de autenticación
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err: any, user: Express.User | false, info: IVerifyOptions) => {
       if (err) {
@@ -136,6 +148,64 @@ export function setupAuth(app: Express) {
         });
       });
     })(req, res, next);
+  });
+
+  // Ruta para crear nuevos usuarios (solo admin)
+  app.post("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const { username, password, role = "user" } = req.body;
+
+      if (!username || !password) {
+        return res.status(400).json({ error: "Usuario y contraseña son requeridos" });
+      }
+
+      // Verificar si el usuario ya existe
+      const [existingUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username))
+        .limit(1);
+
+      if (existingUser) {
+        return res.status(400).json({ error: "El nombre de usuario ya existe" });
+      }
+
+      // Crear nuevo usuario
+      const hashedPassword = await crypto.hash(password);
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          username,
+          password: hashedPassword,
+          role,
+        })
+        .returning();
+
+      res.status(201).json({
+        message: "Usuario creado exitosamente",
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          role: newUser.role,
+        },
+      });
+    } catch (error) {
+      console.error("Error al crear usuario:", error);
+      res.status(500).json({ error: "Error al crear usuario" });
+    }
+  });
+
+  // Obtener lista de usuarios (solo admin)
+  app.get("/api/users", requireAdmin, async (_req, res) => {
+    try {
+      const usersList = await db.select().from(users);
+      // No enviamos las contraseñas
+      const safeUsers = usersList.map(({ password, ...user }) => user);
+      res.json(safeUsers);
+    } catch (error) {
+      console.error("Error al obtener usuarios:", error);
+      res.status(500).json({ error: "Error al obtener usuarios" });
+    }
   });
 
   app.post("/api/logout", (req, res) => {
