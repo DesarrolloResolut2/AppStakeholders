@@ -18,6 +18,9 @@ const crypto = {
   },
   compare: async (suppliedPassword: string, storedPassword: string) => {
     const [hashedPassword, salt] = storedPassword.split(".");
+    if (!hashedPassword || !salt) {
+      return false;
+    }
     const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
     const suppliedPasswordBuf = (await scryptAsync(
       suppliedPassword,
@@ -27,12 +30,6 @@ const crypto = {
     return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
   },
 };
-
-declare global {
-  namespace Express {
-    interface User extends ReturnType<typeof selectUserSchema.parse> {}
-  }
-}
 
 export async function createInitialAdminUser() {
   try {
@@ -56,7 +53,7 @@ export async function createInitialAdminUser() {
   }
 }
 
-export async function setupAuth(app: Express) {
+export function setupAuth(app: Express) {
   const MemoryStore = createMemoryStore(session);
   const sessionSettings: session.SessionOptions = {
     secret: process.env.REPL_ID || "stakeholder-management-secret",
@@ -91,6 +88,7 @@ export async function setupAuth(app: Express) {
         if (!user) {
           return done(null, false, { message: "Usuario no encontrado." });
         }
+
         const isMatch = await crypto.compare(password, user.password);
         if (!isMatch) {
           return done(null, false, { message: "Contraseña incorrecta." });
@@ -116,59 +114,6 @@ export async function setupAuth(app: Express) {
       done(null, user);
     } catch (err) {
       done(err);
-    }
-  });
-
-  // Middleware para verificar si el usuario es administrador
-  const requireAdmin = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).send("No autenticado");
-    }
-    if (req.user.role !== "admin") {
-      return res.status(403).send("Se requieren permisos de administrador");
-    }
-    next();
-  };
-
-  // Solo los administradores pueden crear nuevos usuarios
-  app.post("/api/users", requireAdmin, async (req, res, next) => {
-    try {
-      const result = insertUserSchema.safeParse(req.body);
-      if (!result.success) {
-        return res
-          .status(400)
-          .send("Entrada inválida: " + result.error.issues.map(i => i.message).join(", "));
-      }
-
-      const { username, password, role = "user" } = result.data;
-
-      const [existingUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, username))
-        .limit(1);
-
-      if (existingUser) {
-        return res.status(400).send("El nombre de usuario ya existe");
-      }
-
-      const hashedPassword = await crypto.hash(password);
-
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          username,
-          password: hashedPassword,
-          role,
-        })
-        .returning();
-
-      res.json({
-        message: "Usuario creado exitosamente",
-        user: { id: newUser.id, username: newUser.username, role: newUser.role },
-      });
-    } catch (error) {
-      next(error);
     }
   });
 
@@ -216,15 +161,5 @@ export async function setupAuth(app: Express) {
       return res.json(req.user);
     }
     res.status(401).send("No autenticado");
-  });
-
-  // Ruta para obtener todos los usuarios (solo accesible por administradores)
-  app.get("/api/users", requireAdmin, async (_req, res, next) => {
-    try {
-      const allUsers = await db.select().from(users);
-      res.json(allUsers.map(({ password, ...user }) => user));
-    } catch (error) {
-      next(error);
-    }
   });
 }
