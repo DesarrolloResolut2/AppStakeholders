@@ -49,7 +49,7 @@ export function HomeView() {
   const [showNewProvinciaModal, setShowNewProvinciaModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user } = useUser();
+  const { user, logout } = useUser();
 
   const { data: provincias = [], isLoading } = useQuery({
     queryKey: ["/provincias"],
@@ -163,6 +163,13 @@ export function HomeView() {
               >
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Nueva Provincia
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-white text-blue-600 hover:bg-blue-50"
+                onClick={() => logout()}
+              >
+                Cerrar Sesión
               </Button>
             </div>
           </div>

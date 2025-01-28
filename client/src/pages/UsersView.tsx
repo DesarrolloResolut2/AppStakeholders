@@ -18,7 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Trash2 } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { Link } from "wouter";
 
 interface User {
   id: number;
@@ -113,74 +115,82 @@ export function UsersView() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Gestión de Usuarios</CardTitle>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Nuevo Usuario
+          <div className="flex space-x-4">
+            <Link href="/">
+              <Button variant="outline">
+                <ChevronRight className="h-4 w-4 mr-2 rotate-180" />
+                Volver
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Crear Nuevo Usuario</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Nombre de usuario"
-                    value={newUser.username}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, username: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={newUser.password}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, password: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Select
-                    value={newUser.role}
-                    onValueChange={(value: "admin" | "user") =>
-                      setNewUser({ ...newUser, role: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar rol" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">Usuario</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={createUserMutation.isPending}
-                  >
-                    {createUserMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : null}
-                    Crear Usuario
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+            </Link>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Nuevo Usuario
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Crear Nuevo Usuario</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Nombre de usuario"
+                      value={newUser.username}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, username: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      type="password"
+                      placeholder="Contraseña"
+                      value={newUser.password}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, password: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Select
+                      value={newUser.role}
+                      onValueChange={(value: "admin" | "user") =>
+                        setNewUser({ ...newUser, role: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar rol" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">Usuario</SelectItem>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={createUserMutation.isPending}
+                    >
+                      {createUserMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : null}
+                      Crear Usuario
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
