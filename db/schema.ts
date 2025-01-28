@@ -1,15 +1,6 @@
-import { pgTable, text, serial, integer, jsonb, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
-import { z } from "zod";
-
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  is_admin: boolean("is_admin").notNull().default(false),
-  created_at: text("created_at").notNull().$default(() => new Date().toISOString()),
-});
 
 export const provincias = pgTable("provincias", {
   id: serial("id").primaryKey(),
@@ -57,22 +48,8 @@ export const stakeholdersRelations = relations(stakeholders, ({ one }) => ({
   }),
 }));
 
-// Schemas for validation - Actualizados para manejar login
-export const insertUserSchema = createInsertSchema(users, {
-  username: z.string().min(1, "El nombre de usuario es requerido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-  is_admin: z.boolean().optional(),
-  created_at: z.string().optional()
-});
-
-export const selectUserSchema = createSelectSchema(users);
-
 export const insertProvinciaSchema = createInsertSchema(provincias);
 export const selectProvinciaSchema = createSelectSchema(provincias);
 
 export const insertStakeholderSchema = createInsertSchema(stakeholders);
 export const selectStakeholderSchema = createSelectSchema(stakeholders);
-
-// Type exports
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
