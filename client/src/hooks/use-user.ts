@@ -28,9 +28,6 @@ async function handleRequest(
     });
 
     if (!response.ok) {
-      if (response.status >= 500) {
-        return { ok: false, message: response.statusText };
-      }
       const message = await response.text();
       return { ok: false, message };
     }
@@ -43,27 +40,15 @@ async function handleRequest(
 }
 
 async function fetchUser(): Promise<User | null> {
-  try {
-    const response = await fetch('/api/user', {
-      credentials: 'include'
-    });
+  const response = await fetch('/api/user', {
+    credentials: 'include'
+  });
 
-    if (response.status === 401) {
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error(`${response.status}: ${await response.text()}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('401')) {
-      return null;
-    }
-    console.warn('Error fetching user:', error);
+  if (!response.ok) {
     return null;
   }
+
+  return response.json();
 }
 
 export function useUser() {
@@ -76,9 +61,7 @@ export function useUser() {
     retry: 0,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
-    refetchOnReconnect: false,
-    gcTime: 0,
-    enabled: true // Always enabled to keep authentication state updated
+    refetchOnReconnect: false
   });
 
   const loginMutation = useMutation<RequestResult, Error, LoginCredentials>({
@@ -91,16 +74,9 @@ export function useUser() {
   const logoutMutation = useMutation<RequestResult, Error>({
     mutationFn: () => handleRequest('/api/logout', 'POST'),
     onSuccess: () => {
-      // Temporarily disable the user query
       queryClient.setQueryData(['user'], null);
-
-      // Remove all queries from the cache
       queryClient.clear();
-
-      // Reset the user query state
-      queryClient.resetQueries({ queryKey: ['user'] });
-
-      // Do not use window.location.reload() for a smoother experience
+      window.location.href = '/';
     },
   });
 
