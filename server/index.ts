@@ -47,14 +47,6 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // serve vite app only if the request is not an API request
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      return next('route');
-    }
-    next();
-  });
-
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes

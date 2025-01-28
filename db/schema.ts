@@ -1,24 +1,6 @@
 import { pgTable, text, serial, integer, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
-import { z } from "zod";
-import type { InferModel } from "drizzle-orm";
-
-// Users table for authentication
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  role: text("role").$type<"admin" | "user">().notNull().default("user"),
-});
-
-// Define schema validators first
-export const insertUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
-
-// Define the User types using the schema
-export type User = InferModel<typeof users>;
-export type NewUser = InferModel<typeof users, "insert">;
 
 export const provincias = pgTable("provincias", {
   id: serial("id").primaryKey(),
@@ -66,7 +48,6 @@ export const stakeholdersRelations = relations(stakeholders, ({ one }) => ({
   }),
 }));
 
-// Schema validators
 export const insertProvinciaSchema = createInsertSchema(provincias);
 export const selectProvinciaSchema = createSelectSchema(provincias);
 

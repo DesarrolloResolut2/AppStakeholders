@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-serverless";
 import ws from "ws";
-import * as schema from "./schema";
+import * as schema from "@db/schema";
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -15,5 +15,3 @@ export const db = drizzle({
   schema,
   ws: ws,
 });
-
-export * from "./schema";
