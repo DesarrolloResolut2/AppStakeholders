@@ -2,6 +2,13 @@ import { pgTable, text, serial, integer, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  role: text("role").$type<"admin" | "user">().notNull().default("user"),
+});
+
 export const provincias = pgTable("provincias", {
   id: serial("id").primaryKey(),
   nombre: text("nombre").notNull(),
@@ -53,3 +60,6 @@ export const selectProvinciaSchema = createSelectSchema(provincias);
 
 export const insertStakeholderSchema = createInsertSchema(stakeholders);
 export const selectStakeholderSchema = createSelectSchema(stakeholders);
+
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
