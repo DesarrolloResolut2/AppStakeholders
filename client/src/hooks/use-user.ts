@@ -36,7 +36,7 @@ async function handleRequest(
     }
 
     const data = await response.json();
-    return { ok: true, user: data };
+    return { ok: true, user: data.user };
   } catch (e: any) {
     return { ok: false, message: e.toString() };
   }
