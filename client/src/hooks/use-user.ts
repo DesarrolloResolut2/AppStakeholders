@@ -43,18 +43,23 @@ async function handleRequest(
 }
 
 async function fetchUser(): Promise<User | null> {
-  const response = await fetch('/api/user', {
-    credentials: 'include'
-  });
+  try {
+    const response = await fetch('/api/user', {
+      credentials: 'include'
+    });
 
-  if (!response.ok) {
-    if (response.status === 401) {
-      return null;
+    if (!response.ok) {
+      if (response.status === 401) {
+        return null;
+      }
+      throw new Error(`${response.status}: ${await response.text()}`);
     }
-    throw new Error(`${response.status}: ${await response.text()}`);
-  }
 
-  return response.json();
+    return response.json();
+  } catch (error) {
+    console.warn('Error fetching user:', error);
+    return null;
+  }
 }
 
 export function useUser() {
@@ -64,9 +69,10 @@ export function useUser() {
     queryKey: ['user'],
     queryFn: fetchUser,
     staleTime: Infinity,
-    retry: false,
-    refetchOnWindowFocus: false, // Evitar refetch automático al enfocar la ventana
-    refetchOnMount: true, // Solo refetch al montar el componente
+    retry: 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: false
   });
 
   const loginMutation = useMutation<RequestResult, Error, LoginCredentials>({
@@ -79,9 +85,9 @@ export function useUser() {
   const logoutMutation = useMutation<RequestResult, Error>({
     mutationFn: () => handleRequest('/api/logout', 'POST'),
     onSuccess: () => {
-      // Inmediatamente establecer el usuario como null después del logout
+      // Inmediatamente establecer el usuario como null y eliminar la query
       queryClient.setQueryData(['user'], null);
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.removeQueries({ queryKey: ['user'] });
     },
   });
 
