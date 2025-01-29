@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import * as XLSX from 'xlsx';
 import {
   Dialog,
   DialogContent,
@@ -22,7 +23,31 @@ import {
 } from "@/lib/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Plus, Download, Search, ChevronRight, X, Pencil, Trash, User, Phone, Briefcase, Linkedin, Mail, Globe, Building, Users, AlertTriangle, Target, MessageSquare, ExternalLink, MoreVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  ArrowLeft,
+  Plus,
+  Download,
+  Search,
+  ChevronRight,
+  X,
+  Pencil,
+  Trash,
+  User,
+  Phone,
+  Briefcase,
+  Linkedin,
+  Mail,
+  Globe,
+  Building,
+  Users,
+  AlertTriangle,
+  Target,
+  MessageSquare,
+  MoreVertical,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -34,7 +59,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -63,15 +87,14 @@ import {
 
 export function ProvinceView({ params }: { params: { id: string } }) {
   const provinciaId = parseInt(params.id);
-  const [selectedStakeholder, setSelectedStakeholder] = useState<
-    Stakeholder | undefined
-  >();
+  const [selectedStakeholder, setSelectedStakeholder] = useState<Stakeholder | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterInfluence, setFilterInfluence] = useState("all");
   const [sortField, setSortField] = useState<keyof Stakeholder>("nombre");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [selectedStakeholders, setSelectedStakeholders] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
 
   const { data: provincias = [], isLoading } = useQuery({
@@ -122,7 +145,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
       const otrasOrganizaciones = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase() || '';
       const searchTermLower = searchTerm.toLowerCase();
 
-      const matchesSearch = 
+      const matchesSearch =
         organizacionPrincipal.includes(searchTermLower) ||
         otrasOrganizaciones.includes(searchTermLower);
 
@@ -147,6 +170,58 @@ export function ProvinceView({ params }: { params: { id: string } }) {
       setSortField(field);
       setSortDirection("asc");
     }
+  };
+
+  const handleSelectStakeholder = (id: number) => {
+    setSelectedStakeholders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (sortedStakeholders) {
+      if (selectedStakeholders.size === sortedStakeholders.length) {
+        setSelectedStakeholders(new Set());
+      } else {
+        setSelectedStakeholders(new Set(sortedStakeholders.map(s => s.id!)));
+      }
+    }
+  };
+
+  const exportToExcel = () => {
+    if (!sortedStakeholders || !provincia) return;
+
+    const selectedData = sortedStakeholders
+      .filter(s => selectedStakeholders.has(s.id!))
+      .map(s => ({
+        'Nombre': s.nombre || '',
+        'Organización Principal': s.datos_contacto?.organizacion_principal || '',
+        'Otras Organizaciones': s.datos_contacto?.otras_organizaciones || '',
+        'Nivel de Influencia': s.nivel_influencia || '',
+        'Nivel de Interés': s.nivel_interes || '',
+        'Email': s.datos_contacto?.email || '',
+        'Teléfono': s.datos_contacto?.telefono || '',
+        'Persona de Contacto': s.datos_contacto?.persona_contacto || '',
+        'Website': s.datos_contacto?.website || '',
+        'LinkedIn': s.datos_contacto?.linkedin || '',
+        'Recursos': s.recursos || '',
+        'Relaciones': s.relaciones || '',
+        'Riesgos y Conflictos': s.riesgos_conflictos || '',
+        'Objetivos Generales': s.objetivos_generales || '',
+        'Intereses y Expectativas': s.intereses_expectativas || '',
+        'Expectativas de Comunicación': s.expectativas_comunicacion || ''
+      }));
+
+    const ws = XLSX.utils.json_to_sheet(selectedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Stakeholders");
+    XLSX.writeFile(wb, `stakeholders_${provincia.nombre}_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   useEffect(() => {
@@ -182,7 +257,6 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-background to-secondary/5">
       <div className="space-y-8">
-        {/* Header */}
         <div className="mb-8 bg-gradient-to-r from-primary to-primary-foreground p-8 rounded-lg shadow-lg">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex flex-col gap-2">
@@ -199,8 +273,20 @@ export function ProvinceView({ params }: { params: { id: string } }) {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" onClick={handleExport}>
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                className="mr-2"
+              >
                 <Download className="mr-2 h-4 w-4" /> Exportar JSON
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportToExcel}
+                disabled={selectedStakeholders.size === 0}
+                className="mr-2"
+              >
+                <Download className="mr-2 h-4 w-4" /> Exportar Seleccionados a Excel
               </Button>
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
@@ -241,17 +327,18 @@ export function ProvinceView({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* Filters and search */}
         <Card className="mb-8">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-grow">
+              <div className="flex-grow relative">
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-muted-foreground" />
+                </div>
                 <Input
                   placeholder="Buscar por organización..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
-                  icon={<Search className="h-4 w-4 text-muted-foreground" />}
+                  className="pl-10 w-full"
                 />
               </div>
               <Select
@@ -272,10 +359,15 @@ export function ProvinceView({ params }: { params: { id: string } }) {
           </CardContent>
         </Card>
 
-        {/* Stakeholders List */}
         <div className="space-y-2">
-          {/* Table Header */}
-          <div className="grid grid-cols-5 gap-4 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-semibold">
+          <div className="grid grid-cols-6 gap-4 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-semibold">
+            <div className="flex items-center">
+              <Checkbox 
+                id="select-all"
+                checked={sortedStakeholders?.length === selectedStakeholders.size}
+                onCheckedChange={handleSelectAll}
+              />
+            </div>
             <div className="flex items-center cursor-pointer" onClick={() => toggleSort("nombre")}>
               Nombre
               {sortField === "nombre" && (sortDirection === "asc" ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
@@ -294,7 +386,14 @@ export function ProvinceView({ params }: { params: { id: string } }) {
           {sortedStakeholders?.map((stakeholder) => (
             <Card key={stakeholder.id} className="hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md">
               <CardContent className="p-4">
-                <div className="grid grid-cols-5 gap-4 items-center">
+                <div className="grid grid-cols-6 gap-4 items-center">
+                  <div className="flex items-center">
+                    <Checkbox
+                      id={`select-${stakeholder.id}`}
+                      checked={selectedStakeholders.has(stakeholder.id!)}
+                      onCheckedChange={() => handleSelectStakeholder(stakeholder.id!)}
+                    />
+                  </div>
                   <div className="flex items-center space-x-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${stakeholder.nombre}`} />
@@ -384,294 +483,292 @@ export function ProvinceView({ params }: { params: { id: string } }) {
             </Card>
           ))}
         </div>
-      </div>
 
-      {/* Stakeholder Details Drawer */}
-      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <SheetContent
-          side="right"
-          className="w-[80%] sm:max-w-[100%] p-0 bg-background"
-        >
-          <SheetHeader className="p-6 bg-gradient-to-r from-primary to-primary-foreground sticky top-0 z-10">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${selectedStakeholder?.nombre}`} />
-                  <AvatarFallback>{selectedStakeholder?.nombre.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <SheetTitle className="text-3xl font-bold text-white">
-                    {selectedStakeholder?.nombre}
-                  </SheetTitle>
-                  <p className="text-primary-foreground/80">
-                    {selectedStakeholder?.datos_contacto?.organizacion_principal || "Organización no especificada"}
-                  </p>
+        <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <SheetContent
+            side="right"
+            className="w-[80%] sm:max-w-[100%] p-0 bg-background"
+          >
+            <SheetHeader className="p-6 bg-gradient-to-r from-primary to-primary-foreground sticky top-0 z-10">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${selectedStakeholder?.nombre}`} />
+                    <AvatarFallback>{selectedStakeholder?.nombre.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <SheetTitle className="text-3xl font-bold text-white">
+                      {selectedStakeholder?.nombre}
+                    </SheetTitle>
+                    <p className="text-primary-foreground/80">
+                      {selectedStakeholder?.datos_contacto?.organizacion_principal || "Organización no especificada"}
+                    </p>
+                  </div>
                 </div>
+                <SheetClose asChild>
+                  <Button variant="ghost" size="icon" className="text-primary-foreground">
+                    <X className="h-6 w-6" />
+                  </Button>
+                </SheetClose>
               </div>
-              <SheetClose asChild>
-                <Button variant="ghost" size="icon" className="text-primary-foreground">
-                  <X className="h-6 w-6" />
-                </Button>
-              </SheetClose>
-            </div>
-            <div className="flex space-x-2 mt-4">
-              <Badge variant="secondary" className="text-lg py-1 px-3">
-                Influencia: {selectedStakeholder?.nivel_influencia}
-              </Badge>
-              <Badge variant="secondary" className="text-lg py-1 px-3">
-                Interés: {selectedStakeholder?.nivel_interes}
-              </Badge>
-            </div>
-          </SheetHeader>
-          <ScrollArea className="h-[calc(100vh-12rem)] px-6 py-4">
-            <Tabs defaultValue="general" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6">
-                <TabsTrigger value="general" className="flex items-center gap-2">
-                  <User size={18} />
-                  General
-                </TabsTrigger>
-                <TabsTrigger value="contacto" className="flex items-center gap-2">
-                  <Phone size={18} />
-                  Contacto
-                </TabsTrigger>
-                <TabsTrigger value="objetivos" className="flex items-center gap-2">
-                  <Target size={18} />
-                  Objetivos
-                </TabsTrigger>
-                <TabsTrigger value="linkedin" className="flex items-center gap-2">
-                  <Linkedin size={18} />
-                  LinkedIn
-                </TabsTrigger>
-              </TabsList>
+              <div className="flex space-x-2 mt-4">
+                <Badge variant="secondary" className="text-lg py-1 px-3">
+                  Influencia: {selectedStakeholder?.nivel_influencia}
+                </Badge>
+                <Badge variant="secondary" className="text-lg py-1 px-3">
+                  Interés: {selectedStakeholder?.nivel_interes}
+                </Badge>
+              </div>
+            </SheetHeader>
+            <ScrollArea className="h-[calc(100vh-12rem)] px-6 py-4">
+              <Tabs defaultValue="general" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsTrigger value="general" className="flex items-center gap-2">
+                    <User size={18} />
+                    General
+                  </TabsTrigger>
+                  <TabsTrigger value="contacto" className="flex items-center gap-2">
+                    <Phone size={18} />
+                    Contacto
+                  </TabsTrigger>
+                  <TabsTrigger value="objetivos" className="flex items-center gap-2">
+                    <Target size={18} />
+                    Objetivos
+                  </TabsTrigger>
+                  <TabsTrigger value="linkedin" className="flex items-center gap-2">
+                    <Linkedin size={18} />
+                    LinkedIn
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="general">
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5" />
-                        Recursos y Relaciones
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-semibold mb-2">Recursos:</h4>
-                          <p>{selectedStakeholder?.recursos || "No especificados"}</p>
-                        </div>
-                        <Separator />
-                        <div>
-                          <h4 className="font-semibold mb-2">Relaciones:</h4>
-                          <p>{selectedStakeholder?.relaciones || "No especificadas"}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5" />
-                        Riesgos y Conflictos
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.riesgos_conflictos || "No especificados"}</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="contacto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Building className="h-5 w-5" />
-                        Organizaciones
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-semibold mb-2">Principal:</h4>
-                          <p>{selectedStakeholder?.datos_contacto?.organizacion_principal || "No especificada"}</p>
-                        </div>
-                        <Separator />
-                        <div>
-                          <h4 className="font-semibold mb-2">Otras:</h4>
-                          <p>{selectedStakeholder?.datos_contacto?.otras_organizaciones || "No especificadas"}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <User className="h-5 w-5" />
-                        Persona de Contacto
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.datos_contacto?.persona_contacto || "No especificada"}</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Mail className="h-5 w-5" />
-                        Email
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.datos_contacto?.email || "No especificado"}</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Phone className="h-5 w-5" />
-                        Teléfono
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.datos_contacto?.telefono || "No especificado"}</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="md:col-span-2">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Globe className="h-5 w-5" />
-                        Website
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.datos_contacto?.website || "No especificado"}</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="md:col-span-2">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Globe className="h-5 w-5" />
-                        Linkedin
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.datos_contacto?.linkedin || "No especificado"}</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-              
-
-              <TabsContent value="objetivos">
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Target className="h-5 w-5" />
-                        Objetivos Generales
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.objetivos_generales || "No especificados"}</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5" />
-                        Intereses y Expectativas
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.intereses_expectativas || "No especificados"}</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <MessageSquare className="h-5 w-5" />
-                        Expectativas de Comunicación
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{selectedStakeholder?.expectativas_comunicacion || "No especificadas"}</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="linkedin">
-                {selectedStakeholder?.datos_especificos_linkedin ? (
+                <TabsContent value="general">
                   <div className="space-y-6">
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <User className="h-5 w-5" />
-                          About Me
+                          <Users className="h-5 w-5" />
+                          Recursos y Relaciones
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p>{selectedStakeholder.datos_especificos_linkedin.about_me || "No especificado"}</p>
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="font-semibold mb-2">Recursos:</h4>
+                            <p>{selectedStakeholder?.recursos || "No especificados"}</p>
+                          </div>
+                          <Separator />
+                          <div>
+                            <h4 className="font-semibold mb-2">Relaciones:</h4>
+                            <p>{selectedStakeholder?.relaciones || "No especificadas"}</p>
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <Briefcase className="h-5 w-5" />
-                          Headline
+                          <AlertTriangle className="h-5 w-5" />
+                          Riesgos y Conflictos
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p>{selectedStakeholder.datos_especificos_linkedin.headline || "No especificado"}</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Briefcase className="h-5 w-5" />
-                          Experiencia
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p>{selectedStakeholder.datos_especificos_linkedin.experiencia || "No especificada"}</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Briefcase className="h-5 w-5" />
-                          Formación
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p>{selectedStakeholder.datos_especificos_linkedin.formacion || "No especificada"}</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Briefcase className="h-5 w-5" />
-                          Otros Campos
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p>{selectedStakeholder.datos_especificos_linkedin.otros_campos || "No especificados"}</p>
+                        <p>{selectedStakeholder?.riesgos_conflictos || "No especificados"}</p>
                       </CardContent>
                     </Card>
                   </div>
-                ) : (
-                  <Card>
-                    <CardContent>
-                      <p className="text-center py-4">No hay datos de LinkedIn disponibles para este stakeholder.</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-            </Tabs>
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
+                </TabsContent>
+
+                <TabsContent value="contacto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Building className="h-5 w-5" />
+                          Organizaciones
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="font-semibold mb-2">Principal:</h4>
+                            <p>{selectedStakeholder?.datos_contacto?.organizacion_principal || "No especificada"}</p>
+                          </div>
+                          <Separator />
+                          <div>
+                            <h4 className="font-semibold mb-2">Otras:</h4>
+                            <p>{selectedStakeholder?.datos_contacto?.otras_organizaciones || "No especificadas"}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <User className="h-5 w-5" />
+                          Persona de Contacto
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.datos_contacto?.persona_contacto || "No especificada"}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Mail className="h-5 w-5" />
+                          Email
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.datos_contacto?.email || "No especificado"}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Phone className="h-5 w-5" />
+                          Teléfono
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.datos_contacto?.telefono || "No especificado"}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="md:col-span-2">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Globe className="h-5 w-5" />
+                          Website
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.datos_contacto?.website || "No especificado"}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="md:col-span-2">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Globe className="h-5 w-5" />
+                          Linkedin
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.datos_contacto?.linkedin || "No especificado"}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="objetivos">
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Target className="h-5 w-5" />
+                          Objetivos Generales
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.objetivos_generales || "No especificados"}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Users className="h-5 w-5" />
+                          Intereses y Expectativas
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.intereses_expectativas || "No especificados"}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <MessageSquare className="h-5 w-5" />
+                          Expectativas de Comunicación
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{selectedStakeholder?.expectativas_comunicacion || "No especificadas"}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="linkedin">
+                  {selectedStakeholder?.datos_especificos_linkedin ? (
+                    <div className="space-y-6">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <User className="h-5 w-5" />
+                            About Me
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p>{selectedStakeholder.datos_especificos_linkedin.about_me || "No especificado"}</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Briefcase className="h-5 w-5" />
+                            Headline
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p>{selectedStakeholder.datos_especificos_linkedin.headline || "No especificado"}</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Briefcase className="h-5 w-5" />
+                            Experiencia
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p>{selectedStakeholder.datos_especificos_linkedin.experiencia || "No especificada"}</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Briefcase className="h-5 w-5" />
+                            Formación
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p>{selectedStakeholder.datos_especificos_linkedin.formacion || "No especificada"}</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Briefcase className="h-5 w-5" />
+                            Otros Campos
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p>{selectedStakeholder.datos_especificos_linkedin.otros_campos || "No especificados"}</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ) : (
+                    <Card>
+                      <CardContent>
+                        <p className="text-center py-4">No hay datos de LinkedIn disponibles para este stakeholder.</p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 }
