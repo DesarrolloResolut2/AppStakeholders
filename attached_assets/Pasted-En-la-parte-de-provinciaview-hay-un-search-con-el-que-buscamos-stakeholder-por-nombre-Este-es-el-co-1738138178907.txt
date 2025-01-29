@@ -1,0 +1,53 @@
+En la parte de provinciaview hay un search con el que buscamos stakeholder por nombre. Este es el codigo si no me equivoco:  {/* Filters and search */}
+        <Card className="mb-8">
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-grow">
+                <Input
+                  placeholder="Buscar stakeholder..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                  icon={<Search className="h-4 w-4 text-muted-foreground" />}
+                />
+              </div>
+              <Select
+                value={filterInfluence}
+                onValueChange={setFilterInfluence}
+              >
+                <SelectTrigger className="w-full md:w-[200px]">
+                  <SelectValue placeholder="Nivel de influencia" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="Alto">Alto</SelectItem>
+                  <SelectItem value="Medio">Medio</SelectItem>
+                  <SelectItem value="Bajo">Bajo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+Pues quiero que filtre en vez de por nombre por organización a la que pertenece el stakeholder: esta es la parte del codigo a la que me refiero: <TabsContent value="contacto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Building className="h-5 w-5" />
+                        Organizaciones
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-semibold mb-2">Principal:</h4>
+                          <p>{selectedStakeholder?.datos_contacto?.organizacion_principal || "No especificada"}</p>
+                        </div>
+                        <Separator />
+                        <div>
+                          <h4 className="font-semibold mb-2">Otras:</h4>
+                          <p>{selectedStakeholder?.datos_contacto?.otras_organizaciones || "No especificadas"}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
