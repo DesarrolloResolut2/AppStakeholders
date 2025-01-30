@@ -97,6 +97,7 @@ interface StakeholderCardProps {
   onDelete: () => void;
   onExport: () => void;
   onView: () => void;
+  onTagDrop: (tagId: number, stakeholderId: number) => void;
 }
 
 function StakeholderCard({
@@ -106,21 +107,28 @@ function StakeholderCard({
   onEdit,
   onDelete,
   onExport,
-  onView
+  onView,
+  onTagDrop
 }: StakeholderCardProps) {
-  const { isOver, setNodeRef } = useDroppable({
-    id: `droppable-${stakeholder.id}`,
-    data: {
-      stakeholderId: stakeholder.id,
-    },
-  });
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const tagId = e.dataTransfer.getData('text/plain');
+    if (tagId && stakeholder.id) {
+      onTagDrop(parseInt(tagId), stakeholder.id);
+    }
+  };
 
   return (
     <Card
-      ref={setNodeRef}
-      className={`hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md ${
-        isOver ? 'ring-2 ring-primary bg-blue-100 dark:bg-blue-900/50' : ''
-      }`}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      className={`hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md`}
     >
       <CardContent className="p-4">
         <div className="grid grid-cols-7 gap-4 items-center">
@@ -600,6 +608,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                 onDelete={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}
                 onExport={() => handleExportStakeholder(stakeholder)}
                 onView={() => openStakeholderDrawer(stakeholder)}
+                onTagDrop={handleTagDrop}
               />
             ))}
           </div>
