@@ -13,8 +13,7 @@ import { Tag } from "@/lib/types";
 import { createTag, deleteTag, updateTag } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { X, Edit2, Check, X as Cancel } from "lucide-react";
-import { DndContext, DragEndEvent, useSensor, useSensors, PointerSensor, DragOverlay } from '@dnd-kit/core';
-import { useDraggable } from '@dnd-kit/core';
+import {  DragEndEvent } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 
 interface Props {
@@ -28,69 +27,54 @@ function DraggableTag({ tag, onEdit, onDelete }: {
   onEdit: () => void; 
   onDelete: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: tag.id,
-    data: tag,
-  });
-
-  const style = transform ? {
-    transform: CSS.Translate.toString(transform),
-    cursor: isDragging ? 'grabbing' : 'grab',
-    opacity: isDragging ? 0.5 : undefined,
-  } : undefined;
-
   return (
-    <Badge
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      key={tag.id}
-      variant="secondary"
-      className="px-3 py-1 flex items-center gap-2 cursor-grab active:cursor-grabbing"
+    <div
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData('text/plain', tag.id.toString());
+      }}
+      className="inline-block"
     >
-      {tag.name}
-      <div className="flex gap-1">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-4 w-4 p-0"
-          onClick={(e) => {
-            e.preventDefault();
-            onEdit();
-          }}
-        >
-          <Edit2 className="h-3 w-3" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-4 w-4 p-0"
-          onClick={(e) => {
-            e.preventDefault();
-            onDelete();
-          }}
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-    </Badge>
+      <Badge
+        variant="secondary"
+        className="px-3 py-1 flex items-center gap-2 cursor-grab active:cursor-grabbing"
+      >
+        {tag.name}
+        <div className="flex gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-4 w-4 p-0"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onEdit();
+            }}
+          >
+            <Edit2 className="h-3 w-3" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-4 w-4 p-0"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDelete();
+            }}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      </Badge>
+    </div>
   );
 }
 
 export function TagManager({ tags, onTagsChange, onDragEnd }: Props) {
   const [newTagName, setNewTagName] = useState("");
   const [editingTag, setEditingTag] = useState<{ id: number; name: string } | null>(null);
-  const [activeId, setActiveId] = useState<number | null>(null);
   const { toast } = useToast();
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
 
   const handleCreateTag = async () => {
     if (!newTagName.trim()) return;
@@ -147,23 +131,6 @@ export function TagManager({ tags, onTagsChange, onDragEnd }: Props) {
     }
   };
 
-  const handleDragStart = (event: DragEndEvent) => {
-    setActiveId(Number(event.active.id));
-  };
-
-  const handleDragCancel = () => {
-    setActiveId(null);
-  };
-
-  const handleDragEndInternal = (event: DragEndEvent) => {
-    setActiveId(null);
-    if (onDragEnd) {
-      onDragEnd(event);
-    }
-  };
-
-  const activeTag = activeId ? tags.find(tag => tag.id === activeId) : null;
-
   return (
     <Card>
       <CardHeader>
@@ -188,61 +155,47 @@ export function TagManager({ tags, onTagsChange, onDragEnd }: Props) {
             />
             <Button onClick={handleCreateTag}>Crear Etiqueta</Button>
           </div>
-          <DndContext 
-            sensors={sensors} 
-            onDragEnd={handleDragEndInternal}
-            onDragStart={handleDragStart}
-            onDragCancel={handleDragCancel}
-          >
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) =>
-                editingTag?.id === tag.id ? (
-                  <div key={tag.id} className="flex items-center gap-2">
-                    <Input
-                      value={editingTag.name}
-                      onChange={(e) =>
-                        setEditingTag({ ...editingTag, name: e.target.value })
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) =>
+              editingTag?.id === tag.id ? (
+                <div key={tag.id} className="flex items-center gap-2">
+                  <Input
+                    value={editingTag.name}
+                    onChange={(e) =>
+                      setEditingTag({ ...editingTag, name: e.target.value })
+                    }
+                    className="w-[150px]"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleUpdateTag();
                       }
-                      className="w-[150px]"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleUpdateTag();
-                        }
-                      }}
-                    />
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={handleUpdateTag}
-                    >
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => setEditingTag(null)}
-                    >
-                      <Cancel className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <DraggableTag
-                    key={tag.id}
-                    tag={tag}
-                    onEdit={() => setEditingTag({ id: tag.id, name: tag.name })}
-                    onDelete={() => handleDeleteTag(tag.id)}
+                    }}
                   />
-                )
-              )}
-            </div>
-            <DragOverlay>
-              {activeTag && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  {activeTag.name}
-                </Badge>
-              )}
-            </DragOverlay>
-          </DndContext>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleUpdateTag}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setEditingTag(null)}
+                  >
+                    <Cancel className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <DraggableTag
+                  key={tag.id}
+                  tag={tag}
+                  onEdit={() => setEditingTag({ id: tag.id, name: tag.name })}
+                  onDelete={() => handleDeleteTag(tag.id)}
+                />
+              )
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
