@@ -385,7 +385,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tagId }),
+        body: JSON.stringify({ tag_id: tagId }),
       });
 
       if (!response.ok) {
@@ -398,6 +398,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
         description: "Etiqueta asignada correctamente",
       });
     } catch (error) {
+      console.error('Error al asignar etiqueta:', error);
       toast({
         title: "Error",
         description: "No se pudo asignar la etiqueta",
@@ -410,11 +411,11 @@ export function ProvinceView({ params }: { params: { id: string } }) {
     const { active, over } = event;
 
     if (over) {
-      const stakeholderId = over.data?.current?.stakeholderId;
+      const stakeholderId = over.id.replace('droppable-', '');
       const tagId = Number(active.id);
 
       if (stakeholderId && tagId) {
-        handleTagDrop(tagId, stakeholderId);
+        handleTagDrop(tagId, parseInt(stakeholderId));
       }
     }
   }
