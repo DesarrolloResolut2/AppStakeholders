@@ -89,6 +89,15 @@ import {
 import { TagManager } from "@/components/TagManager";
 import { useToast } from "@/hooks/use-toast";
 
+const generatePastelColor = (id: number) => {
+  const hue = (id * 137.508) % 360;
+  return `hsl(${hue}, 50%, 87%)`;
+};
+
+const getTextColor = (backgroundColor: string) => {
+  return 'rgb(51, 51, 51)';
+};
+
 interface StakeholderCardProps {
   stakeholder: Stakeholder;
   isSelected: boolean;
@@ -182,7 +191,16 @@ function StakeholderCard({
           <div className="flex flex-wrap gap-1">
             {stakeholder.tags && stakeholder.tags.length > 0 ? (
               stakeholder.tags.map(({ tag }) => (
-                <Badge key={tag.id} variant="outline" className="text-xs group relative">
+                <Badge
+                  key={tag.id}
+                  variant="outline"
+                  className="text-xs group relative"
+                  style={{
+                    backgroundColor: generatePastelColor(tag.id),
+                    color: getTextColor(generatePastelColor(tag.id)),
+                    border: 'none'
+                  }}
+                >
                   {tag.name}
                   <button
                     onClick={(e) => {
@@ -191,7 +209,7 @@ function StakeholderCard({
                     }}
                     className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-3 w-3" style={{ color: getTextColor(generatePastelColor(tag.id)) }} />
                   </button>
                 </Badge>
               ))
@@ -778,13 +796,22 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                           <div className="flex flex-wrap gap-2">
                             {selectedStakeholder?.tags && selectedStakeholder.tags.length > 0 ? (
                               selectedStakeholder.tags.map(({ tag }) => (
-                                <Badge key={tag.id} variant="outline" className="group relative">
+                                <Badge
+                                  key={tag.id}
+                                  variant="outline"
+                                  className="group relative"
+                                  style={{
+                                    backgroundColor: generatePastelColor(tag.id),
+                                    color: getTextColor(generatePastelColor(tag.id)),
+                                    border: 'none'
+                                  }}
+                                >
                                   {tag.name}
                                   <button
                                     onClick={() => handleRemoveTag(selectedStakeholder.id!, tag.id)}
                                     className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                   >
-                                    <X className="h-3 w-3" />
+                                    <X className="h-3 w-3" style={{ color: getTextColor(generatePastelColor(tag.id)) }} />
                                   </button>
                                 </Badge>
                               ))
@@ -854,37 +881,37 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                           <p>{selectedStakeholder?.datos_contacto?.email || "No especificado"}</p>
                         </CardContent>
                       </Card>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <Phone className="h-5 w-5" />
-                            Teléfono
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p>{selectedStakeholder?.datos_contacto?.telefono || "No especificado"}</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="md:col-span-2">
-                        <CardHeader>
+                      <Card className="md:col-span-2">                        <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Globe className="h-5 w-5" />
-                            Website
+                            Enlaces y Sitios Web
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p>{selectedStakeholder?.datos_contacto?.website || "No especificado"}</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="md:col-span-2">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <Globe className="h-5 w-5" />
-                            Linkedin
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p>{selectedStakeholder?.datos_contacto?.linkedin || "No especificado"}</p>
+                          <div className="space-y-2">
+                            {selectedStakeholder?.datos_contacto?.website && (
+                              <a
+                                href={selectedStakeholder.datos_contacto.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-primary hover:underline"
+                              >
+                                <Globe className="h-4 w-4" />
+                                {selectedStakeholder.datos_contacto.website}
+                              </a>
+                            )}
+                            {selectedStakeholder?.datos_contacto?.linkedin && (
+                              <a
+                                href={selectedStakeholder.datos_contacto.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-primary hover:underline"
+                              >
+                                <Linkedin className="h-4 w-4" />
+                                {selectedStakeholder.datos_contacto.linkedin}
+                              </a>
+                            )}
+                          </div>
                         </CardContent>
                       </Card>
                     </div>

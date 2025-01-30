@@ -13,8 +13,22 @@ import { Tag } from "@/lib/types";
 import { createTag, deleteTag, updateTag } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { X, Edit2, Check, X as Cancel } from "lucide-react";
-import {  DragEndEvent } from '@dnd-kit/core';
+import { DragEndEvent } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
+
+// Función para generar color pastel basado en el ID de la etiqueta
+const generatePastelColor = (id: number) => {
+  // Utilizamos el ID para generar un matiz único
+  const hue = (id * 137.508) % 360; // Número áureo para distribución uniforme
+  // Utilizamos valores altos de luminosidad y saturación baja para colores pastel
+  return `hsl(${hue}, 50%, 87%)`;
+};
+
+// Función para generar color de texto basado en el fondo
+const getTextColor = (backgroundColor: string) => {
+  // Para colores pastel, usamos un texto oscuro para mejor contraste
+  return 'rgb(51, 51, 51)';
+};
 
 interface Props {
   tags: Tag[];
@@ -27,6 +41,9 @@ function DraggableTag({ tag, onEdit, onDelete }: {
   onEdit: () => void; 
   onDelete: () => void;
 }) {
+  const backgroundColor = generatePastelColor(tag.id);
+  const textColor = getTextColor(backgroundColor);
+
   return (
     <div
       draggable
@@ -37,33 +54,38 @@ function DraggableTag({ tag, onEdit, onDelete }: {
     >
       <Badge
         variant="secondary"
-        className="px-3 py-1 flex items-center gap-2 cursor-grab active:cursor-grabbing"
+        className="px-3 py-1 flex items-center gap-2 cursor-grab active:cursor-grabbing hover:opacity-90 transition-opacity"
+        style={{
+          backgroundColor,
+          color: textColor,
+          border: 'none',
+        }}
       >
         {tag.name}
         <div className="flex gap-1">
           <Button
             size="icon"
             variant="ghost"
-            className="h-4 w-4 p-0"
+            className="h-4 w-4 p-0 hover:bg-black/10"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onEdit();
             }}
           >
-            <Edit2 className="h-3 w-3" />
+            <Edit2 className="h-3 w-3" style={{ color: textColor }} />
           </Button>
           <Button
             size="icon"
             variant="ghost"
-            className="h-4 w-4 p-0"
+            className="h-4 w-4 p-0 hover:bg-black/10"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onDelete();
             }}
           >
-            <X className="h-3 w-3" />
+            <X className="h-3 w-3" style={{ color: textColor }} />
           </Button>
         </div>
       </Badge>
