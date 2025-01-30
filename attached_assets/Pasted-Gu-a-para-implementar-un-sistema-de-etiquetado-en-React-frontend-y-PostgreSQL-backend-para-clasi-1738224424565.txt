@@ -1,0 +1,121 @@
+Guía para implementar un sistema de etiquetado en React (frontend) y PostgreSQL (backend) para clasificar y filtrar stakeholders por palabras clave, incluyendo la visualización en pantalla de los stakeholders etiquetados:
+
+1. Objetivo de la mejora
+El objetivo es permitir a los usuarios asignar una o varias etiquetas (tags) a cada stakeholder para:
+
+Clasificar a los stakeholders en base a palabras clave que describan su rol, área de interés o cualquier otra categoría relevante.
+Filtrar la lista de stakeholders según las etiquetas seleccionadas.
+Visualizar de forma clara cuáles etiquetas están asignadas a cada stakeholder en pantalla.
+2. Diseño a nivel de base de datos (PostgreSQL)
+Para gestionar etiquetas, se recomienda usar una relación de muchos a muchos (un stakeholder puede tener varias etiquetas y una etiqueta puede aplicarse a varios stakeholders).
+
+Tabla de Stakeholders: Ya existente, con campos como id, nombre, etc.
+Tabla de Tags: Nueva tabla que contendrá:
+id (clave primaria).
+nombre (campo de texto con el nombre de la etiqueta).
+Tabla intermedia (Stakeholder_Tags): Para vincular cada stakeholder con sus etiquetas:
+stakeholder_id (clave foránea que hace referencia a Stakeholders.id).
+tag_id (clave foránea que hace referencia a Tags.id).
+Estructura básica (en términos descriptivos):
+
+Stakeholders(id, nombre, …)
+Tags(id, nombre)
+Stakeholder_Tags(stakeholder_id, tag_id)
+Esta tabla intermedia es la que permite que un stakeholder tenga múltiples etiquetas y, a su vez, cada etiqueta pueda asignarse a muchos stakeholders.
+
+3. Lógica en el servidor (Node / Express)
+Creación y gestión de etiquetas
+
+Crear una etiqueta: Endpoint (por ejemplo, POST /tags) que reciba el nombre de la etiqueta y la inserte en la tabla Tags.
+Obtener etiquetas: Endpoint (GET /tags) para listar todas las etiquetas almacenadas.
+Editar una etiqueta: Endpoint (PUT /tags/:id) para actualizar el nombre de una etiqueta si se requiere.
+Eliminar una etiqueta: Endpoint (DELETE /tags/:id) para borrar la etiqueta si no se usa o si se necesita limpieza.
+Asignación de etiquetas a los stakeholders
+
+Asociar etiquetas a un stakeholder: Endpoint (POST /stakeholders/:id/tags o PUT /stakeholders/:id/tags) que reciba la lista de etiquetas a asociar y las vincule en la tabla intermedia Stakeholder_Tags.
+Remover etiquetas de un stakeholder: Endpoint (DELETE /stakeholders/:id/tags/:tag_id) para eliminar una asociación específica.
+Filtrado de stakeholders por etiquetas
+
+Al buscar stakeholders (p. ej., GET /stakeholders), se pueden añadir parámetros de filtro para que el servidor devuelva solo aquellos que cumplan con las etiquetas indicadas.
+Se usaría un JOIN con la tabla Stakeholder_Tags y Tags.
+Se pueden definir modos de filtro, como “tiene todas las etiquetas seleccionadas” o “tiene al menos una de las etiquetas seleccionadas”.
+Validaciones y seguridad
+
+Controlar que solo usuarios con permisos (por ejemplo, rol de administrador) puedan crear o eliminar etiquetas, si así se requiere.
+Almacenar los datos de forma coherente, evitando duplicaciones de etiquetas con el mismo nombre si no se desean (normalizar textos, etc.).
+4. Estructura en el cliente (React)
+Interfaz para la gestión de etiquetas
+
+Un formulario o modal para que el usuario (generalmente un administrador) cree, edite o elimine etiquetas.
+Botones o iconos para la confirmación/cancelación de cada operación.
+Asignación de etiquetas a un Stakeholder
+
+En la vista de detalle o edición de un stakeholder, incluir un componente para añadir o quitar etiquetas:
+Puede ser un campo de autocompletado para buscar etiquetas existentes o crear nuevas.
+Representar las etiquetas asignadas como “chips” o “badges” para visualizarlas y permitir su eliminación con un clic (si está permitido).
+Filtrado de la lista de Stakeholders
+
+En la lista principal de stakeholders, añadir un mecanismo (por ejemplo, un filtro lateral o un dropdown) donde se muestren todas las etiquetas disponibles.
+Al seleccionar una o varias etiquetas, se llama al endpoint que filtra los stakeholders correspondientes.
+Opcionalmente, se puede permitir el filtrado por “todas las etiquetas” o “al menos una de estas etiquetas”.
+Control de estado y comunicación con la API
+
+Usar métodos como useState/useEffect, React Query o Redux para almacenar y actualizar la lista de etiquetas y los stakeholders filtrados.
+Cuando el usuario asigne o retire una etiqueta, se envía la información al servidor para actualizar la tabla intermedia.
+5. Flujo de trabajo propuesto
+Diseño y creación del esquema en PostgreSQL
+
+Añadir la tabla Tags y la tabla intermedia Stakeholder_Tags con las claves foráneas adecuadas.
+Configurar índices para mejorar el rendimiento en las consultas (especialmente si se esperan muchos stakeholders).
+Implementación de la lógica en el servidor
+
+Crear los endpoints para el CRUD de etiquetas.
+Crear los endpoints para asignar/desasignar etiquetas a stakeholders.
+Incorporar la funcionalidad de filtrado por etiquetas en la obtención de stakeholders (GET /stakeholders).
+Adaptación del frontend en React
+
+Implementar un módulo de gestión de etiquetas y la integración en la ficha de cada stakeholder.
+Añadir un componente de filtrado por etiquetas en la vista general de stakeholders.
+Pruebas y validaciones
+
+Verificar que la asociación de etiquetas se refleje correctamente en la base de datos.
+Probar la búsqueda y filtrado con diferentes combinaciones de etiquetas.
+Comprobar el comportamiento con roles de usuario (quién puede crear o borrar etiquetas).
+Despliegue
+
+Tras las pruebas, desplegar en el entorno de producción.
+Documentar el proceso de asignación y uso de etiquetas para los usuarios finales.
+6. Consideraciones adicionales
+Normalización de etiquetas: Decidir si se admitirán mayúsculas y minúsculas, acentos, espacios, etc. Para evitar duplicados, se puede almacenar internamente en un formato estandar (minúsculas, sin tildes) y mostrar una versión amigable en pantalla.
+Número máximo de etiquetas: Es posible establecer límites para evitar una proliferación excesiva de tags.
+Seguridad: Determinar si solo ciertos roles pueden crear/eliminar etiquetas o si cualquier usuario puede sugerir nuevas.
+Rendimiento: Con un gran volumen de datos, se recomienda optimizar los índices y las consultas.
+Evolución futura: En un paso siguiente, se pueden añadir funcionalidades como análisis de etiquetas, estadísticas o sugerencias automatizadas de tags basadas en palabras clave.
+7. Visualización de los stakeholders etiquetados en pantalla
+Para mostrar los stakeholders etiquetados de forma clara e intuitiva:
+
+Lista o tabla de stakeholders
+
+En la vista principal (p. ej. una tabla), cada fila corresponde a un stakeholder.
+Añadir una columna o sección denominada “Etiquetas” o “Tags”.
+Uso de “chips” o “badges”
+
+Cada etiqueta asignada se representa como un pequeño chip o badge (un recuadro con bordes redondeados y fondo de color).
+Ejemplo: si un stakeholder “Juan Pérez” tiene las etiquetas “Marketing” y “Cliente VIP”, en la columna “Etiquetas” se mostrarían dos chips:
+Marketing
+Cliente VIP
+Interacción con las etiquetas
+
+Si se permite editar, al pasar el cursor sobre la etiqueta se podría mostrar una “x” para eliminarla.
+También podría haber un botón “+ Agregar etiqueta” debajo o al lado de los chips para invocar un cuadro de búsqueda de etiquetas disponibles o la creación de una nueva.
+Filtrado visual
+
+Si el usuario selecciona una etiqueta en la interfaz de filtrado, la lista se reduce para mostrar solo los stakeholders que tengan esa etiqueta (u otras condiciones de filtrado definidas).
+Diseño consistente
+
+Mantener una paleta de colores homogénea.
+En caso de muchas etiquetas diferentes, se pueden usar colores distintivos para cada etiqueta o un color neutro para todas.
+Con este enfoque, no solo se cuenta con la funcionalidad de etiquetado para fines de filtrado y clasificación, sino también con una presentación clara de las etiquetas asociadas a cada stakeholder en la interfaz de usuario.
+
+Conclusión
+La implementación de un sistema de etiquetado, combinado con la capacidad de filtrar y visualizar fácilmente dichas etiquetas, proporciona una forma poderosa de organizar a los stakeholders. Mediante la creación de tablas específicas para etiquetas y su relación con los stakeholders, la adaptación de los endpoints en el servidor y una interfaz intuitiva en React, se obtiene una solución versátil y eficaz para el manejo de la información.
