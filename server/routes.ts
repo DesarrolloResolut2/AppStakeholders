@@ -58,7 +58,7 @@ export function registerRoutes(app: Express): Server {
       res.status(201).json(result[0]);
     } catch (error) {
       console.error("Error detallado:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Error al crear provincia",
         details: error instanceof Error ? error.message : String(error)
       });
@@ -86,7 +86,7 @@ export function registerRoutes(app: Express): Server {
       res.json(result[0]);
     } catch (error) {
       console.error("Error detallado:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Error al crear stakeholder",
         details: error instanceof Error ? error.message : String(error)
       });
@@ -126,7 +126,7 @@ export function registerRoutes(app: Express): Server {
       res.json({ success: true });
     } catch (error) {
       console.error("Error al eliminar provincia:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Error al eliminar provincia",
         details: error instanceof Error ? error.message : String(error)
       });
@@ -221,26 +221,34 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/stakeholders/:id/tags", requireAuth, async (req, res) => {
     try {
       const stakeholderId = parseInt(req.params.id);
-      const { tagIds } = req.body;
+      const { tagId } = req.body;
 
-      if (!Array.isArray(tagIds)) {
-        return res.status(400).json({ error: "tagIds debe ser un array" });
+      if (!tagId) {
+        return res.status(400).json({ error: "Se requiere el ID de la etiqueta" });
       }
 
-      // Eliminar asignaciones existentes
-      await db.delete(stakeholderTags)
-        .where(eq(stakeholderTags.stakeholder_id, stakeholderId));
+      // Verificar si la etiqueta ya está asignada
+      const existingTag = await db
+        .select()
+        .from(stakeholderTags)
+        .where(
+          and(
+            eq(stakeholderTags.stakeholder_id, stakeholderId),
+            eq(stakeholderTags.tag_id, tagId)
+          )
+        )
+        .limit(1);
 
-      // Crear nuevas asignaciones
-      if (tagIds.length > 0) {
-        await db.insert(stakeholderTags)
-          .values(tagIds.map(tagId => ({
-            stakeholder_id: stakeholderId,
-            tag_id: tagId
-          })));
+      if (existingTag.length === 0) {
+        // Si la etiqueta no está asignada, la asignamos
+        await db.insert(stakeholderTags).values({
+          stakeholder_id: stakeholderId,
+          tag_id: tagId,
+        });
       }
 
-      const result = await db.query.stakeholders.findFirst({
+      // Obtener el stakeholder actualizado con sus etiquetas
+      const updatedStakeholder = await db.query.stakeholders.findFirst({
         where: eq(stakeholders.id, stakeholderId),
         with: {
           tags: {
@@ -251,9 +259,10 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
-      res.json(result);
+      res.json(updatedStakeholder);
     } catch (error) {
-      res.status(500).json({ error: "Error al asignar tags" });
+      console.error("Error al asignar etiqueta:", error);
+      res.status(500).json({ error: "Error al asignar etiqueta al stakeholder" });
     }
   });
 

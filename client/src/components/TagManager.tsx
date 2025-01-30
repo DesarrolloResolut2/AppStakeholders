@@ -13,18 +13,80 @@ import { Tag } from "@/lib/types";
 import { createTag, deleteTag, updateTag } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { X, Edit2, Check, X as Cancel } from "lucide-react";
+import { DndContext, DragEndEvent, useSensor, useSensors, PointerSensor } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Props {
   tags: Tag[];
   onTagsChange: () => void;
+  onDragEnd?: (tagId: number) => void;
 }
 
-export function TagManager({ tags, onTagsChange }: Props) {
-  const [newTagName, setNewTagName] = useState("");
-  const [editingTag, setEditingTag] = useState<{ id: number; name: string } | null>(
-    null
+function DraggableTag({ tag, onEdit, onDelete }: { 
+  tag: Tag; 
+  onEdit: () => void; 
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: tag.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    cursor: 'grab',
+  };
+
+  return (
+    <Badge
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      key={tag.id}
+      variant="secondary"
+      className="px-3 py-1 flex items-center gap-2"
+    >
+      {tag.name}
+      <div className="flex gap-1">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-4 w-4 p-0"
+          onClick={onEdit}
+        >
+          <Edit2 className="h-3 w-3" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-4 w-4 p-0"
+          onClick={onDelete}
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    </Badge>
   );
+}
+
+export function TagManager({ tags, onTagsChange, onDragEnd }: Props) {
+  const [newTagName, setNewTagName] = useState("");
+  const [editingTag, setEditingTag] = useState<{ id: number; name: string } | null>(null);
   const { toast } = useToast();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   const handleCreateTag = async () => {
     if (!newTagName.trim()) return;
@@ -81,12 +143,18 @@ export function TagManager({ tags, onTagsChange }: Props) {
     }
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    if (event.active && onDragEnd) {
+      onDragEnd(Number(event.active.id));
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Gestión de Etiquetas</CardTitle>
         <CardDescription>
-          Crea y gestiona etiquetas para clasificar stakeholders
+          Crea y gestiona etiquetas para clasificar stakeholders. Arrastra las etiquetas hacia los stakeholders para asignarlas.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -105,66 +173,49 @@ export function TagManager({ tags, onTagsChange }: Props) {
             />
             <Button onClick={handleCreateTag}>Crear Etiqueta</Button>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag) =>
-              editingTag?.id === tag.id ? (
-                <div key={tag.id} className="flex items-center gap-2">
-                  <Input
-                    value={editingTag.name}
-                    onChange={(e) =>
-                      setEditingTag({ ...editingTag, name: e.target.value })
-                    }
-                    className="w-[150px]"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleUpdateTag();
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) =>
+                editingTag?.id === tag.id ? (
+                  <div key={tag.id} className="flex items-center gap-2">
+                    <Input
+                      value={editingTag.name}
+                      onChange={(e) =>
+                        setEditingTag({ ...editingTag, name: e.target.value })
                       }
-                    }}
-                  />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={handleUpdateTag}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setEditingTag(null)}
-                  >
-                    <Cancel className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <Badge
-                  key={tag.id}
-                  variant="secondary"
-                  className="px-3 py-1 flex items-center gap-2"
-                >
-                  {tag.name}
-                  <div className="flex gap-1">
+                      className="w-[150px]"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleUpdateTag();
+                        }
+                      }}
+                    />
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-4 w-4 p-0"
-                      onClick={() => setEditingTag({ id: tag.id, name: tag.name })}
+                      onClick={handleUpdateTag}
                     >
-                      <Edit2 className="h-3 w-3" />
+                      <Check className="h-4 w-4" />
                     </Button>
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-4 w-4 p-0"
-                      onClick={() => handleDeleteTag(tag.id)}
+                      onClick={() => setEditingTag(null)}
                     >
-                      <X className="h-3 w-3" />
+                      <Cancel className="h-4 w-4" />
                     </Button>
                   </div>
-                </Badge>
-              )
-            )}
-          </div>
+                ) : (
+                  <DraggableTag
+                    key={tag.id}
+                    tag={tag}
+                    onEdit={() => setEditingTag({ id: tag.id, name: tag.name })}
+                    onDelete={() => handleDeleteTag(tag.id)}
+                  />
+                )
+              )}
+            </div>
+          </DndContext>
         </div>
       </CardContent>
     </Card>
