@@ -24,9 +24,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Stakeholder } from "@/lib/types";
 import { User, Phone, Book, Linkedin } from 'lucide-react'
-import { MultiSelect } from "@/components/ui/multi-select";
-import { useQuery } from "@tanstack/react-query";
-import { fetchTags } from "@/lib/api";
 
 const stakeholderSchema = z.object({
   nombre: z.string().optional(),
@@ -54,13 +51,6 @@ const stakeholderSchema = z.object({
     formacion: z.string().optional(),
     otros_campos: z.string().optional(),
   }).optional(),
-  tags: z.array(z.object({
-    tag_id: z.number(),
-    tag: z.object({
-      id: z.number(),
-      name: z.string()
-    })
-  })).optional()
 }).partial();
 
 interface Props {
@@ -97,8 +87,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
         experiencia: stakeholder?.datos_especificos_linkedin?.experiencia || '',
         formacion: stakeholder?.datos_especificos_linkedin?.formacion || '',
         otros_campos: stakeholder?.datos_especificos_linkedin?.otros_campos || '',
-      },
-      tags: stakeholder?.tags || []
+      }
     },
   });
 
@@ -106,17 +95,9 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
     const formattedValues = {
       ...values,
       provincia_id: provinciaId,
-      tags: values.tags?.map(tag => ({
-        tag_id: tag.tag.id
-      }))
     };
     onSubmit(formattedValues as Omit<Stakeholder, "id">);
   };
-
-  const { data: tags = [] } = useQuery({
-    queryKey: ["tags"],
-    queryFn: fetchTags,
-  });
 
   return (
     <Form {...form}>
@@ -216,29 +197,6 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                             <Textarea
                               {...field}
                               placeholder="Describir los objetivos principales del stakeholder..."
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="tags"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Etiquetas</FormLabel>
-                          <FormControl>
-                            <MultiSelect
-                              selected={field.value?.map(t => t.tag.id) || []}
-                              options={tags.map(tag => ({
-                                value: tag.id,
-                                label: tag.name
-                              }))}
-                              onChange={(values) => {
-                                field.onChange(values.map(v => ({ tag: { id: v, name: tags.find(t => t.id === v)?.name || '' }, tag_id: v })));
-                              }}
-                              placeholder="Seleccionar etiquetas..."
                             />
                           </FormControl>
                           <FormMessage />
