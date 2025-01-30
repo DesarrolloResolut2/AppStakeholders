@@ -262,6 +262,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedStakeholders, setSelectedStakeholders] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
+  const [searchType, setSearchType] = useState<"organization" | "tags">("organization");
 
   const { data: provincias = [], isLoading } = useQuery({
     queryKey: ["/provincias"],
@@ -313,18 +314,32 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   const filteredStakeholders = provincia?.stakeholders?.filter(
     (stakeholder) => {
       const searchTermLower = searchTerm.toLowerCase();
-      const organizacionPrincipal = stakeholder.datos_contacto?.organizacion_principal?.toLowerCase() || '';
-      const otrasOrganizaciones = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase() || '';
 
-      const matchesSearch =
-        organizacionPrincipal.includes(searchTermLower) ||
-        otrasOrganizaciones.includes(searchTermLower);
+      if (searchType === "organization") {
+        const organizacionPrincipal = stakeholder.datos_contacto?.organizacion_principal?.toLowerCase() || '';
+        const otrasOrganizaciones = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase() || '';
 
-      const matchesInfluence =
-        filterInfluence === "all" ||
-        stakeholder.nivel_influencia === filterInfluence;
+        const matchesSearch =
+          organizacionPrincipal.includes(searchTermLower) ||
+          otrasOrganizaciones.includes(searchTermLower);
 
-      return matchesSearch && matchesInfluence;
+        const matchesInfluence =
+          filterInfluence === "all" ||
+          stakeholder.nivel_influencia === filterInfluence;
+
+        return matchesSearch && matchesInfluence;
+      } else {
+        // Búsqueda por etiquetas
+        const hasMatchingTag = stakeholder.tags?.some(
+          ({ tag }) => tag.name.toLowerCase().includes(searchTermLower)
+        );
+
+        const matchesInfluence =
+          filterInfluence === "all" ||
+          stakeholder.nivel_influencia === filterInfluence;
+
+        return hasMatchingTag && matchesInfluence;
+      }
     },
   );
 
@@ -584,16 +599,30 @@ export function ProvinceView({ params }: { params: { id: string } }) {
           <Card className="mb-8">
             <CardContent className="p-4">
               <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-grow relative">
-                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-muted-foreground" />
+                <div className="flex-grow relative flex gap-2">
+                  <Select
+                    value={searchType}
+                    onValueChange={(value: "organization" | "tags") => setSearchType(value)}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Tipo de búsqueda" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="organization">Organizaciones</SelectItem>
+                      <SelectItem value="tags">Etiquetas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="flex-grow relative">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <Input
+                      placeholder={`Buscar por ${searchType === "organization" ? "organización" : "etiquetas"}...`}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 w-full"
+                    />
                   </div>
-                  <Input
-                    placeholder="Buscar por organización..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-full"
-                  />
                 </div>
                 <Select
                   value={filterInfluence}
