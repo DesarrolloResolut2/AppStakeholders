@@ -119,7 +119,7 @@ function StakeholderCard({
     <Card
       ref={setNodeRef}
       className={`hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md ${
-        isOver ? 'ring-2 ring-primary' : ''
+        isOver ? 'ring-2 ring-primary bg-blue-100 dark:bg-blue-900/50' : ''
       }`}
     >
       <CardContent className="p-4">
