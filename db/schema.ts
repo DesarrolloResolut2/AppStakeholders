@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, jsonb, primaryKey } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
@@ -44,14 +44,50 @@ export const stakeholders = pgTable("stakeholders", {
   }>(),
 });
 
+// Nueva tabla de tags
+export const tags = pgTable("tags", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+});
+
+// Nueva tabla de relación muchos a muchos entre stakeholders y tags
+export const stakeholderTags = pgTable("stakeholder_tags", {
+  stakeholder_id: integer("stakeholder_id")
+    .references(() => stakeholders.id, { onDelete: "cascade" })
+    .notNull(),
+  tag_id: integer("tag_id")
+    .references(() => tags.id, { onDelete: "cascade" })
+    .notNull(),
+}, (table) => {
+  return {
+    pk: primaryKey(table.stakeholder_id, table.tag_id),
+  }
+});
+
 export const provinciasRelations = relations(provincias, ({ many }) => ({
   stakeholders: many(stakeholders),
 }));
 
-export const stakeholdersRelations = relations(stakeholders, ({ one }) => ({
+export const stakeholdersRelations = relations(stakeholders, ({ one, many }) => ({
   provincia: one(provincias, {
     fields: [stakeholders.provincia_id],
     references: [provincias.id],
+  }),
+  tags: many(stakeholderTags),
+}));
+
+export const tagsRelations = relations(tags, ({ many }) => ({
+  stakeholders: many(stakeholderTags),
+}));
+
+export const stakeholderTagsRelations = relations(stakeholderTags, ({ one }) => ({
+  stakeholder: one(stakeholders, {
+    fields: [stakeholderTags.stakeholder_id],
+    references: [stakeholders.id],
+  }),
+  tag: one(tags, {
+    fields: [stakeholderTags.tag_id],
+    references: [tags.id],
   }),
 }));
 
@@ -63,3 +99,10 @@ export const selectStakeholderSchema = createSelectSchema(stakeholders);
 
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
+
+// Schemas para tags
+export const insertTagSchema = createInsertSchema(tags);
+export const selectTagSchema = createSelectSchema(tags);
+
+export const insertStakeholderTagSchema = createInsertSchema(stakeholderTags);
+export const selectStakeholderTagSchema = createSelectSchema(stakeholderTags);

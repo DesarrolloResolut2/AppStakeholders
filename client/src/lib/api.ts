@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Provincia, Stakeholder } from "./types";
+import type { Provincia, Stakeholder, Tag } from "./types";
 
 const api = axios.create({
   baseURL: "/api",
@@ -66,4 +66,35 @@ export const exportStakeholderContactData = async (stakeholder: Stakeholder) => 
 
 export const deleteProvincia = async (id: number) => {
   await api.delete(`/provincias/${id}`);
+};
+
+// Nuevas funciones para manejar tags
+export const fetchTags = async () => {
+  const { data } = await api.get<Tag[]>("/tags");
+  return data;
+};
+
+export const createTag = async (name: string) => {
+  const { data } = await api.post<Tag>("/tags", { name });
+  return data;
+};
+
+export const updateTag = async (id: number, name: string) => {
+  const { data } = await api.put<Tag>(`/tags/${id}`, { name });
+  return data;
+};
+
+export const deleteTag = async (id: number) => {
+  await api.delete(`/tags/${id}`);
+};
+
+export const assignTagsToStakeholder = async (stakeholderId: number, tagIds: number[]) => {
+  const { data } = await api.post<Stakeholder>(`/stakeholders/${stakeholderId}/tags`, { tagIds });
+  return data;
+};
+
+export const fetchStakeholdersWithTags = async (tagIds?: number[]) => {
+  const params = tagIds?.length ? { tags: tagIds } : undefined;
+  const { data } = await api.get<Stakeholder[]>("/stakeholders", { params });
+  return data;
 };

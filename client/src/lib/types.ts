@@ -4,6 +4,11 @@ export interface Provincia {
   stakeholders?: Stakeholder[];
 }
 
+export interface Tag {
+  id: number;
+  name: string;
+}
+
 export interface Stakeholder {
   id?: number;
   provincia_id: number;
@@ -32,6 +37,7 @@ export interface Stakeholder {
     formacion?: string;
     otros_campos?: string;
   };
+  tags?: { tag: Tag }[];
 }
 
 export interface User {

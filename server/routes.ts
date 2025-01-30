@@ -1,8 +1,8 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { db } from "../db";
-import { provincias, stakeholders } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { provincias, stakeholders, tags, stakeholderTags } from "../db/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import { setupAuth } from "./auth";
 
 export function registerRoutes(app: Express): Server {
@@ -137,6 +137,160 @@ export function registerRoutes(app: Express): Server {
       res.json(provincia);
     } catch (error) {
       res.status(500).json({ error: "Error al exportar datos" });
+    }
+  });
+
+  // Nuevas rutas para tags
+  app.get("/api/tags", requireAuth, async (_req, res) => {
+    try {
+      const result = await db.query.tags.findMany();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Error al obtener tags" });
+    }
+  });
+
+  app.post("/api/tags", requireAuth, async (req, res) => {
+    try {
+      const { name } = req.body;
+      if (!name || typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ error: "El nombre del tag es requerido" });
+      }
+
+      const result = await db.insert(tags)
+        .values({ name: name.trim() })
+        .returning();
+
+      res.status(201).json(result[0]);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('unique constraint')) {
+        res.status(400).json({ error: "Ya existe un tag con ese nombre" });
+      } else {
+        res.status(500).json({ error: "Error al crear tag" });
+      }
+    }
+  });
+
+  app.put("/api/tags/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name } = req.body;
+
+      if (!name || typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ error: "El nombre del tag es requerido" });
+      }
+
+      const result = await db.update(tags)
+        .set({ name: name.trim() })
+        .where(eq(tags.id, id))
+        .returning();
+
+      if (result.length === 0) {
+        return res.status(404).json({ error: "Tag no encontrado" });
+      }
+
+      res.json(result[0]);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('unique constraint')) {
+        res.status(400).json({ error: "Ya existe un tag con ese nombre" });
+      } else {
+        res.status(500).json({ error: "Error al actualizar tag" });
+      }
+    }
+  });
+
+  app.delete("/api/tags/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(tags).where(eq(tags.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Error al eliminar tag" });
+    }
+  });
+
+  // Rutas para asignar/desasignar tags a stakeholders
+  app.post("/api/stakeholders/:id/tags", requireAuth, async (req, res) => {
+    try {
+      const stakeholderId = parseInt(req.params.id);
+      const { tagIds } = req.body;
+
+      if (!Array.isArray(tagIds)) {
+        return res.status(400).json({ error: "tagIds debe ser un array" });
+      }
+
+      // Eliminar asignaciones existentes
+      await db.delete(stakeholderTags)
+        .where(eq(stakeholderTags.stakeholder_id, stakeholderId));
+
+      // Crear nuevas asignaciones
+      if (tagIds.length > 0) {
+        await db.insert(stakeholderTags)
+          .values(tagIds.map(tagId => ({
+            stakeholder_id: stakeholderId,
+            tag_id: tagId
+          })));
+      }
+
+      const result = await db.query.stakeholders.findFirst({
+        where: eq(stakeholders.id, stakeholderId),
+        with: {
+          tags: {
+            with: {
+              tag: true
+            }
+          }
+        }
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Error al asignar tags" });
+    }
+  });
+
+  // Obtener stakeholders con filtro por tags
+  app.get("/api/stakeholders", requireAuth, async (req, res) => {
+    try {
+      const { tags: tagIds } = req.query;
+      let result;
+
+      if (tagIds && Array.isArray(tagIds)) {
+        const parsedTagIds = tagIds.map(id => parseInt(id as string));
+
+        // Obtener stakeholders que tienen todos los tags especificados
+        const stakeholderIds = await db
+          .select({ stakeholderId: stakeholderTags.stakeholder_id })
+          .from(stakeholderTags)
+          .where(inArray(stakeholderTags.tag_id, parsedTagIds))
+          .groupBy(stakeholderTags.stakeholder_id)
+          .having({ count: sql`count(*)`.eq(parsedTagIds.length) });
+
+        result = await db.query.stakeholders.findMany({
+          where: inArray(stakeholders.id, stakeholderIds.map(s => s.stakeholderId)),
+          with: {
+            tags: {
+              with: {
+                tag: true
+              }
+            }
+          }
+        });
+      } else {
+        result = await db.query.stakeholders.findMany({
+          with: {
+            tags: {
+              with: {
+                tag: true
+              }
+            }
+          }
+        });
+      }
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Error al obtener stakeholders" });
     }
   });
 
