@@ -22,7 +22,15 @@ export function registerRoutes(app: Express): Server {
     try {
       const result = await db.query.provincias.findMany({
         with: {
-          stakeholders: true,
+          stakeholders: {
+            with: {
+              tags: {
+                with: {
+                  tag: true
+                }
+              }
+            }
+          },
         },
       });
       res.json(result);

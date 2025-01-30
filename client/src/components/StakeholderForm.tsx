@@ -54,7 +54,13 @@ const stakeholderSchema = z.object({
     formacion: z.string().optional(),
     otros_campos: z.string().optional(),
   }).optional(),
-  tags: z.array(z.object({ tag: z.object({id: z.number(), name: z.string()})})).optional()
+  tags: z.array(z.object({
+    tag_id: z.number(),
+    tag: z.object({
+      id: z.number(),
+      name: z.string()
+    })
+  })).optional()
 }).partial();
 
 interface Props {
@@ -97,10 +103,14 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
   });
 
   const handleSubmit = (values: z.infer<typeof stakeholderSchema>) => {
-    onSubmit({
+    const formattedValues = {
       ...values,
       provincia_id: provinciaId,
-    } as Omit<Stakeholder, "id">);
+      tags: values.tags?.map(tag => ({
+        tag_id: tag.tag.id
+      }))
+    };
+    onSubmit(formattedValues as Omit<Stakeholder, "id">);
   };
 
   const { data: tags = [] } = useQuery({
@@ -226,7 +236,7 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                                 label: tag.name
                               }))}
                               onChange={(values) => {
-                                field.onChange(values.map(v => ({ tag: { id: v, name: tags.find(t => t.id === v)?.name || '' } })));
+                                field.onChange(values.map(v => ({ tag: { id: v, name: tags.find(t => t.id === v)?.name || '' }, tag_id: v })));
                               }}
                               placeholder="Seleccionar etiquetas..."
                             />
@@ -365,8 +375,6 @@ export function StakeholderForm({ provinciaId, stakeholder, onSubmit }: Props) {
                     <CardTitle>Información Detallada</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-
-
                     <FormField
                       control={form.control}
                       name="intereses_expectativas"
