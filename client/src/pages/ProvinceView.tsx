@@ -416,6 +416,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
         'Persona de Contacto': s.datos_contacto?.persona_contacto || '',
         'Website': s.datos_contacto?.website || '',
         'LinkedIn': s.datos_contacto?.linkedin || '',
+        'Etiquetas': s.tags?.map(({tag}) => tag.name).join(', ') || '',
         'Recursos': s.recursos || '',
         'Relaciones': s.relaciones || '',
         'Riesgos y Conflictos': s.riesgos_conflictos || '',
