@@ -388,16 +388,20 @@ export function ProvinceView({ params }: { params: { id: string } }) {
 
   const handleTagDrop = async (tagId: number, stakeholderId: number) => {
     try {
+      console.log('Intentando asignar tag:', { tagId, stakeholderId });
+
       const response = await fetch(`/api/stakeholders/${stakeholderId}/tags`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tag_id: tagId }),
+        body: JSON.stringify({ tagId }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Error al asignar etiqueta');
+        throw new Error(data.error || 'Error al asignar etiqueta');
       }
 
       queryClient.invalidateQueries({ queryKey: ["/provincias"] });
@@ -406,10 +410,10 @@ export function ProvinceView({ params }: { params: { id: string } }) {
         description: "Etiqueta asignada correctamente",
       });
     } catch (error) {
-      console.error('Error al asignar etiqueta:', error);
+      console.error('Error detallado al asignar etiqueta:', error);
       toast({
         title: "Error",
-        description: "No se pudo asignar la etiqueta",
+        description: error instanceof Error ? error.message : "No se pudo asignar la etiqueta",
         variant: "destructive",
       });
     }

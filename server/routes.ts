@@ -4,6 +4,7 @@ import { db } from "../db";
 import { provincias, stakeholders, tags, stakeholderTags } from "../db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { setupAuth } from "./auth";
+import { sql } from "drizzle-orm";
 
 export function registerRoutes(app: Express): Server {
   // Configurar autenticación antes de las rutas
