@@ -87,10 +87,152 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TagManager } from "@/components/TagManager";
-import { useToast } from "@/hooks/use-toast"; // Changed from toast import
+import { useToast } from "@/hooks/use-toast";
+
+interface StakeholderCardProps {
+  stakeholder: Stakeholder;
+  isSelected: boolean;
+  onSelect: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onExport: () => void;
+  onView: () => void;
+}
+
+function StakeholderCard({
+  stakeholder,
+  isSelected,
+  onSelect,
+  onEdit,
+  onDelete,
+  onExport,
+  onView
+}: StakeholderCardProps) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `droppable-${stakeholder.id}`,
+    data: {
+      stakeholderId: stakeholder.id,
+    },
+  });
+
+  return (
+    <Card
+      ref={setNodeRef}
+      className={`hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md ${
+        isOver ? 'ring-2 ring-primary' : ''
+      }`}
+    >
+      <CardContent className="p-4">
+        <div className="grid grid-cols-7 gap-4 items-center">
+          <div className="flex items-center">
+            <Checkbox
+              id={`select-${stakeholder.id}`}
+              checked={isSelected}
+              onCheckedChange={onSelect}
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${stakeholder.nombre}`} />
+              <AvatarFallback>{stakeholder.nombre?.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium">{stakeholder.nombre}</p>
+              <p className="text-sm text-muted-foreground">
+                {stakeholder.datos_contacto?.organizacion_principal || "No especificada"}
+              </p>
+            </div>
+          </div>
+          <div>
+            <Badge
+              variant={
+                stakeholder.nivel_influencia === "Alto"
+                  ? "default"
+                  : stakeholder.nivel_influencia === "Medio"
+                    ? "secondary"
+                    : "outline"
+              }
+            >
+              {stakeholder.nivel_influencia}
+            </Badge>
+          </div>
+          <div>
+            <Badge
+              variant={
+                stakeholder.nivel_interes === "Alto"
+                  ? "default"
+                  : stakeholder.nivel_interes === "Medio"
+                    ? "secondary"
+                    : "outline"
+              }
+            >
+              {stakeholder.nivel_interes}
+            </Badge>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {stakeholder.tags && stakeholder.tags.length > 0 ? (
+              stakeholder.tags.map(({ tag }) => (
+                <Badge key={tag.id} variant="outline" className="text-xs">
+                  {tag.name}
+                </Badge>
+              ))
+            ) : (
+              <span className="text-sm text-muted-foreground">Sin etiquetas</span>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm">{stakeholder.datos_contacto?.email || "No especificado"}</span>
+            <span className="text-sm">{stakeholder.datos_contacto?.telefono || "No especificado"}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={onView}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    Ver Más
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Ver detalles</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onEdit}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onExport}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Exportar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onDelete}>
+                  <Trash className="mr-2 h-4 w-4" />
+                  Eliminar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export function ProvinceView({ params }: { params: { id: string } }) {
-  const { toast } = useToast(); // Added useToast hook
+  const { toast } = useToast();
   const provinciaId = parseInt(params.id);
   const [selectedStakeholder, setSelectedStakeholder] = useState<Stakeholder | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -113,7 +255,6 @@ export function ProvinceView({ params }: { params: { id: string } }) {
     queryKey: ["/tags"],
     queryFn: fetchTags,
   });
-
 
   const handleCreateStakeholder = async (data: Omit<Stakeholder, "id">) => {
     await createStakeholder(data);
@@ -152,9 +293,9 @@ export function ProvinceView({ params }: { params: { id: string } }) {
 
   const filteredStakeholders = provincia?.stakeholders?.filter(
     (stakeholder) => {
+      const searchTermLower = searchTerm.toLowerCase();
       const organizacionPrincipal = stakeholder.datos_contacto?.organizacion_principal?.toLowerCase() || '';
       const otrasOrganizaciones = stakeholder.datos_contacto?.otras_organizaciones?.toLowerCase() || '';
-      const searchTermLower = searchTerm.toLowerCase();
 
       const matchesSearch =
         organizacionPrincipal.includes(searchTermLower) ||
@@ -169,8 +310,10 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   );
 
   const sortedStakeholders = filteredStakeholders?.sort((a, b) => {
-    if (a[sortField] < b[sortField]) return sortDirection === "asc" ? -1 : 1;
-    if (a[sortField] > b[sortField]) return sortDirection === "asc" ? 1 : -1;
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
 
@@ -235,20 +378,6 @@ export function ProvinceView({ params }: { params: { id: string } }) {
     XLSX.writeFile(wb, `stakeholders_${provincia.nombre}_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setDrawerOpen(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, []);
-
   const handleTagDrop = async (tagId: number, stakeholderId: number) => {
     try {
       const response = await fetch(`/api/stakeholders/${stakeholderId}/tags`, {
@@ -289,6 +418,20 @@ export function ProvinceView({ params }: { params: { id: string } }) {
       }
     }
   }
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setDrawerOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   if (isLoading || tagsLoading) {
     return (
@@ -383,9 +526,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
           <TagManager
             tags={tags}
             onTagsChange={() => queryClient.invalidateQueries({ queryKey: ["/tags"] })}
-            onDragEnd={(tagId, stakeholderId) => {
-              if(stakeholderId) handleTagDrop(tagId, stakeholderId)
-            }}
+            onDragEnd={handleDragEnd}
           />
 
           <Card className="mb-8">
@@ -445,130 +586,21 @@ export function ProvinceView({ params }: { params: { id: string } }) {
               <div>Contacto</div>
               <div>Acciones</div>
             </div>
-            {sortedStakeholders?.map((stakeholder) => {
-              const { isOver, setNodeRef } = useDroppable({
-                id: `droppable-${stakeholder.id}`,
-                data: {
-                  stakeholderId: stakeholder.id,
-                },
-              });
-              return (
-                <Card
-                  key={stakeholder.id}
-                  ref={setNodeRef}
-                  className={`hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md ${
-                    isOver ? 'ring-2 ring-primary' : ''
-                  }`}
-                >
-                  <CardContent className="p-4">
-                    <div className="grid grid-cols-7 gap-4 items-center">
-                      <div className="flex items-center">
-                        <Checkbox
-                          id={`select-${stakeholder.id}`}
-                          checked={selectedStakeholders.has(stakeholder.id!)}
-                          onCheckedChange={() => handleSelectStakeholder(stakeholder.id!)}
-                        />
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${stakeholder.nombre}`} />
-                          <AvatarFallback>{stakeholder.nombre?.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{stakeholder.nombre}</p>
-                          <p className="text-sm text-muted-foreground">{stakeholder.datos_contacto?.organizacion_principal || "No especificada"}</p>
-                        </div>
-                      </div>
-                      <div>
-                        <Badge
-                          variant={
-                            stakeholder.nivel_influencia === "Alto"
-                              ? "default"
-                              : stakeholder.nivel_influencia === "Medio"
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {stakeholder.nivel_influencia}
-                        </Badge>
-                      </div>
-                      <div>
-                        <Badge
-                          variant={
-                            stakeholder.nivel_interes === "Alto"
-                              ? "default"
-                              : stakeholder.nivel_interes === "Medio"
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {stakeholder.nivel_interes}
-                        </Badge>
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {stakeholder.tags && stakeholder.tags.length > 0 ? (
-                          stakeholder.tags.map(({ tag }) => (
-                            <Badge key={tag.id} variant="outline" className="text-xs">
-                              {tag.name}
-                            </Badge>
-                          ))
-                        ) : (
-                          <span className="text-sm text-muted-foreground">Sin etiquetas</span>
-                        )}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm">{stakeholder.datos_contacto?.email || "No especificado"}</span>
-                        <span className="text-sm">{stakeholder.datos_contacto?.telefono || "No especificado"}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => openStakeholderDrawer(stakeholder)}
-                                className="bg-blue-500 hover:bg-blue-600 text-white"
-                              >
-                                Ver Más
-                                <ChevronRight className="ml-2 h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Ver detalles</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => {
-                              setSelectedStakeholder(stakeholder);
-                              setDialogOpen(true);
-                            }}>
-                              <Pencil className="mr-2 h-4 w-4" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {handleExportStakeholder(stakeholder)}}>
-                              <Download className="mr-2 h-4 w-4" />
-                              Exportar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}>
-                              <Trash className="mr-2 h-4 w-4" />
-                              Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {sortedStakeholders?.map((stakeholder) => (
+              <StakeholderCard
+                key={stakeholder.id}
+                stakeholder={stakeholder}
+                isSelected={selectedStakeholders.has(stakeholder.id!)}
+                onSelect={() => handleSelectStakeholder(stakeholder.id!)}
+                onEdit={() => {
+                  setSelectedStakeholder(stakeholder);
+                  setDialogOpen(true);
+                }}
+                onDelete={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}
+                onExport={() => handleExportStakeholder(stakeholder)}
+                onView={() => openStakeholderDrawer(stakeholder)}
+              />
+            ))}
           </div>
 
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -581,7 +613,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                   <div className="flex items-center space-x-4">
                     <Avatar className="h-16 w-16">
                       <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${selectedStakeholder?.nombre}`} />
-                      <AvatarFallback>{selectedStakeholder?.nombre.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{selectedStakeholder?.nombre?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
                       <SheetTitle className="text-3xl font-bold text-white">
