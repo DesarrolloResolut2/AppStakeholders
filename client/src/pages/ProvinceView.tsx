@@ -432,12 +432,15 @@ export function ProvinceView({ params }: { params: { id: string } }) {
 
   const handleRemoveTag = async (stakeholderId: number, tagId: number) => {
     try {
+      console.log('Intentando eliminar tag:', { stakeholderId, tagId });
+
       const response = await fetch(`/api/stakeholders/${stakeholderId}/tags/${tagId}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) {
-        throw new Error('Error al eliminar la etiqueta');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al eliminar la etiqueta');
       }
 
       queryClient.invalidateQueries({ queryKey: ["/provincias"] });
@@ -446,7 +449,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
         description: "Etiqueta eliminada correctamente",
       });
     } catch (error) {
-      console.error('Error al eliminar etiqueta:', error);
+      console.error('Error detallado al eliminar etiqueta:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "No se pudo eliminar la etiqueta",
@@ -891,7 +894,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                         </CardHeader>
                         <CardContent>
                           <p>{selectedStakeholder?.expectativas_comunicacion || "No especificadas"}</p>
-                                                </CardContent>
+                        </CardContent>
                       </Card>
                     </div>
                   </TabsContent>
