@@ -312,6 +312,31 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Rutas para asignar/desasignar tags a stakeholders
+  app.delete("/api/stakeholders/:stakeholderId/tags/:tagId", requireAuth, async (req, res) => {
+    try {
+      const stakeholderId = parseInt(req.params.stakeholderId);
+      const tagId = parseInt(req.params.tagId);
+
+      console.log('Eliminando tag:', { stakeholderId, tagId });
+
+      // Eliminar la relación entre el stakeholder y el tag
+      await db.delete(stakeholderTags)
+        .where(
+          and(
+            eq(stakeholderTags.stakeholder_id, stakeholderId),
+            eq(stakeholderTags.tag_id, tagId)
+          )
+        );
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error al eliminar etiqueta:", error);
+      res.status(500).json({ error: "Error al eliminar etiqueta del stakeholder" });
+    }
+  });
+
+
   const httpServer = createServer(app);
   return httpServer;
 }
