@@ -697,6 +697,29 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                           </div>
                         </CardContent>
                       </Card>
+
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Target className="h-5 w-5" />
+                            Etiquetas
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedStakeholder?.tags && selectedStakeholder.tags.length > 0 ? (
+                              selectedStakeholder.tags.map(({ tag }) => (
+                                <Badge key={tag.id} variant="outline">
+                                  {tag.name}
+                                </Badge>
+                              ))
+                            ) : (
+                              <p className="text-muted-foreground">Sin etiquetas</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+
                       <Card>
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
