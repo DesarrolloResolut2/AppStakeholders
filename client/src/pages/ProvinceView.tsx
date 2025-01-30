@@ -20,6 +20,7 @@ import {
   exportProvinciaData,
   fetchProvincias,
   exportStakeholderContactData,
+  fetchTags // Assuming this function exists in "@/lib/api"
 } from "@/lib/api";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -84,6 +85,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TagManager } from "@/components/TagManager";
+
 
 export function ProvinceView({ params }: { params: { id: string } }) {
   const provinciaId = parseInt(params.id);
@@ -103,6 +106,12 @@ export function ProvinceView({ params }: { params: { id: string } }) {
   });
 
   const provincia = provincias.find((p) => p.id === provinciaId);
+
+  const { data: tags = [], isLoading: tagsLoading } = useQuery({
+    queryKey: ["/tags"],
+    queryFn: fetchTags,
+  });
+
 
   const handleCreateStakeholder = async (data: Omit<Stakeholder, "id">) => {
     await createStakeholder(data);
@@ -238,7 +247,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
     };
   }, []);
 
-  if (isLoading) {
+  if (isLoading || tagsLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         Cargando...
@@ -327,6 +336,8 @@ export function ProvinceView({ params }: { params: { id: string } }) {
           </div>
         </div>
 
+        <TagManager tags={tags} onTagsChange={() => queryClient.invalidateQueries({ queryKey: ["/tags"] })} />
+
         <Card className="mb-8">
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
@@ -362,7 +373,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
         <div className="space-y-2">
           <div className="grid grid-cols-6 gap-4 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-semibold">
             <div className="flex items-center">
-              <Checkbox 
+              <Checkbox
                 id="select-all"
                 checked={sortedStakeholders?.length === selectedStakeholders.size}
                 onCheckedChange={handleSelectAll}
@@ -433,6 +444,15 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                   <div className="flex flex-col">
                     <span className="text-sm">{stakeholder.datos_contacto?.email || "No especificado"}</span>
                     <span className="text-sm">{stakeholder.datos_contacto?.telefono || "No especificado"}</span>
+                    {stakeholder.tags && stakeholder.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {stakeholder.tags.map(({ tag }) => (
+                          <Badge key={tag.id} variant="outline" className="text-xs">
+                            {tag.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center space-x-2">
                     <TooltipProvider>

@@ -6,7 +6,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tag } from "@/lib/types";
 import { createTag, deleteTag, updateTag } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -83,6 +85,9 @@ export function TagManager({ tags, onTagsChange }: Props) {
     <Card>
       <CardHeader>
         <CardTitle>Gestión de Etiquetas</CardTitle>
+        <CardDescription>
+          Crea y gestiona etiquetas para clasificar stakeholders
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -92,10 +97,15 @@ export function TagManager({ tags, onTagsChange }: Props) {
               onChange={(e) => setNewTagName(e.target.value)}
               placeholder="Nueva etiqueta..."
               className="flex-1"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleCreateTag();
+                }
+              }}
             />
-            <Button onClick={handleCreateTag}>Crear</Button>
+            <Button onClick={handleCreateTag}>Crear Etiqueta</Button>
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
             {tags.map((tag) =>
               editingTag?.id === tag.id ? (
                 <div key={tag.id} className="flex items-center gap-2">
@@ -104,7 +114,12 @@ export function TagManager({ tags, onTagsChange }: Props) {
                     onChange={(e) =>
                       setEditingTag({ ...editingTag, name: e.target.value })
                     }
-                    className="flex-1"
+                    className="w-[150px]"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleUpdateTag();
+                      }
+                    }}
                   />
                   <Button
                     size="icon"
@@ -122,28 +137,31 @@ export function TagManager({ tags, onTagsChange }: Props) {
                   </Button>
                 </div>
               ) : (
-                <div
+                <Badge
                   key={tag.id}
-                  className="flex items-center justify-between bg-secondary/20 p-2 rounded"
+                  variant="secondary"
+                  className="px-3 py-1 flex items-center gap-2"
                 >
-                  <span>{tag.name}</span>
-                  <div className="flex gap-2">
+                  {tag.name}
+                  <div className="flex gap-1">
                     <Button
                       size="icon"
                       variant="ghost"
+                      className="h-4 w-4 p-0"
                       onClick={() => setEditingTag({ id: tag.id, name: tag.name })}
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <Edit2 className="h-3 w-3" />
                     </Button>
                     <Button
                       size="icon"
                       variant="ghost"
+                      className="h-4 w-4 p-0"
                       onClick={() => handleDeleteTag(tag.id)}
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3" />
                     </Button>
                   </div>
-                </div>
+                </Badge>
               )
             )}
           </div>
