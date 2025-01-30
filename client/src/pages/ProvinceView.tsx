@@ -98,6 +98,7 @@ interface StakeholderCardProps {
   onExport: () => void;
   onView: () => void;
   onTagDrop: (tagId: number, stakeholderId: number) => void;
+  onRemoveTag: (stakeholderId: number, tagId: number) => void;
 }
 
 function StakeholderCard({
@@ -108,7 +109,8 @@ function StakeholderCard({
   onDelete,
   onExport,
   onView,
-  onTagDrop
+  onTagDrop,
+  onRemoveTag
 }: StakeholderCardProps) {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -180,8 +182,17 @@ function StakeholderCard({
           <div className="flex flex-wrap gap-1">
             {stakeholder.tags && stakeholder.tags.length > 0 ? (
               stakeholder.tags.map(({ tag }) => (
-                <Badge key={tag.id} variant="outline" className="text-xs">
+                <Badge key={tag.id} variant="outline" className="text-xs group relative">
                   {tag.name}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (stakeholder.id) onRemoveTag(stakeholder.id, tag.id);
+                    }}
+                    className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </Badge>
               ))
             ) : (
@@ -419,6 +430,31 @@ export function ProvinceView({ params }: { params: { id: string } }) {
     }
   };
 
+  const handleRemoveTag = async (stakeholderId: number, tagId: number) => {
+    try {
+      const response = await fetch(`/api/stakeholders/${stakeholderId}/tags/${tagId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar la etiqueta');
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["/provincias"] });
+      toast({
+        title: "Éxito",
+        description: "Etiqueta eliminada correctamente",
+      });
+    } catch (error) {
+      console.error('Error al eliminar etiqueta:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "No se pudo eliminar la etiqueta",
+        variant: "destructive",
+      });
+    }
+  };
+
   function handleDragEnd(event: any) {
     const { active, over } = event;
 
@@ -613,6 +649,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                 onExport={() => handleExportStakeholder(stakeholder)}
                 onView={() => openStakeholderDrawer(stakeholder)}
                 onTagDrop={handleTagDrop}
+                onRemoveTag={handleRemoveTag}
               />
             ))}
           </div>
@@ -709,8 +746,14 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                           <div className="flex flex-wrap gap-2">
                             {selectedStakeholder?.tags && selectedStakeholder.tags.length > 0 ? (
                               selectedStakeholder.tags.map(({ tag }) => (
-                                <Badge key={tag.id} variant="outline">
+                                <Badge key={tag.id} variant="outline" className="group relative">
                                   {tag.name}
+                                  <button
+                                    onClick={() => handleRemoveTag(selectedStakeholder.id!, tag.id)}
+                                    className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
                                 </Badge>
                               ))
                             ) : (
@@ -848,7 +891,7 @@ export function ProvinceView({ params }: { params: { id: string } }) {
                         </CardHeader>
                         <CardContent>
                           <p>{selectedStakeholder?.expectativas_comunicacion || "No especificadas"}</p>
-                        </CardContent>
+                                                </CardContent>
                       </Card>
                     </div>
                   </TabsContent>
