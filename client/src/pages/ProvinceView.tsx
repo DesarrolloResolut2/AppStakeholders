@@ -371,139 +371,142 @@ export function ProvinceView({ params }: { params: { id: string } }) {
         </Card>
 
         <div className="space-y-2">
-          <div className="grid grid-cols-6 gap-4 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-semibold">
-            <div className="flex items-center">
-              <Checkbox
-                id="select-all"
-                checked={sortedStakeholders?.length === selectedStakeholders.size}
-                onCheckedChange={handleSelectAll}
-              />
+            <div className="grid grid-cols-7 gap-4 px-4 py-2 bg-gray-100 dark:bg-gray-800 font-semibold">
+              <div className="flex items-center">
+                <Checkbox
+                  id="select-all"
+                  checked={sortedStakeholders?.length === selectedStakeholders.size}
+                  onCheckedChange={handleSelectAll}
+                />
+              </div>
+              <div className="flex items-center cursor-pointer" onClick={() => toggleSort("nombre")}>
+                Nombre
+                {sortField === "nombre" && (sortDirection === "asc" ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+              </div>
+              <div className="flex items-center cursor-pointer" onClick={() => toggleSort("nivel_influencia")}>
+                Influencia
+                {sortField === "nivel_influencia" && (sortDirection === "asc" ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+              </div>
+              <div className="flex items-center cursor-pointer" onClick={() => toggleSort("nivel_interes")}>
+                Interés
+                {sortField === "nivel_interes" && (sortDirection === "asc" ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
+              </div>
+              <div>Etiquetas</div>
+              <div>Contacto</div>
+              <div>Acciones</div>
             </div>
-            <div className="flex items-center cursor-pointer" onClick={() => toggleSort("nombre")}>
-              Nombre
-              {sortField === "nombre" && (sortDirection === "asc" ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-            </div>
-            <div className="flex items-center cursor-pointer" onClick={() => toggleSort("nivel_influencia")}>
-              Influencia
-              {sortField === "nivel_influencia" && (sortDirection === "asc" ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-            </div>
-            <div className="flex items-center cursor-pointer" onClick={() => toggleSort("nivel_interes")}>
-              Interés
-              {sortField === "nivel_interes" && (sortDirection === "asc" ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />)}
-            </div>
-            <div>Contacto</div>
-            <div>Acciones</div>
-          </div>
-          {sortedStakeholders?.map((stakeholder) => (
-            <Card key={stakeholder.id} className="hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md">
-              <CardContent className="p-4">
-                <div className="grid grid-cols-6 gap-4 items-center">
-                  <div className="flex items-center">
-                    <Checkbox
-                      id={`select-${stakeholder.id}`}
-                      checked={selectedStakeholders.has(stakeholder.id!)}
-                      onCheckedChange={() => handleSelectStakeholder(stakeholder.id!)}
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${stakeholder.nombre}`} />
-                      <AvatarFallback>{stakeholder.nombre.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{stakeholder.nombre}</p>
-                      <p className="text-sm text-muted-foreground">{stakeholder.datos_contacto?.organizacion_principal || "No especificada"}</p>
+            {sortedStakeholders?.map((stakeholder) => (
+              <Card key={stakeholder.id} className="hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-200 hover:shadow-md">
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-7 gap-4 items-center">
+                    <div className="flex items-center">
+                      <Checkbox
+                        id={`select-${stakeholder.id}`}
+                        checked={selectedStakeholders.has(stakeholder.id!)}
+                        onCheckedChange={() => handleSelectStakeholder(stakeholder.id!)}
+                      />
                     </div>
-                  </div>
-                  <div>
-                    <Badge
-                      variant={
-                        stakeholder.nivel_influencia === "Alto"
-                          ? "default"
-                          : stakeholder.nivel_influencia === "Medio"
-                            ? "secondary"
-                            : "outline"
-                      }
-                    >
-                      {stakeholder.nivel_influencia}
-                    </Badge>
-                  </div>
-                  <div>
-                    <Badge
-                      variant={
-                        stakeholder.nivel_interes === "Alto"
-                          ? "default"
-                          : stakeholder.nivel_interes === "Medio"
-                            ? "secondary"
-                            : "outline"
-                      }
-                    >
-                      {stakeholder.nivel_interes}
-                    </Badge>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm">{stakeholder.datos_contacto?.email || "No especificado"}</span>
-                    <span className="text-sm">{stakeholder.datos_contacto?.telefono || "No especificado"}</span>
-                    {stakeholder.tags && stakeholder.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {stakeholder.tags.map(({ tag }) => (
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${stakeholder.nombre}`} />
+                        <AvatarFallback>{stakeholder.nombre?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{stakeholder.nombre}</p>
+                        <p className="text-sm text-muted-foreground">{stakeholder.datos_contacto?.organizacion_principal || "No especificada"}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <Badge
+                        variant={
+                          stakeholder.nivel_influencia === "Alto"
+                            ? "default"
+                            : stakeholder.nivel_influencia === "Medio"
+                              ? "secondary"
+                              : "outline"
+                        }
+                      >
+                        {stakeholder.nivel_influencia}
+                      </Badge>
+                    </div>
+                    <div>
+                      <Badge
+                        variant={
+                          stakeholder.nivel_interes === "Alto"
+                            ? "default"
+                            : stakeholder.nivel_interes === "Medio"
+                              ? "secondary"
+                              : "outline"
+                        }
+                      >
+                        {stakeholder.nivel_interes}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {stakeholder.tags && stakeholder.tags.length > 0 ? (
+                        stakeholder.tags.map(({ tag }) => (
                           <Badge key={tag.id} variant="outline" className="text-xs">
                             {tag.name}
                           </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => openStakeholderDrawer(stakeholder)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white"
-                          >
-                            Ver Más
-                            <ChevronRight className="ml-2 h-4 w-4" />
+                        ))
+                      ) : (
+                        <span className="text-sm text-muted-foreground">Sin etiquetas</span>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm">{stakeholder.datos_contacto?.email || "No especificado"}</span>
+                      <span className="text-sm">{stakeholder.datos_contacto?.telefono || "No especificado"}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => openStakeholderDrawer(stakeholder)}
+                              className="bg-blue-500 hover:bg-blue-600 text-white"
+                            >
+                              Ver Más
+                              <ChevronRight className="ml-2 h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver detalles</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <MoreVertical className="h-4 w-4" />
                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Ver detalles</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => {
-                          setSelectedStakeholder(stakeholder);
-                          setDialogOpen(true);
-                        }}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleExportStakeholder(stakeholder)}>
-                          <Download className="mr-2 h-4 w-4" />
-                          Exportar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}>
-                          <Trash className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => {
+                            setSelectedStakeholder(stakeholder);
+                            setDialogOpen(true);
+                          }}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleExportStakeholder(stakeholder)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Exportar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => stakeholder.id && handleDeleteStakeholder(stakeholder.id)}>
+                            <Trash className="mr-2 h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <SheetContent
             side="right"
